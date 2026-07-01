@@ -1,45 +1,434 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Utility Website</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="css/style.css">
+<title>Utility Website</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+
+--primary:#ff007f;
+--secondary:#00f0ff;
+--tertiary:#9d4edd;
+
+--background:#0d0714;
+
+--surface:rgba(26,12,38,.72);
+
+--surface2:rgba(37,18,54,.6);
+
+--text:#f4f4ff;
+
+--text2:#b8b8d0;
+
+--outline:rgba(0,240,255,.18);
+
+--radius:22px;
+
+--transition:.25s cubic-bezier(.4,0,.2,1);
+
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+
+font-family:Outfit,sans-serif;
+
+color:var(--text);
+
+background:
+radial-gradient(at 0% 0%,rgba(255,0,127,.18) 0px,transparent 50%),
+radial-gradient(at 100% 0%,rgba(0,240,255,.12) 0px,transparent 45%),
+linear-gradient(#0d0714,#140a20);
+
+width:100vw;
+height:100vh;
+
+overflow:hidden;
+
+display:flex;
+
+}
+
+.sidebar{
+
+width:260px;
+
+padding:25px;
+
+background:rgba(18,10,30,.72);
+
+backdrop-filter:blur(18px);
+
+border-right:1px solid rgba(255,255,255,.05);
+
+display:flex;
+
+flex-direction:column;
+
+}
+
+.logo{
+
+font-size:28px;
+
+font-weight:700;
+
+margin-bottom:40px;
+
+background:linear-gradient(90deg,#ff007f,#00f0ff);
+
+-webkit-background-clip:text;
+
+-webkit-text-fill-color:transparent;
+
+}
+
+.nav{
+
+display:flex;
+
+flex-direction:column;
+
+gap:8px;
+
+}
+
+.nav button{
+
+height:48px;
+
+background:none;
+
+border:none;
+
+color:var(--text2);
+
+border-radius:14px;
+
+cursor:pointer;
+
+transition:.25s;
+
+font-size:15px;
+
+}
+
+.nav button:hover{
+
+background:rgba(255,255,255,.05);
+
+color:white;
+
+}
+
+.nav .active{
+
+background:linear-gradient(90deg,#ff007f,#7c3aed);
+
+color:white;
+
+}
+
+.main{
+
+flex:1;
+
+padding:40px;
+
+overflow:auto;
+
+}
+
+.topbar{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:40px;
+
+}
+
+.search{
+
+width:500px;
+
+height:54px;
+
+background:rgba(255,255,255,.05);
+
+border:1px solid rgba(255,255,255,.05);
+
+border-radius:999px;
+
+padding:0 20px;
+
+color:white;
+
+outline:none;
+
+transition:.25s;
+
+backdrop-filter:blur(12px);
+
+}
+
+.search:focus{
+
+border-color:#00f0ff;
+
+box-shadow:0 0 30px rgba(0,240,255,.15);
+
+}
+
+.profile{
+
+width:48px;
+
+height:48px;
+
+border-radius:50%;
+
+background:linear-gradient(135deg,#ff007f,#00f0ff);
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+font-weight:bold;
+
+}
+
+.title{
+
+font-size:42px;
+
+font-weight:700;
+
+margin-bottom:10px;
+
+}
+
+.subtitle{
+
+color:var(--text2);
+
+margin-bottom:35px;
+
+}
+
+.cards{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+
+gap:25px;
+
+}
+
+.card{
+
+background:var(--surface);
+
+border:1px solid rgba(255,255,255,.05);
+
+backdrop-filter:blur(20px);
+
+border-radius:22px;
+
+overflow:hidden;
+
+transition:.3s;
+
+cursor:pointer;
+
+}
+
+.card:hover{
+
+transform:translateY(-8px);
+
+border-color:#00f0ff;
+
+box-shadow:
+
+0 25px 60px rgba(255,0,127,.15),
+
+0 0 40px rgba(0,240,255,.12);
+
+}
+
+.card img{
+
+width:100%;
+
+height:180px;
+
+object-fit:cover;
+
+}
+
+.content{
+
+padding:22px;
+
+}
+
+.content h2{
+
+margin-bottom:10px;
+
+}
+
+.content p{
+
+color:var(--text2);
+
+margin-bottom:18px;
+
+}
+
+.content button{
+
+width:100%;
+
+height:45px;
+
+border:none;
+
+border-radius:14px;
+
+background:linear-gradient(90deg,#ff007f,#7c3aed);
+
+color:white;
+
+font-size:15px;
+
+cursor:pointer;
+
+}
+
+#popup{
+
+position:fixed;
+
+inset:0;
+
+display:none;
+
+justify-content:center;
+
+align-items:center;
+
+background:rgba(0,0,0,.55);
+
+backdrop-filter:blur(12px);
+
+}
+
+.popup{
+
+width:92%;
+
+height:90%;
+
+background:#130a1f;
+
+border-radius:24px;
+
+overflow:hidden;
+
+border:1px solid rgba(255,255,255,.05);
+
+display:flex;
+
+flex-direction:column;
+
+}
+
+.popupHeader{
+
+height:65px;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:0 25px;
+
+background:rgba(255,255,255,.04);
+
+}
+
+.popupHeader button{
+
+background:none;
+
+border:none;
+
+font-size:22px;
+
+color:white;
+
+cursor:pointer;
+
+}
+
+iframe{
+
+flex:1;
+
+border:none;
+
+background:white;
+
+}
+
+</style>
+
 </head>
+
 <body>
 
 <div class="sidebar">
 
-    <h2><i class="fa-solid fa-toolbox"></i> Utility</h2>
+<div class="logo">Utility</div>
 
-    <button class="active">
-        <i class="fa-solid fa-house"></i>
-        Dashboard
-    </button>
+<div class="nav">
 
-    <button>
-        <i class="fa-solid fa-star"></i>
-        Favoriten
-    </button>
+<button class="active">🏠 Dashboard</button>
 
-    <button>
-        <i class="fa-solid fa-folder"></i>
-        Alle Tools
-    </button>
+<button>⭐ Favoriten</button>
 
-    <hr>
+<button>🛠 Alle Tools</button>
 
-    <h3>Kategorien</h3>
+<button>💻 Developer</button>
 
-    <button><i class="fa-solid fa-code"></i> Developer</button>
-    <button><i class="fa-solid fa-image"></i> Image</button>
-    <button><i class="fa-solid fa-wand-magic-sparkles"></i> AI</button>
-    <button><i class="fa-solid fa-globe"></i> Network</button>
+<button>🖼 Image</button>
+
+<button>🌍 Network</button>
+
+<button>⚙ Einstellungen</button>
+
+</div>
 
 </div>
 
@@ -47,26 +436,35 @@
 
 <div class="topbar">
 
-<input type="text" placeholder="🔍 Tool suchen...">
+<input class="search" placeholder="🔍 Search utility...">
 
-<div class="profile">
-    🌙
-</div>
+<div class="profile">V</div>
 
 </div>
 
-<h1>Utility Tools</h1>
+<div class="title">
+
+All your Utility Tools
+
+</div>
+
+<div class="subtitle">
+
+Fast • Beautiful • Modern
+
+</div>
 
 <div class="cards">
 
 <div class="card" onclick="openTool('tools/calculator/index.html')">
 
-<img src="https://picsum.photos/400/220?1">
+<img src="https://picsum.photos/500/300?1">
 
 <div class="content">
+
 <h2>Calculator</h2>
 
-<p>Schneller Taschenrechner.</p>
+<p>Ein schneller Taschenrechner.</p>
 
 <button>Öffnen</button>
 
@@ -76,12 +474,13 @@
 
 <div class="card">
 
-<img src="https://picsum.photos/400/220?2">
+<img src="https://picsum.photos/500/300?2">
 
 <div class="content">
+
 <h2>Password Generator</h2>
 
-<p>Sichere Passwörter erstellen.</p>
+<p>Sichere Passwörter erzeugen.</p>
 
 <button>Öffnen</button>
 
@@ -91,12 +490,13 @@
 
 <div class="card">
 
-<img src="https://picsum.photos/400/220?3">
+<img src="https://picsum.photos/500/300?3">
 
 <div class="content">
-<h2>Image Converter</h2>
 
-<p>Bilder umwandeln.</p>
+<h2>QR Generator</h2>
+
+<p>QR-Codes in Sekunden erstellen.</p>
 
 <button>Öffnen</button>
 
@@ -114,9 +514,9 @@
 
 <div class="popupHeader">
 
-<h2>Tool</h2>
+<h2>Utility Tool</h2>
 
-<button onclick="closeTool()">✖</button>
+<button onclick="closeTool()">✕</button>
 
 </div>
 
@@ -126,7 +526,28 @@
 
 </div>
 
-<script src="js/script.js"></script>
+<script>
+
+const popup=document.getElementById("popup");
+const frame=document.getElementById("toolFrame");
+
+function openTool(path){
+
+frame.src=path;
+
+popup.style.display="flex";
+
+}
+
+function closeTool(){
+
+frame.src="";
+
+popup.style.display="none";
+
+}
+
+</script>
 
 </body>
 </html>
