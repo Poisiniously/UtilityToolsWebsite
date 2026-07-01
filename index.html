@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Utility Tools</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Utility Tools</h1>
+
+<div class="tools">
+
+  <div class="tool-card" onclick="openTool('tools/calculator/index.html')">
+    <img src="tools/calculator/preview.png">
+    <h3>Calculator</h3>
+    <p>Ein einfacher Rechner</p>
+  </div>
+
+  <div class="tool-card" onclick="openTool('tools/password-generator/index.html')">
+    <img src="tools/password-generator/preview.png">
+    <h3>Password Generator</h3>
+    <p>Erstelle sichere Passwörter</p>
+  </div>
+
+</div>
+
+<!-- Popup -->
+<div id="popup" class="hidden">
+  <div class="popup-content">
+    <span onclick="closeTool()">✖</span>
+    <iframe id="toolFrame"></iframe>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
