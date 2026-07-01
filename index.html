@@ -1,40 +1,132 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Utility Tools</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utility Website</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body>
 
+<div class="sidebar">
+
+    <h2><i class="fa-solid fa-toolbox"></i> Utility</h2>
+
+    <button class="active">
+        <i class="fa-solid fa-house"></i>
+        Dashboard
+    </button>
+
+    <button>
+        <i class="fa-solid fa-star"></i>
+        Favoriten
+    </button>
+
+    <button>
+        <i class="fa-solid fa-folder"></i>
+        Alle Tools
+    </button>
+
+    <hr>
+
+    <h3>Kategorien</h3>
+
+    <button><i class="fa-solid fa-code"></i> Developer</button>
+    <button><i class="fa-solid fa-image"></i> Image</button>
+    <button><i class="fa-solid fa-wand-magic-sparkles"></i> AI</button>
+    <button><i class="fa-solid fa-globe"></i> Network</button>
+
+</div>
+
+<div class="main">
+
+<div class="topbar">
+
+<input type="text" placeholder="🔍 Tool suchen...">
+
+<div class="profile">
+    🌙
+</div>
+
+</div>
+
 <h1>Utility Tools</h1>
 
-<div class="tools">
+<div class="cards">
 
-  <div class="tool-card" onclick="openTool('tools/calculator/index.html')">
-    <img src="tools/calculator/preview.png">
-    <div class="content">
-        <h3>Calculator</h3>
-        <p>Schneller Taschenrechner für einfache Berechnungen.</p>
-    </div>
-</div>
+<div class="card" onclick="openTool('tools/calculator/index.html')">
 
-  <div class="tool-card" onclick="openTool('tools/password-generator/index.html')">
-    <img src="tools/password-generator/preview.png">
-    <h3>Password Generator</h3>
-    <p>Erstelle sichere Passwörter</p>
-  </div>
+<img src="https://picsum.photos/400/220?1">
+
+<div class="content">
+<h2>Calculator</h2>
+
+<p>Schneller Taschenrechner.</p>
+
+<button>Öffnen</button>
 
 </div>
 
-<!-- Popup -->
-<div id="popup" class="hidden">
-  <div class="popup-content">
-    <span onclick="closeTool()">✖</span>
-    <iframe id="toolFrame"></iframe>
-  </div>
 </div>
 
-<script src="script.js"></script>
+<div class="card">
+
+<img src="https://picsum.photos/400/220?2">
+
+<div class="content">
+<h2>Password Generator</h2>
+
+<p>Sichere Passwörter erstellen.</p>
+
+<button>Öffnen</button>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<img src="https://picsum.photos/400/220?3">
+
+<div class="content">
+<h2>Image Converter</h2>
+
+<p>Bilder umwandeln.</p>
+
+<button>Öffnen</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div id="popup">
+
+<div class="popup">
+
+<div class="popupHeader">
+
+<h2>Tool</h2>
+
+<button onclick="closeTool()">✖</button>
+
+</div>
+
+<iframe id="toolFrame"></iframe>
+
+</div>
+
+</div>
+
+<script src="js/script.js"></script>
+
 </body>
 </html>
