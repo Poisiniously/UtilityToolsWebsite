@@ -1,215 +1,217 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Utility Hub</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Utility Hub</title>
 
-  <style>
-    :root {
-      --bg: #0d0714;
-      --primary: #ff007f;
-      --secondary: #00f0ff;
-      --text: #e0e0ff;
-      --glass: rgba(255,255,255,0.05);
-    }
+<style>
+:root {
+  --bg: #0d0714;
+  --primary: #ff007f;
+  --secondary: #00f0ff;
+  --text: #e0e0ff;
+  --glass: rgba(255,255,255,0.05);
+}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
 
-    body {
-      background:
-        radial-gradient(at 0% 0%, #ff007f33, transparent 50%),
-        radial-gradient(at 100% 0%, #00f0ff22, transparent 40%),
-        var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 30px;
-    }
+body {
+  background:
+    radial-gradient(at 0% 0%, #ff007f33, transparent 50%),
+    radial-gradient(at 100% 0%, #00f0ff22, transparent 40%),
+    var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 30px;
+}
 
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: var(--primary);
-    }
+/* TITLE */
+h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: var(--primary);
+}
 
-    /* SEARCH */
-    .search {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 30px;
-    }
+/* SEARCH */
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
 
-    .search input {
-      width: 300px;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid var(--secondary);
-      background: var(--glass);
-      color: white;
-      outline: none;
-    }
+.search-input {
+  width: 300px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--secondary);
+  background: var(--glass);
+  color: white;
+  outline: none;
+}
 
-    /* GRID */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
-    }
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
 
-    /* CARD */
-    .card {
-      background: var(--glass);
-      border-radius: 15px;
-      padding: 15px;
-      backdrop-filter: blur(10px);
-      border: 1px solid #ffffff11;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+/* CARD */
+.card {
+  background: var(--glass);
+  border-radius: 15px;
+  padding: 15px;
+  backdrop-filter: blur(12px);
+  border: 1px solid #ffffff11;
+  cursor: pointer;
+  transition: 0.3s;
+}
 
-    .card:hover {
-      transform: translateY(-5px) scale(1.02);
-      box-shadow: 0 0 20px #ff007f55;
-    }
+.card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 0 20px #ff007f55;
+}
 
-    .img {
-      height: 120px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, #ff007f, #00f0ff);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: black;
-      font-weight: bold;
-    }
+/* PLACEHOLDER IMAGE */
+.card-image {
+  height: 120px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: black;
+}
 
-    .title {
-      font-size: 18px;
-      margin-bottom: 5px;
-    }
+/* TEXT */
+.card-title {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
 
-    .desc {
-      font-size: 14px;
-      opacity: 0.7;
-    }
+.card-desc {
+  font-size: 14px;
+  opacity: 0.7;
+}
 
-    /* POPUP */
-    .popup {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.8);
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
+/* POPUP */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  background: rgba(0,0,0,0.85);
+  justify-content: center;
+  align-items: center;
+}
 
-    .popup iframe {
-      width: 80%;
-      height: 80%;
-      border: none;
-      border-radius: 15px;
-      background: white;
-    }
+.popup iframe {
+  width: 80%;
+  height: 80%;
+  border: none;
+  border-radius: 12px;
+  background: white;
+}
 
-    .close {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      font-size: 30px;
-      cursor: pointer;
-      color: white;
-    }
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 28px;
+  cursor: pointer;
+}
 
-    .no-results {
-      text-align: center;
-      margin-top: 20px;
-      opacity: 0.6;
-      display: none;
-    }
-
-  </style>
+/* NO RESULTS */
+.no-results {
+  text-align: center;
+  margin-top: 20px;
+  display: none;
+  opacity: 0.6;
+}
+</style>
 </head>
 
 <body>
 
 <h1>Utility Hub</h1>
 
-<div class="search">
-  <input type="text" id="search" placeholder="Search tools...">
+<div class="search-container">
+  <input id="searchInput" class="search-input" placeholder="Search tools...">
 </div>
 
-<div class="grid" id="grid">
+<div id="grid" class="grid">
 
   <div class="card" data-name="calculator" onclick="openTool('tools/calculator/index.html')">
-    <div class="img">CALC</div>
-    <div class="title">Calculator</div>
-    <div class="desc">Simple math calculator</div>
+    <div class="card-image">CALC</div>
+    <div class="card-title">Calculator</div>
+    <div class="card-desc">Simple math calculator</div>
   </div>
 
   <div class="card" data-name="converter" onclick="openTool('tools/converter/index.html')">
-    <div class="img">CONV</div>
-    <div class="title">Converter</div>
-    <div class="desc">Convert units easily</div>
+    <div class="card-image">CONV</div>
+    <div class="card-title">Converter</div>
+    <div class="card-desc">Convert units easily</div>
   </div>
 
   <div class="card" data-name="timer" onclick="openTool('tools/timer/index.html')">
-    <div class="img">TIME</div>
-    <div class="title">Timer</div>
-    <div class="desc">Countdown timer tool</div>
+    <div class="card-image">TIME</div>
+    <div class="card-title">Timer</div>
+    <div class="card-desc">Countdown timer</div>
   </div>
 
 </div>
 
-<div class="no-results" id="noResults">Keine Tools gefunden</div>
+<div id="noResults" class="no-results">No tools found</div>
 
 <!-- POPUP -->
-<div class="popup" id="popup">
-  <div class="close" onclick="closeTool()">✖</div>
-  <iframe id="frame"></iframe>
+<div id="popup" class="popup">
+  <div class="close-btn" onclick="closeTool()">✖</div>
+  <iframe id="toolFrame"></iframe>
 </div>
 
 <script>
-  const search = document.getElementById("search");
-  const cards = document.querySelectorAll(".card");
-  const noResults = document.getElementById("noResults");
+const searchInput = document.getElementById("searchInput");
+const cards = document.querySelectorAll(".card");
+const noResults = document.getElementById("noResults");
 
-  search.addEventListener("input", () => {
-    const value = search.value.toLowerCase();
-    let visible = 0;
+searchInput.addEventListener("input", () => {
+  const query = searchInput.value.toLowerCase();
+  let visible = 0;
 
-    cards.forEach(card => {
-      const name = card.dataset.name;
-      if (name.includes(value)) {
-        card.style.display = "block";
-        visible++;
-      } else {
-        card.style.display = "none";
-      }
-    });
+  cards.forEach(card => {
+    const name = card.dataset.name;
 
-    noResults.style.display = visible === 0 ? "block" : "none";
+    if (name.includes(query)) {
+      card.style.display = "block";
+      visible++;
+    } else {
+      card.style.display = "none";
+    }
   });
 
-  function openTool(path) {
-    document.getElementById("popup").style.display = "flex";
-    document.getElementById("frame").src = path;
-  }
+  noResults.style.display = visible === 0 ? "block" : "none";
+});
 
-  function closeTool() {
-    document.getElementById("popup").style.display = "none";
-    document.getElementById("frame").src = "";
-  }
+function openTool(path) {
+  document.getElementById("popup").style.display = "flex";
+  document.getElementById("toolFrame").src = path;
+}
+
+function closeTool() {
+  document.getElementById("popup").style.display = "none";
+  document.getElementById("toolFrame").src = "";
+}
 </script>
 
 </body>
-</html>
 </html>
