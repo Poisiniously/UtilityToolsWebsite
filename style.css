@@ -119,23 +119,33 @@ cursor:pointer;
 }
 
 #popup{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.75);
-backdrop-filter:blur(10px);
-display:none;
-justify-content:center;
-align-items:center;
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(5, 5, 10, 0.92);
+    backdrop-filter: blur(20px);
+
+    z-index: 9999;
 }
 
 .popup{
-width:90%;
-height:90%;
-background:#121826;
-border-radius:20px;
-overflow:hidden;
-display:flex;
-flex-direction:column;
+    width: min(1400px, 92vw);
+    height: min(850px, 90vh);
+
+    background: #0d0714;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 24px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 25px 80px rgba(0,0,0,.6),
+        0 0 40px rgba(255,0,127,.15);
+
+    animation: popupOpen .3s ease;
 }
 
 .popupHeader{
@@ -147,16 +157,25 @@ padding:0 25px;
 background:#1b2232;
 }
 
-.popupHeader button{
-background:none;
-border:none;
-color:white;
-font-size:22px;
-cursor:pointer;
+.popupHeader{
+    height:60px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:0 24px;
+
+    background:#141020;
+    border-bottom:1px solid rgba(255,255,255,.06);
+
+    color:white;
 }
 
 iframe{
-flex:1;
-border:none;
-background:white;
+    width:100%;
+    height:calc(100% - 60px);
+
+    border:none;
+    background:#0d0714;
 }
