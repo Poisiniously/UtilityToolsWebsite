@@ -1,48 +1,100 @@
-body {
-  font-family: Arial;
-  background: #111;
-  color: white;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Inter",sans-serif;
 }
 
-.tools {
-  display: flex;
-  gap: 20px;
+body{
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color:white;
+    min-height:100vh;
+    padding:40px;
 }
 
-.tool-card {
-  background: #222;
-  padding: 10px;
-  cursor: pointer;
-  width: 200px;
-  border-radius: 10px;
+h1{
+    text-align:center;
+    font-size:3rem;
+    margin-bottom:40px;
 }
 
-.tool-card img {
-  width: 100%;
+.tools{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:25px;
 }
 
-#popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.8);
+.tool-card{
+    background:rgba(255,255,255,.08);
+    backdrop-filter:blur(15px);
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:20px;
+    overflow:hidden;
+    cursor:pointer;
+    transition:.3s;
 }
 
-.hidden {
-  display: none;
+.tool-card:hover{
+    transform:translateY(-8px) scale(1.03);
+    box-shadow:0 20px 40px rgba(0,0,0,.4);
 }
 
-.popup-content {
-  width: 80%;
-  height: 80%;
-  background: white;
-  margin: 5% auto;
+.tool-card img{
+    width:100%;
+    height:180px;
+    object-fit:cover;
 }
 
-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
+.tool-card .content{
+    padding:20px;
+}
+
+.tool-card h3{
+    margin-bottom:10px;
+}
+
+.tool-card p{
+    color:#cbd5e1;
+}
+
+/* Popup */
+
+#popup{
+    position:fixed;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:rgba(0,0,0,.65);
+    backdrop-filter:blur(8px);
+}
+
+.hidden{
+    display:none!important;
+}
+
+.popup-content{
+    width:min(1200px,92%);
+    height:90%;
+    background:#0f172a;
+    border-radius:20px;
+    overflow:hidden;
+    position:relative;
+    box-shadow:0 25px 60px rgba(0,0,0,.6);
+}
+
+.popup-content span{
+    position:absolute;
+    right:20px;
+    top:15px;
+    font-size:28px;
+    cursor:pointer;
+    z-index:2;
+}
+
+iframe{
+    width:100%;
+    height:100%;
+    border:none;
+    background:white;
 }
