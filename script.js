@@ -1,9 +1,18 @@
-function openTool(path) {
-  document.getElementById("popup").classList.remove("hidden");
-  document.getElementById("toolFrame").src = path;
+const popup = document.getElementById("popup");
+const frame = document.getElementById("toolFrame");
+
+function openTool(path){
+
+    frame.src = path;
+
+    popup.style.display = "flex";
+
 }
 
-function closeTool() {
-  document.getElementById("popup").classList.add("hidden");
-  document.getElementById("toolFrame").src = "";
+function closeTool(){
+
+    frame.src = "";
+
+    popup.style.display = "none";
+
 }
