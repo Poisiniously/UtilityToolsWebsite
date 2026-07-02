@@ -93,3 +93,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+const commissionOverlay = (targetUrl, toolTitle) => {
+    modalToolTitle.textContent = toolTitle;
+    toolFrame.src = targetUrl;
+    modalOverlay.classList.add('active');
+    
+    // Hard-Lock für das Scrollen auf der Hauptseite aktivieren
+    document.body.classList.add('modal-open');
+};
+
+const decommissionOverlay = () => {
+    modalOverlay.classList.remove('active');
+    toolFrame.src = '';
+    
+    // Scrollen auf der Hauptseite wieder freigeben
+    document.body.classList.remove('modal-open');
+};
