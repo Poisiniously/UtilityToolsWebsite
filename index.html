@@ -1,217 +1,276 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Utility Hub</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Dark Timer with Zen Alarm</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-<style>
-:root {
-  --bg: #0d0714;
-  --primary: #ff007f;
-  --secondary: #00f0ff;
-  --text: #e0e0ff;
-  --glass: rgba(255,255,255,0.05);
-}
+        body {
+            background-color: #0a0a0c;
+            color: #e2e8f0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
+        .timer-container {
+            text-align: center;
+            user-select: none;
+        }
 
-body {
-  background:
-    radial-gradient(at 0% 0%, #ff007f33, transparent 50%),
-    radial-gradient(at 100% 0%, #00f0ff22, transparent 40%),
-    var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  padding: 30px;
-}
+        /* Container für Eingabe und Anzeige */
+        .timer-box {
+            font-size: 7.5rem;
+            font-weight: 200;
+            margin-bottom: 2.5rem;
+            color: #f8fafc;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-/* TITLE */
-h1 {
-  text-align: center;
-  margin-bottom: 25px;
-  color: var(--primary);
-}
+        /* Styling für die Input-Felder */
+        .timer-box input {
+            background: transparent;
+            border: none;
+            color: #f8fafc;
+            font-size: 7.5rem;
+            font-weight: 200;
+            width: 160px;
+            text-align: center;
+            font-family: inherit;
+            outline: none;
+        }
 
-/* SEARCH */
-.search-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 30px;
-}
+        /* Entfernt Pfeile bei Inputs */
+        .timer-box input::-webkit-outer-spin-button,
+        .timer-box input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .timer-box input[type=number] {
+            -moz-appearance: textfield;
+        }
 
-.search-input {
-  width: 300px;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid var(--secondary);
-  background: var(--glass);
-  color: white;
-  outline: none;
-}
+        .time-display {
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -2px;
+        }
 
-/* GRID */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-}
+        /* Buttons */
+        .controls {
+            display: flex;
+            gap: 1.25rem;
+            justify-content: center;
+        }
 
-/* CARD */
-.card {
-  background: var(--glass);
-  border-radius: 15px;
-  padding: 15px;
-  backdrop-filter: blur(12px);
-  border: 1px solid #ffffff11;
-  cursor: pointer;
-  transition: 0.3s;
-}
+        button {
+            background: rgba(255, 255, 255, 0.03);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
 
-.card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 0 20px #ff007f55;
-}
+        button:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #f8fafc;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
 
-/* PLACEHOLDER IMAGE */
-.card-image {
-  height: 120px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  color: black;
-}
+        button:active {
+            transform: scale(0.96);
+        }
 
-/* TEXT */
-.card-title {
-  font-size: 18px;
-  margin-bottom: 5px;
-}
+        button.running {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
 
-.card-desc {
-  font-size: 14px;
-  opacity: 0.7;
-}
+        button.running:hover {
+            background: rgba(239, 68, 68, 0.18);
+            color: #fca5a5;
+        }
 
-/* POPUP */
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: none;
-  background: rgba(0,0,0,0.85);
-  justify-content: center;
-  align-items: center;
-}
+        /* Sanftes Pulsieren am Ende */
+        @keyframes alarm-pulse {
+            0% { opacity: 1; color: #f8fafc; }
+            50% { opacity: 0.4; color: #a78bfa; }
+            100% { opacity: 1; color: #f8fafc; }
+        }
 
-.popup iframe {
-  width: 80%;
-  height: 80%;
-  border: none;
-  border-radius: 12px;
-  background: white;
-}
-
-.close-btn {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  font-size: 28px;
-  cursor: pointer;
-}
-
-/* NO RESULTS */
-.no-results {
-  text-align: center;
-  margin-top: 20px;
-  display: none;
-  opacity: 0.6;
-}
-</style>
+        .alarm {
+            animation: alarm-pulse 2s infinite ease-in-out;
+        }
+    </style>
 </head>
-
 <body>
 
-<h1>Utility Hub</h1>
+    <div class="timer-container">
+        <div class="timer-box" id="timerBox">
+            <div id="inputs">
+                <input type="number" id="hrs" placeholder="00" min="0" max="99" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2);">:
+                <input type="number" id="mins" placeholder="00" min="0" max="59" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2);">:
+                <input type="number" id="secs" placeholder="00" min="0" max="59" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2);">
+            </div>
+            <div id="display" class="time-display" style="display: none;">00:00:00</div>
+        </div>
+        
+        <div class="controls">
+            <button id="startStopBtn">Start</button>
+            <button id="resetBtn">Reset</button>
+        </div>
+    </div>
 
-<div class="search-container">
-  <input id="searchInput" class="search-input" placeholder="Search tools...">
-</div>
+    <script>
+        let countdownInterval;
+        let alarmInterval;
+        let totalSeconds = 0;
+        let isRunning = false;
+        let isPaused = false;
+        let audioCtx = null;
 
-<div id="grid" class="grid">
+        const startStopBtn = document.getElementById('startStopBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const inputsDiv = document.getElementById('inputs');
+        const displayDiv = document.getElementById('display');
+        const timerBox = document.getElementById('timerBox');
 
-  <div class="card" data-name="calculator" onclick="openTool('tools/textcleaner/index.html')">
-    <div class="card-image">TEXT</div>
-    <div class="card-title">Text Cleaner</div>
-    <div class="card-desc">Simple text formatting</div>
-  </div>
+        const hrsInput = document.getElementById('hrs');
+        const minsInput = document.getElementById('mins');
+        const secsInput = document.getElementById('secs');
 
-  <div class="card" data-name="converter" onclick="openTool('tools/file-converter/index.html')">
-    <div class="card-image">CONV</div>
-    <div class="card-title">Converter</div>
-    <div class="card-desc">Convert files easily</div>
-  </div>
+        function playZenChime() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            const now = audioCtx.currentTime;
+            const notes = [329.63, 440.00, 493.88, 659.25]; 
 
-  <div class="card" data-name="timer" onclick="openTool('tools/timer/index.html')">
-    <div class="card-image">TIME</div>
-    <div class="card-title">Timer</div>
-    <div class="card-desc">Countdown timer</div>
-  </div>
+            notes.forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now + index * 0.12);
+                
+                gainNode.gain.setValueAtTime(0, now + index * 0.12);
+                gainNode.gain.linearRampToValueAtTime(0.15, now + index * 0.12 + 0.04);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.12 + 1.5);
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                osc.start(now + index * 0.12);
+                osc.stop(now + index * 0.12 + 1.5);
+            });
+        }
 
-</div>
+        function startAlarm() {
+            timerBox.classList.add('alarm');
+            playZenChime();
+            alarmInterval = setInterval(playZenChime, 3000);
+        }
 
-<div id="noResults" class="no-results">No tools found</div>
+        function stopAlarm() {
+            clearInterval(alarmInterval);
+            timerBox.classList.remove('alarm');
+        }
 
-<!-- POPUP -->
-<div id="popup" class="popup">
-  <div class="close-btn" onclick="closeTool()">✖</div>
-  <iframe id="toolFrame"></iframe>
-</div>
+        function updateDisplay(seconds) {
+            let h = Math.floor(seconds / 3600);
+            let m = Math.floor((seconds % 3600) / 60);
+            let s = seconds % 60;
+            displayDiv.textContent = 
+                `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
 
-<script>
-const searchInput = document.getElementById("searchInput");
-const cards = document.querySelectorAll(".card");
-const noResults = document.getElementById("noResults");
+        function startTimer() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
 
-searchInput.addEventListener("input", () => {
-  const query = searchInput.value.toLowerCase();
-  let visible = 0;
+            if (!isPaused) {
+                let h = parseInt(hrsInput.value) || 0;
+                let m = parseInt(minsInput.value) || 0;
+                let s = parseInt(secsInput.value) || 0;
+                totalSeconds = (h * 3600) + (m * 60) + s;
+                if (totalSeconds <= 0) return;
+            }
 
-  cards.forEach(card => {
-    const name = card.dataset.name;
+            inputsDiv.style.display = 'none';
+            displayDiv.style.display = 'block';
+            updateDisplay(totalSeconds);
 
-    if (name.includes(query)) {
-      card.style.display = "block";
-      visible++;
-    } else {
-      card.style.display = "none";
-    }
-  });
+            isRunning = true;
+            isPaused = false;
+            startStopBtn.textContent = "Pause";
+            startStopBtn.classList.add("running");
 
-  noResults.style.display = visible === 0 ? "block" : "none";
-});
+            countdownInterval = setInterval(() => {
+                totalSeconds--;
+                updateDisplay(totalSeconds);
 
-function openTool(path) {
-  document.getElementById("popup").style.display = "flex";
-  document.getElementById("toolFrame").src = path;
-}
+                if (totalSeconds <= 0) {
+                    clearInterval(countdownInterval);
+                    isRunning = false;
+                    startStopBtn.style.display = 'none';
+                    startAlarm();
+                }
+            }, 1000);
+        }
 
-function closeTool() {
-  document.getElementById("popup").style.display = "none";
-  document.getElementById("toolFrame").src = "";
-}
-</script>
+        function pauseTimer() {
+            clearInterval(countdownInterval);
+            isPaused = true;
+            isRunning = false;
+            startStopBtn.textContent = "Weiter";
+            startStopBtn.classList.remove("running");
+        }
 
+        function resetTimer() {
+            clearInterval(countdownInterval);
+            stopAlarm();
+            isRunning = false;
+            isPaused = false;
+            totalSeconds = 0;
+
+            hrsInput.value = '';
+            minsInput.value = '';
+            secsInput.value = '';
+            
+            inputsDiv.style.display = 'block';
+            displayDiv.style.display = 'none';
+            startStopBtn.style.display = 'inline-block';
+            startStopBtn.textContent = "Start";
+            startStopBtn.classList.remove("running");
+        }
+
+        startStopBtn.addEventListener('click', () => {
+            if (!isRunning) {
+                startTimer();
+            } else {
+                pauseTimer();
+            }
+        });
+
+        resetBtn.addEventListener('click', resetTimer);
+    </script>
 </body>
 </html>
