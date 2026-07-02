@@ -22,93 +22,107 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
         
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 820px;
             background-color: #111111;
-            border-radius: 16px;
-            padding: 40px 32px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            padding: 48px 52px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
             border: 1px solid #222222;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+        }
+        
+        .left {
+            display: flex;
+            flex-direction: column;
         }
         
         h1 {
-            text-align: center;
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 600;
             margin-bottom: 32px;
-            letter-spacing: -0.5px;
+            letter-spacing: -1px;
         }
         
         .input-group {
-            margin-bottom: 24px;
+            flex: 1;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
+            margin-bottom: 10px;
+            font-size: 15px;
             color: #aaaaaa;
             font-weight: 500;
         }
         
         textarea {
             width: 100%;
-            min-height: 120px;
+            min-height: 240px;
             background-color: #1a1a1a;
             border: 1px solid #333333;
-            border-radius: 8px;
-            padding: 14px;
+            border-radius: 12px;
+            padding: 18px;
             color: #ffffff;
-            font-size: 16px;
+            font-size: 17px;
             resize: vertical;
             outline: none;
             transition: all 0.2s ease;
+            font-family: inherit;
         }
         
         textarea:focus {
-            border-color: #555555;
-            box-shadow: 0 0 0 3px rgba(255,255,255,0.05);
+            border-color: #666666;
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.06);
+        }
+        
+        .right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
         .preview {
-            margin: 32px 0;
-            text-align: center;
-            padding: 24px;
+            margin-bottom: 32px;
+            padding: 32px;
             background-color: #1a1a1a;
-            border-radius: 12px;
+            border-radius: 16px;
             border: 1px solid #222222;
-            min-height: 260px;
+            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
+            min-height: 340px;
         }
         
         #qrcode {
             background: white;
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
         
         .controls {
             display: flex;
-            gap: 12px;
-            margin-top: 8px;
+            gap: 14px;
+            width: 100%;
         }
         
         button {
-            flex: 1;
-            padding: 14px;
+            padding: 16px 24px;
             font-size: 16px;
             font-weight: 600;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s ease;
             border: none;
+            flex: 1;
         }
         
         .btn-primary {
@@ -117,8 +131,8 @@
         }
         
         .btn-primary:hover {
-            background-color: #eeeeee;
-            transform: translateY(-1px);
+            background-color: #f0f0f0;
+            transform: translateY(-2px);
         }
         
         .btn-secondary {
@@ -130,52 +144,62 @@
             background-color: #333333;
         }
         
-        .info {
-            text-align: center;
-            font-size: 13px;
-            color: #666666;
-            margin-top: 24px;
-        }
-        
         .empty-state {
             color: #555555;
-            font-size: 15px;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .info {
+            text-align: center;
+            font-size: 14px;
+            color: #666666;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>QR Code Generator</h1>
-        
-        <div class="input-group">
-            <label for="text">Text oder URL</label>
-            <textarea id="text" placeholder="Gib hier Text oder eine URL ein..."></textarea>
-        </div>
-        
-        <div class="preview">
-            <div id="qrcode-container">
-                <div id="qrcode"></div>
+        <!-- Linke Seite: Eingabe -->
+        <div class="left">
+            <h1>QR Code Generator</h1>
+            
+            <div class="input-group">
+                <label for="text">Text oder URL</label>
+                <textarea id="text" placeholder="Gib hier den Text oder die URL ein, die in den QR-Code soll..."></textarea>
             </div>
-            <div id="empty" class="empty-state">Der QR-Code erscheint hier live</div>
+            
+            <div class="info">
+                Der QR-Code wird live aktualisiert
+            </div>
         </div>
         
-        <div class="controls">
-            <button onclick="downloadQR()" class="btn-primary" id="downloadBtn" disabled>
-                Als PNG herunterladen
-            </button>
-            <button onclick="clearInput()" class="btn-secondary">
-                Löschen
-            </button>
-        </div>
-        
-        <div class="info">
-            Live-Vorschau • Schwarzes Design
+        <!-- Rechte Seite: Vorschau -->
+        <div class="right">
+            <div class="preview">
+                <div id="qrcode-container">
+                    <div id="qrcode"></div>
+                </div>
+                <div id="empty" class="empty-state">
+                    Der QR-Code erscheint hier
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button onclick="downloadQR()" class="btn-primary" id="downloadBtn" disabled>
+                    Als PNG herunterladen
+                </button>
+                <button onclick="clearInput()" class="btn-secondary">
+                    Löschen
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
-        let qrcode = null;
+        let qrcodeInstance = null;
         let currentText = '';
+        
         const textarea = document.getElementById('text');
         const downloadBtn = document.getElementById('downloadBtn');
         const emptyState = document.getElementById('empty');
@@ -192,15 +216,13 @@
             emptyState.style.display = 'none';
             qrcodeContainer.style.display = 'block';
             
-            // Entferne alten QR-Code
             const qrDiv = document.getElementById('qrcode');
             qrDiv.innerHTML = '';
             
-            // Neuen QR-Code erstellen
-            qrcode = new QRCode(qrDiv, {
+            qrcodeInstance = new QRCode(qrDiv, {
                 text: text,
-                width: 256,
-                height: 256,
+                width: 280,
+                height: 280,
                 colorDark: "#000000",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
@@ -210,13 +232,13 @@
             downloadBtn.disabled = false;
         }
         
-        // Live-Update mit Debounce
+        // Live Update mit Debounce
         let timeout = null;
         textarea.addEventListener('input', () => {
             clearTimeout(timeout);
             timeout = setTimeout(() => {
                 generateQR(textarea.value.trim());
-            }, 300);
+            }, 250);
         });
         
         function downloadQR() {
@@ -227,16 +249,17 @@
             
             const link = document.createElement('a');
             link.download = 'qrcode.png';
-            link.href = canvas.toDataURL('image/png');
+            link.href = canvas.toDataURL('image/png', 1.0);
             link.click();
         }
         
         function clearInput() {
             textarea.value = '';
             generateQR('');
+            textarea.focus();
         }
         
-        // Initialer leerer Zustand
+        // Initialzustand
         window.onload = () => {
             emptyState.style.display = 'block';
             qrcodeContainer.style.display = 'none';
