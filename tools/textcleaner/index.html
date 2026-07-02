@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickText Sanitizer Node</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Cyberpunk Global Design Token Variables */
+        :root {
+            --background: #0d0714;
+            --surface: rgba(26, 12, 38, .65);
+            --primary: #ff007f;
+            --secondary: #00f0ff;
+            --text: #f4f4ff;
+            --text-secondary: #a0a0c0;
+            --border: rgba(255, 255, 255, .08);
+            --font-main: 'Outfit', 'Segoe UI', sans-serif;
+            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: transparent; /* Essential requirement for hub iframe overlays */
+            color: var(--text);
+            font-family: var(--font-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        /* Glassmorphic Tool Deck Container */
+        .tool-wrapper {
+            width: 100%;
+            max-width: 750px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 0, 127, 0.02);
+        }
+
+        .header-group {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--text) 40%, var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Input Core Stream Deck */
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 220px;
+            padding: 1.25rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            color: var(--text);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: var(--transition-smooth);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Responsive Operational Controls Grid */
+        .matrix-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-utility {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            font-family: var(--font-main);
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-utility:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--text-secondary);
+            transform: translateY(-1px);
+        }
+
+        .btn-utility:active {
+            transform: scale(0.98);
+        }
+
+        /* Cyberpunk High-Priority Deploy Actions */
+        .btn-deploy {
+            width: 100%;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 1rem;
+            border-radius: 14px;
+            font-family: var(--font-main);
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(255, 0, 127, 0.2);
+        }
+
+        .btn-deploy:hover {
+            background: #ff1a8c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 0, 127, 0.45);
+        }
+
+        /* Status Diagnostics Display Node */
+        .status-telemetry {
+            text-align: center;
+            color: var(--secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            margin-top: 1.25rem;
+            height: 20px;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: var(--transition-smooth);
+        }
+
+        .status-telemetry.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="tool-wrapper">
+        <div class="header-group">
+            <h2>QuickText Sanitizer</h2>
+            <p class="subtitle">Deploy automated manipulation filters over custom text sequences instantly.</p>
+        </div>
+
+        <div class="input-group">
+            <textarea id="textInput" placeholder="Input raw string payload here..."></textarea>
+        </div>
+
+        <div class="matrix-controls">
+            <button class="btn-utility" id="btnRemoveBreaks">Remove Line Breaks</button>
+            <button class="btn-utility" id="btnRemoveSpaces">Strip Double Spaces</button>
+            <button class="btn-utility" id="btnUpperCase">TRANSFORM UPPERCASE</button>
+            <button class="btn-utility" id="btnLowerCase">transform lowercase</button>
+            <button class="btn-utility" id="btnStripHtml">Sanitize HTML Tags</button>
+            <button class="btn-utility" id="btnClearText">Clear Workspace</button>
+        </div>
+
+        <button class="btn-deploy" id="btnCopy">Copy Compiled Stream to Clipboard</button>
+
+        <div id="telemetryFeedback" class="status-telemetry">Data pipeline copied successfully!</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Decoupled DOM Declarations following modern JavaScript guidelines
+            const textInput = document.getElementById('textInput');
+            const btnRemoveBreaks = document.getElementById('btnRemoveBreaks');
+            const btnRemoveSpaces = document.getElementById('btnRemoveSpaces');
+            const btnUpperCase = document.getElementById('btnUpperCase');
+            const btnLowerCase = document.getElementById('btnLowerCase');
+            const btnStripHtml = document.getElementById('btnStripHtml');
+            const btnClearText = document.getElementById('btnClearText');
+            const btnCopy = document.getElementById('btnCopy');
+            const telemetryFeedback = document.getElementById('telemetryFeedback');
+
+            let telemetryTimeout = null;
+
+            // Diagnostic status renderer function
+            const triggerTelemetry = (message, isError = false) => {
+                if (telemetryTimeout) clearTimeout(telemetryTimeout);
+                
+                telemetryFeedback.textContent = message;
+                telemetryFeedback.style.color = isError ? 'var(--primary)' : 'var(--secondary)';
+                telemetryFeedback.classList.add('active');
+
+                telemetryTimeout = setTimeout(() => {
+                    telemetryFeedback.classList.remove('active');
+                }, 2200);
+            };
+
+            // Formatting Operations Pipelines
+            const sanitizeLineBreaks = () => {
+                textInput.value = textInput.value.replace(/\r?\n|\r/g, ' ');
+                sanitizeDoubleSpaces();
+            };
+
+            const sanitizeDoubleSpaces = () => {
+                textInput.value = textInput.value.replace(/\s+/g, ' ');
+            };
+
+            const convertToUpperCase = () => {
+                textInput.value = textInput.value.toUpperCase();
+            };
+
+            const convertToLowerCase = () => {
+                textInput.value = textInput.value.toLowerCase();
+            };
+
+            const stripHtmlContent = () => {
+                textInput.value = textInput.value.replace(/<\/?[^>]+(>|$)/g, '');
+            };
+
+            const resetWorkspace = () => {
+                textInput.value = '';
+                textInput.focus();
+            };
+
+            const executeClipboardDeployment = () => {
+                const textPayload = textInput.value.trim();
+
+                if (!textPayload) {
+                    triggerTelemetry('Operation halted: Workspace buffer is empty.', true);
+                    return;
+                }
+
+                textInput.select();
+                textInput.setSelectionRange(0, 99999);
+
+                navigator.clipboard.writeText(textPayload)
+                    .then(() => {
+                        triggerTelemetry('Data payload copied successfully to network clipboard.');
+                    })
+                    .catch(() => {
+                        triggerTelemetry('Pipeline Error: Clipboard deployment failed.', true);
+                    });
+            };
+
+            // Event Listeners Framework Mapping Architecture
+            btnRemoveBreaks.addEventListener('click', sanitizeLineBreaks);
+            btnRemoveSpaces.addEventListener('click', sanitizeDoubleSpaces);
+            btnUpperCase.addEventListener('click', convertToUpperCase);
+            btnLowerCase.addEventListener('click', convertToLowerCase);
+            btnStripHtml.addEventListener('click', stripHtmlContent);
+            btnClearText.addEventListener('click', resetWorkspace);
+            btnCopy.addEventListener('click', executeClipboardDeployment);
+        });
+    </script>
+</body>
+</html>
