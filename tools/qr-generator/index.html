@@ -23,6 +23,7 @@
             align-items: center;
             justify-content: center;
             padding: 40px 20px;
+            overflow: hidden;
         }
         
         .container {
@@ -36,6 +37,18 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 48px;
+            animation: containerPop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes containerPop {
+            from {
+                opacity: 0;
+                transform: scale(0.7) translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
         
         .left {
@@ -48,10 +61,18 @@
             font-weight: 600;
             margin-bottom: 32px;
             letter-spacing: -1px;
+            animation: titleFade 1s ease 0.2s backwards;
+        }
+        
+        @keyframes titleFade {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .input-group {
             flex: 1;
+            display: flex;
+            flex-direction: column;
         }
         
         label {
@@ -60,26 +81,28 @@
             font-size: 15px;
             color: #aaaaaa;
             font-weight: 500;
+            animation: fadeIn 0.6s ease 0.4s backwards;
         }
         
         textarea {
             width: 100%;
-            min-height: 240px;
+            height: 240px;           /* Feste Höhe */
+            resize: none;            /* Nicht veränderbar */
             background-color: #1a1a1a;
             border: 1px solid #333333;
             border-radius: 12px;
             padding: 18px;
             color: #ffffff;
             font-size: 17px;
-            resize: vertical;
             outline: none;
-            transition: all 0.2s ease;
-            font-family: inherit;
+            transition: all 0.3s ease;
+            animation: inputPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s backwards;
         }
         
         textarea:focus {
             border-color: #666666;
-            box-shadow: 0 0 0 4px rgba(255,255,255,0.06);
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.08);
+            transform: translateY(-2px);
         }
         
         .right {
@@ -90,15 +113,36 @@
         
         .preview {
             margin-bottom: 32px;
-            padding: 32px;
+            padding: 40px;
             background-color: #1a1a1a;
             border-radius: 16px;
             border: 1px solid #222222;
             width: 100%;
+            min-height: 340px;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 340px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .preview::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            opacity: 0;
+            transition: all 0.6s ease;
+            pointer-events: none;
+        }
+        
+        .preview:hover::before {
+            opacity: 1;
+            transform: translate(80%, 80%);
         }
         
         #qrcode {
@@ -106,6 +150,12 @@
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .preview:hover #qrcode {
+            transform: scale(1.06) rotate(1deg);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
         }
         
         .controls {
@@ -120,9 +170,29 @@
             font-weight: 600;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
             flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 40%;
+            height: 200%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-25deg);
+            transition: all 0.6s;
+            opacity: 0;
+        }
+        
+        button:hover::after {
+            left: 120%;
+            opacity: 1;
         }
         
         .btn-primary {
@@ -132,7 +202,7 @@
         
         .btn-primary:hover {
             background-color: #f0f0f0;
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.03);
         }
         
         .btn-secondary {
@@ -142,12 +212,14 @@
         
         .btn-secondary:hover {
             background-color: #333333;
+            transform: translateY(-2px);
         }
         
         .empty-state {
             color: #555555;
             font-size: 16px;
             text-align: center;
+            animation: fadeIn 1s ease;
         }
         
         .info {
@@ -155,28 +227,45 @@
             font-size: 14px;
             color: #666666;
             margin-top: 20px;
+            animation: fadeIn 1s ease 0.8s backwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes inputPop {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Linke Seite: Eingabe -->
+        <!-- Linke Seite -->
         <div class="left">
             <h1>QR Code Generator</h1>
             
             <div class="input-group">
                 <label for="text">Text oder URL</label>
-                <textarea id="text" placeholder="Gib hier den Text oder die URL ein, die in den QR-Code soll..."></textarea>
+                <textarea id="text" placeholder="Gib hier den Text oder die URL ein..."></textarea>
             </div>
             
             <div class="info">
-                Der QR-Code wird live aktualisiert
+                Live-Vorschau mit Animationen
             </div>
         </div>
         
-        <!-- Rechte Seite: Vorschau -->
+        <!-- Rechte Seite -->
         <div class="right">
-            <div class="preview">
+            <div class="preview" id="previewBox">
                 <div id="qrcode-container">
                     <div id="qrcode"></div>
                 </div>
@@ -197,13 +286,14 @@
     </div>
 
     <script>
-        let qrcodeInstance = null;
+        let qrcode = null;
         let currentText = '';
         
         const textarea = document.getElementById('text');
         const downloadBtn = document.getElementById('downloadBtn');
         const emptyState = document.getElementById('empty');
         const qrcodeContainer = document.getElementById('qrcode-container');
+        const previewBox = document.getElementById('previewBox');
         
         function generateQR(text) {
             if (!text || text.trim() === '') {
@@ -219,7 +309,7 @@
             const qrDiv = document.getElementById('qrcode');
             qrDiv.innerHTML = '';
             
-            qrcodeInstance = new QRCode(qrDiv, {
+            qrcode = new QRCode(qrDiv, {
                 text: text,
                 width: 280,
                 height: 280,
@@ -230,6 +320,12 @@
             
             currentText = text;
             downloadBtn.disabled = false;
+            
+            // Extra Animation beim Generieren
+            previewBox.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                previewBox.style.transform = 'scale(1)';
+            }, 10);
         }
         
         // Live Update mit Debounce
@@ -238,7 +334,7 @@
             clearTimeout(timeout);
             timeout = setTimeout(() => {
                 generateQR(textarea.value.trim());
-            }, 250);
+            }, 280);
         });
         
         function downloadQR() {
@@ -259,10 +355,15 @@
             textarea.focus();
         }
         
-        // Initialzustand
+        // Initialzustand + kleine Start-Animation
         window.onload = () => {
             emptyState.style.display = 'block';
             qrcodeContainer.style.display = 'none';
+            
+            // Fokus auf Textfeld nach kurzer Verzögerung
+            setTimeout(() => {
+                textarea.focus();
+            }, 800);
         };
     </script>
 </body>
