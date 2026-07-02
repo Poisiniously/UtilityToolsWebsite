@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. CORE DESIGN TOKENS & SYSTEM VARIABLES
+   1. CORE DESIGN TOKENS
    ========================================================================== */
 :root {
     --background: #0d0714;
@@ -15,7 +15,7 @@
 }
 
 /* ==========================================================================
-   2. GLOBAL RESET & FLEX BASE (THE CURE FOR THE IPAD BUG)
+   2. GLOBAL RESET & SCROLL UNLOCK (DIESER BEREICH LÖST DAS INFRIEREN)
    ========================================================================== */
 *, *::before, *::after {
     box-sizing: border-box;
@@ -23,104 +23,70 @@
     padding: 0;
 }
 
-html, body {
+html {
+    background-color: var(--background);
+    /* KEIN overflow: hidden hier! */
+    height: -webkit-fill-available; /* Fix für mobile Safari-Browser */
+}
+
+body {
     background-color: var(--background);
     color: var(--text);
     font-family: var(--font-main);
     width: 100%;
+    
+    /* Erlaubt der Seite, so lang zu werden wie der Inhalt, statt bei 100vh abzuriegeln */
     min-height: 100vh;
-}
-
-body {
-    display: flex;
-    flex-direction: row; /* Sidebar und Inhalt stehen sauber nebeneinander */
-    overflow-y: auto; 
+    height: auto; 
+    
+    /* Aktiviert das Scrollen explizit und erzwingt flüssiges Touch-Scrollen */
+    overflow-y: auto !important; 
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    
+    display: flex;
+    flex-direction: row;
 }
 
-/* Wird via JS getriggert, wenn das Tool-Popup geöffnet ist */
+/* Wird NUR aktiv, wenn das Popup-Fenster offen ist */
 body.modal-open {
-    overflow: hidden;
+    overflow: hidden !important;
     touch-action: none;
 }
 
 /* ==========================================================================
-   3. SIDEBAR LAYER (NO MORE POSITION FIXED)
+   3. SIDEBAR NAVIGATION (STICKY STATT FIXED)
    ========================================================================== */
 .sidebar {
     width: var(--sidebar-width);
-    min-width: var(--sidebar-width); /* Garantiert, dass die Sidebar nicht schrumpft */
+    min-width: var(--sidebar-width);
     background: rgba(13, 7, 20, 0.85);
     border-right: 1px solid var(--border);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     display: flex;
     flex-direction: column;
+    
+    /* Verhindert, dass die Sidebar das Layout zerstört oder wegschwimmt */
     height: 100vh;
-    position: sticky; /* Bleibt beim Scrollen stehen, ohne das Layout zu brechen */
+    position: sticky;
     top: 0;
+    
     z-index: 10;
     padding: 2rem 1.5rem;
 }
 
-.brand-zone {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 3rem;
-}
-
-.brand-logo {
-    font-size: 1.5rem;
-    text-shadow: 0 0 10px var(--primary);
-}
-
-.brand-title {
-    font-size: 1.25rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-}
-
-.brand-title span {
-    color: var(--primary);
-}
-
-.nav-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.nav-item {
-    color: var(--text-secondary);
-    text-decoration: none;
-    padding: 0.85rem 1rem;
-    border-radius: 12px;
-    font-weight: 500;
-    transition: var(--transition-smooth);
-    display: flex;
-    align-items: center;
-}
-
-.nav-item:hover, .nav-item.active {
-    color: var(--text);
-    background: rgba(255, 255, 255, 0.04);
-}
-
-.nav-item.active {
-    border-left: 3px solid var(--primary);
-    background: rgba(255, 0, 127, 0.05);
-}
-
 /* ==========================================================================
-   4. MAIN VIEWPORT SHELL
+   4. MAIN VIEWPORT (MUSS FLEXIBEL SEIN)
    ========================================================================== */
 .dashboard-viewport {
     flex-grow: 1;
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    
+    /* WICHTIG: Keine feste Höhe! Muss mit den Karten nach unten wachsen können */
+    min-height: 100vh;
+    height: auto; 
     width: calc(100% - var(--sidebar-width));
 }
 
@@ -137,76 +103,10 @@ body.modal-open {
     -webkit-backdrop-filter: blur(5px);
 }
 
-.search-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 450px;
-}
-
-.search-icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-secondary);
-    font-size: 1.2rem;
-}
-
-#toolSearch {
-    width: 100%;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--border);
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    border-radius: 12px;
-    color: var(--text);
-    font-family: var(--font-main);
-    font-size: 0.95rem;
-    transition: var(--transition-smooth);
-}
-
-#toolSearch:focus {
-    outline: none;
-    border-color: var(--secondary);
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
-}
-
-.system-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.status-pulse {
-    width: 8px;
-    height: 8px;
-    background: #00ff66;
-    border-radius: 50%;
-    box-shadow: 0 0 10px #00ff66;
-}
-
 .viewport-content {
     padding: 3rem;
     flex-grow: 1;
-}
-
-.welcome-banner {
-    margin-bottom: 2.5rem;
-}
-
-.welcome-banner h2 {
-    font-size: 2.25rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    margin-bottom: 0.5rem;
-}
-
-.welcome-banner p {
-    color: var(--text-secondary);
-    font-size: 1.05rem;
+    height: auto; /* Erlaubt vertikale Ausdehnung */
 }
 
 /* ==========================================================================
