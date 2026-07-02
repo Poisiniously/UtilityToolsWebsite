@@ -179,50 +179,59 @@
     </div>
 
     <script>
-        const qrContainer = document.getElementById('qrcode');
-        const textInput = document.getElementById('qr-text');
-        
-        // Initialer QR Code (Platzhalter)
-        let qrcode = new QRCode(qrContainer, {
-            text: "https://example.com",
-            width: 280,
-            height: 280,
-            colorDark : "#0a0a0c", // Tiefschwarz/Dunkelgrau für den Code (passt zum Theme)
-            colorLight : "#ffffff", // Weißer Hintergrund
-            correctLevel : QRCode.CorrectLevel.H // Hohe Fehlerkorrektur
-        });
+    const qrContainer = document.getElementById('qrcode');
+    const textInput = document.getElementById('qr-text');
 
-        // Live-Update beim Tippen
-        textInput.addEventListener('input', () => {
-            const val = textInput.value.trim();
-            qrcode.clear(); // Alten Code löschen
-            
-            if(!val) {
-                // Wenn das Feld leer ist, zeige einen Platzhalter
-                qrcode.makeCode("https://example.com");
-            } else {
-                // Erstelle neuen Code mit dem eingegebenen Text
-                qrcode.makeCode(val);
-            }
-        });
+    // Startwert setzen (wichtig für echte Live UX)
+    textInput.value = "https://example.com";
 
-        // Funktion zum Herunterladen des QR-Codes als Bild
-        function downloadQR() {
-            // qrcode.js generiert ein <canvas> Element im Container
-            const canvas = document.querySelector('#qrcode canvas');
-            if (canvas) {
-                // Konvertiere Canvas zu einer Data-URL
-                const url = canvas.toDataURL("image/png");
-                
-                // Erstelle einen temporären Link und klicke ihn an
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'Zen_QRCode.png';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            }
+    let qrcode = new QRCode(qrContainer, {
+        text: textInput.value,
+        width: 280,
+        height: 280,
+        colorDark: "#0a0a0c",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    // Smooth Update Funktion
+    function updateQR(value) {
+        qrContainer.style.opacity = "0.3";
+
+        setTimeout(() => {
+            qrcode.clear();
+            qrcode.makeCode(value || "https://example.com");
+            qrContainer.style.opacity = "1";
+        }, 120);
+    }
+
+    // Live Vorschau beim Tippen
+    textInput.addEventListener('input', (e) => {
+        updateQR(e.target.value.trim());
+    });
+
+    // Optional: bessere Performance bei schnellem Tippen
+    let timeout;
+    textInput.addEventListener('input', (e) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            updateQR(e.target.value.trim());
+        }, 150);
+    });
+
+    // Download bleibt gleich
+    function downloadQR() {
+        const canvas = document.querySelector('#qrcode canvas');
+        if (canvas) {
+            const url = canvas.toDataURL("image/png");
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Zen_QRCode.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
-    </script>
+    }
+</script>
 </body>
 </html>
