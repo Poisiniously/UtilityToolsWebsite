@@ -1,217 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Utility Hub</title>
-
-<style>
-:root {
-  --bg: #0d0714;
-  --primary: #ff007f;
-  --secondary: #00f0ff;
-  --text: #e0e0ff;
-  --glass: rgba(255,255,255,0.05);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
-
-body {
-  background:
-    radial-gradient(at 0% 0%, #ff007f33, transparent 50%),
-    radial-gradient(at 100% 0%, #00f0ff22, transparent 40%),
-    var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  padding: 30px;
-}
-
-/* TITLE */
-h1 {
-  text-align: center;
-  margin-bottom: 25px;
-  color: var(--primary);
-}
-
-/* SEARCH */
-.search-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 30px;
-}
-
-.search-input {
-  width: 300px;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid var(--secondary);
-  background: var(--glass);
-  color: white;
-  outline: none;
-}
-
-/* GRID */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-}
-
-/* CARD */
-.card {
-  background: var(--glass);
-  border-radius: 15px;
-  padding: 15px;
-  backdrop-filter: blur(12px);
-  border: 1px solid #ffffff11;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 0 20px #ff007f55;
-}
-
-/* PLACEHOLDER IMAGE */
-.card-image {
-  height: 120px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  color: black;
-}
-
-/* TEXT */
-.card-title {
-  font-size: 18px;
-  margin-bottom: 5px;
-}
-
-.card-desc {
-  font-size: 14px;
-  opacity: 0.7;
-}
-
-/* POPUP */
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: none;
-  background: rgba(0,0,0,0.85);
-  justify-content: center;
-  align-items: center;
-}
-
-.popup iframe {
-  width: 80%;
-  height: 80%;
-  border: none;
-  border-radius: 12px;
-  background: white;
-}
-
-.close-btn {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  font-size: 28px;
-  cursor: pointer;
-}
-
-/* NO RESULTS */
-.no-results {
-  text-align: center;
-  margin-top: 20px;
-  display: none;
-  opacity: 0.6;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utility Hub // Cyber-Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-<h1>Utility Hub</h1>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-glow"></div>
+                <span class="brand-text">UTILITY<span class="accent">.HUB</span></span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-filter="all">
+                    <span class="icon">⊞</span> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-filter="dev">
+                    <span class="icon">⚡</span> Developer
+                </a>
+                <a href="#" class="nav-item" data-filter="media">
+                    <span class="icon">🔮</span> Media
+                </a>
+                <a href="#" class="nav-item" data-filter="math">
+                    <span class="icon">∫</span> Math & Calc
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="status-indicator"></span> System Operational
+            </div>
+        </aside>
 
-<div class="search-container">
-  <input id="searchInput" class="search-input" placeholder="Search tools...">
-</div>
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-wrapper">
+                    <span class="search-icon">⌕</span>
+                    <input type="text" id="search-bar" placeholder="Search neural tools... (Press '/' to focus)" autocomplete="off">
+                </div>
+            </header>
 
-<div id="grid" class="grid">
+            <div class="content-body">
+                <div class="welcome-section">
+                    <h1>System Utilities</h1>
+                    <p class="subtitle">Deploy modular micro-applications instantly within your secure workspace.</p>
+                </div>
 
-  <div class="card" data-name="calculator" onclick="openTool('tools/textcleaner/index.html')">
-    <div class="card-image">CALC</div>
-    <div class="card-title">Calculator</div>
-    <div class="card-desc">Simple math calculator</div>
-  </div>
+                <div class="tools-grid" id="tools-grid">
+                    
+                    <div class="tool-card" data-tags="math calculator" data-category="math" data-url="tools/calculator/index.html">
+                        <div class="card-visual calc-gradient">
+                            <div class="visual-glow"></div>
+                            <span class="visual-icon">±</span>
+                        </div>
+                        <div class="card-info">
+                            <h3>Matrix Calculator</h3>
+                            <p>High-precision arithmetic engine with live state logging.</p>
+                            <button class="btn-open">Launch Tool <span class="arrow">→</span></button>
+                        </div>
+                    </div>
 
-  <div class="card" data-name="converter" onclick="openTool('tools/file-converter/index.html')">
-    <div class="card-image">CONV</div>
-    <div class="card-title">Converter</div>
-    <div class="card-desc">Convert units easily</div>
-  </div>
+                    <div class="tool-card" data-tags="dev converter unit" data-category="dev" data-url="tools/converter/index.html">
+                        <div class="card-visual convert-gradient">
+                            <div class="visual-glow"></div>
+                            <span class="visual-icon">⇄</span>
+                        </div>
+                        <div class="card-info">
+                            <h3>Unit & Base Converter</h3>
+                            <p>Transform data types, bases, and global metrics seamlessly.</p>
+                            <button class="btn-open">Launch Tool <span class="arrow">→</span></button>
+                        </div>
+                    </div>
 
-  <div class="card" data-name="timer" onclick="openTool('tools/timer/index.html')">
-    <div class="card-image">TIME</div>
-    <div class="card-title">Timer</div>
-    <div class="card-desc">Countdown timer</div>
-  </div>
+                    <div class="tool-card" data-tags="media qr code generator" data-category="media" data-url="tools/qr-generator/index.html">
+                        <div class="card-visual qr-gradient">
+                            <div class="visual-glow"></div>
+                            <span class="visual-icon">⚃</span>
+                        </div>
+                        <div class="card-info">
+                            <h3>QR Matrix Vectorizer</h3>
+                            <p>Generate high-density, error-corrected modern QR nodes.</p>
+                            <button class="btn-open">Launch Tool <span class="arrow">→</span></button>
+                        </div>
+                    </div>
 
-</div>
+                    <div class="tool-card" data-tags="dev password security generator" data-category="dev" data-url="tools/password-generator/index.html">
+                        <div class="card-visual crypto-gradient">
+                            <div class="visual-glow"></div>
+                            <span class="visual-icon">⚿</span>
+                        </div>
+                        <div class="card-info">
+                            <h3>Entropy Passphrase Keygen</h3>
+                            <p>Generate cryptographically secure, high-entropy access keys.</p>
+                            <button class="btn-open">Launch Tool <span class="arrow">→</span></button>
+                        </div>
+                    </div>
 
-<div id="noResults" class="no-results">No tools found</div>
+                    <div class="tool-card" data-tags="media image converter compress jpeg png" data-category="media" data-url="tools/image-converter/index.html">
+                        <div class="card-visual image-gradient">
+                            <div class="visual-glow"></div>
+                            <span class="visual-icon">🖼</span>
+                        </div>
+                        <div class="card-info">
+                            <h3>Image Core Transcoder</h3>
+                            <p>Client-side image formatting, optimization, and compression mapping.</p>
+                            <button class="btn-open">Launch Tool <span class="arrow">→</span></button>
+                        </div>
+                    </div>
 
-<!-- POPUP -->
-<div id="popup" class="popup">
-  <div class="close-btn" onclick="closeTool()">✖</div>
-  <iframe id="toolFrame"></iframe>
-</div>
+                </div>
 
-<script>
-const searchInput = document.getElementById("searchInput");
-const cards = document.querySelectorAll(".card");
-const noResults = document.getElementById("noResults");
+                <div class="empty-state hidden" id="empty-state">
+                    <div class="empty-icon">⚠️</div>
+                    <h3>No tools found matching your query</h3>
+                    <p>Refine your keywords or browse categories via the sidebar.</p>
+                </div>
+            </div>
+        </main>
+    </div>
 
-searchInput.addEventListener("input", () => {
-  const query = searchInput.value.toLowerCase();
-  let visible = 0;
+    <div class="popup-overlay hidden" id="popup-overlay">
+        <div class="popup-window">
+            <div class="popup-header">
+                <h2 id="popup-title">Tool Core</h2>
+                <button class="btn-close" id="popup-close" title="Close Workspace">×</button>
+            </div>
+            <div class="popup-body">
+                <iframe id="tool-iframe" src="" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
 
-  cards.forEach(card => {
-    const name = card.dataset.name;
-
-    if (name.includes(query)) {
-      card.style.display = "block";
-      visible++;
-    } else {
-      card.style.display = "none";
-    }
-  });
-
-  noResults.style.display = visible === 0 ? "block" : "none";
-});
-
-function openTool(path) {
-  document.getElementById("popup").style.display = "flex";
-  document.getElementById("toolFrame").src = path;
-}
-
-function closeTool() {
-  document.getElementById("popup").style.display = "none";
-  document.getElementById("toolFrame").src = "";
-}
-</script>
-
+    <script src="js/main.js"></script>
 </body>
 </html>
