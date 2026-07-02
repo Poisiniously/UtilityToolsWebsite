@@ -3,157 +3,254 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>3D Endless Runner</title>
+<title>ULTRA 3D Runner</title>
 <style>
-  body { margin:0; overflow:hidden; background:#000; }
-  #ui {
-    position:absolute;
-    top:10px; left:10px;
-    color:white;
-    font-family:sans-serif;
-    font-size:20px;
-  }
+body { margin:0; overflow:hidden; background:black; }
+#ui {
+ position:absolute; top:10px; left:10px;
+ color:white; font-family:sans-serif;
+}
 </style>
 </head>
 <body>
-<div id="ui">Score: <span id="score">0</span></div>
+<div id="ui">
+Score: <span id="score">0</span><br>
+Coins: <span id="coins">0</span><br>
+Highscore: <span id="high">0</span>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
 <script>
+// BASIC SETUP
 let scene = new THREE.Scene();
-scene.background = new THREE.Color(0x111111);
+scene.fog = new THREE.Fog(0x000000,10,100);
 
-let camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
-let renderer = new THREE.WebGLRenderer();
-renderer.setSize(innerWidth, innerHeight);
+let camera = new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,1000);
+let renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Licht
-let light = new THREE.DirectionalLight(0xffffff,1);
-light.position.set(5,10,5);
+// LIGHT
+let light = new THREE.PointLight(0xffffff,1);
+light.position.set(0,10,5);
 scene.add(light);
 
-// Spieler
+// PLAYER
 let player = new THREE.Mesh(
-  new THREE.BoxGeometry(1,1,1),
-  new THREE.MeshStandardMaterial({color:0x00ffcc})
+ new THREE.BoxGeometry(1,1,1),
+ new THREE.MeshStandardMaterial({color:0x00ffff})
 );
 player.position.y = 0.5;
 scene.add(player);
 
-let lanes = [-2,0,2];
-let currentLane = 1;
+// LANES
+let lanes=[-2,0,2];
+let lane=1;
 
-// Boden
-let ground = [];
-for(let i=0;i<50;i++){
-  let tile = new THREE.Mesh(
-    new THREE.BoxGeometry(6,0.1,5),
-    new THREE.MeshStandardMaterial({color:0x222222})
-  );
-  tile.position.z = i*5;
-  scene.add(tile);
-  ground.push(tile);
+// GROUND
+let ground=[];
+for(let i=0;i<60;i++){
+ let g=new THREE.Mesh(
+  new THREE.BoxGeometry(6,0.1,5),
+  new THREE.MeshStandardMaterial({color:0x111111})
+ );
+ g.position.z=i*5;
+ scene.add(g);
+ ground.push(g);
 }
 
-// Hindernisse
-let obstacles = [];
+// OBJECTS
+let obstacles=[], coins=[], particles=[];
+
+// AUDIO
+let ctx=new AudioContext();
+function beep(freq){
+ let o=ctx.createOscillator();
+ let g=ctx.createGain();
+ o.frequency.value=freq;
+ o.connect(g); g.connect(ctx.destination);
+ o.start();
+ g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.2);
+}
+
+// SPAWN
 function spawnObstacle(z){
-  let obs = new THREE.Mesh(
-    new THREE.BoxGeometry(1,1,1),
-    new THREE.MeshStandardMaterial({color:0xff3333})
-  );
-  let lane = Math.floor(Math.random()*3);
-  obs.position.set(lanes[lane],0.5,z);
-  scene.add(obs);
-  obstacles.push(obs);
+ let o=new THREE.Mesh(
+  new THREE.BoxGeometry(1,1,1),
+  new THREE.MeshStandardMaterial({color:0xff0000})
+ );
+ o.position.set(lanes[Math.floor(Math.random()*3)],0.5,z);
+ scene.add(o);
+ obstacles.push(o);
 }
 
-// Kamera
+function spawnCoin(z){
+ let c=new THREE.Mesh(
+  new THREE.TorusGeometry(0.4,0.15,8,16),
+  new THREE.MeshStandardMaterial({color:0xffff00})
+ );
+ c.position.set(lanes[Math.floor(Math.random()*3)],0.7,z);
+ scene.add(c);
+ coins.push(c);
+}
+
+// PARTICLES
+function explode(x,y,z){
+ for(let i=0;i<10;i++){
+  let p=new THREE.Mesh(
+   new THREE.SphereGeometry(0.1),
+   new THREE.MeshBasicMaterial({color:0xff00ff})
+  );
+  p.position.set(x,y,z);
+  p.vx=(Math.random()-0.5)*0.2;
+  p.vy=Math.random()*0.2;
+  p.vz=(Math.random()-0.5)*0.2;
+  scene.add(p);
+  particles.push(p);
+ }
+}
+
+// CONTROL
+document.addEventListener("keydown",e=>{
+ if(e.key==="ArrowLeft" && lane>0) lane--;
+ if(e.key==="ArrowRight" && lane<2) lane++;
+ if(e.key===" " && player.y<=0.5) velocity=0.15;
+ if(e.key==="p") paused=!paused;
+});
+
+// PHYSICS
+let velocity=0, gravity=-0.008;
+
+// GAME STATE
+let speed=0.2, score=0, coinScore=0;
+let high=localStorage.high||0;
+document.getElementById("high").innerText=high;
+
+let shield=false, boost=0;
+let paused=false;
+
+function gameOver(){
+ beep(100);
+ explode(player.position.x,player.position.y,player.position.z);
+
+ if(score>high){
+  localStorage.high=score;
+ }
+
+ setTimeout(()=>location.reload(),1000);
+}
+
+// LOOP
+function animate(){
+ requestAnimationFrame(animate);
+ if(paused) return;
+
+ player.position.x+=(lanes[lane]-player.position.x)*0.2;
+
+ // JUMP
+ velocity+=gravity;
+ player.position.y+=velocity;
+ if(player.position.y<0.5){
+  player.position.y=0.5;
+  velocity=0;
+ }
+
+ // GROUND LOOP
+ ground.forEach(g=>{
+  g.position.z-=speed;
+  if(g.position.z<-5) g.position.z+=300;
+ });
+
+ // SPAWN
+ if(Math.random()<0.03) spawnObstacle(100);
+ if(Math.random()<0.05) spawnCoin(100);
+
+ // OBSTACLES
+ obstacles.forEach((o,i)=>{
+  o.position.z-=speed;
+
+  if(Math.abs(o.position.z)<1 &&
+     Math.abs(o.position.x-player.position.x)<1 &&
+     player.position.y<1){
+
+     if(!shield) gameOver();
+     else shield=false;
+  }
+
+  if(o.position.z<-10){
+   scene.remove(o);
+   obstacles.splice(i,1);
+  }
+ });
+
+ // COINS
+ coins.forEach((c,i)=>{
+  c.rotation.y+=0.1;
+  c.position.z-=speed;
+
+  if(Math.abs(c.position.z)<1 &&
+     Math.abs(c.position.x-player.position.x)<1){
+
+     beep(800);
+     coinScore++;
+     scene.remove(c);
+     coins.splice(i,1);
+
+     // RANDOM POWERUP
+     if(Math.random()<0.2){
+       shield=true;
+     }
+     if(Math.random()<0.2){
+       boost=200;
+     }
+  }
+
+  if(c.position.z<-10){
+   scene.remove(c);
+   coins.splice(i,1);
+  }
+ });
+
+ // BOOST
+ if(boost>0){
+  speed=0.4;
+  boost--;
+ } else {
+  speed+=0.00005;
+ }
+
+ // PARTICLES
+ particles.forEach((p,i)=>{
+  p.position.x+=p.vx;
+  p.position.y+=p.vy;
+  p.position.z+=p.vz;
+  p.vy-=0.01;
+
+  if(p.position.y<0){
+   scene.remove(p);
+   particles.splice(i,1);
+  }
+ });
+
+ // UI
+ score++;
+ document.getElementById("score").innerText=score;
+ document.getElementById("coins").innerText=coinScore;
+
+ renderer.render(scene,camera);
+}
+
 camera.position.set(0,3,-6);
 camera.lookAt(0,0,5);
 
-// Steuerung
-document.addEventListener("keydown", e=>{
-  if(e.key==="ArrowLeft" && currentLane>0) currentLane--;
-  if(e.key==="ArrowRight" && currentLane<2) currentLane++;
-  if(e.key===" " && player.position.y<=0.5){
-    velocityY = 0.15;
-  }
-});
-
-// Physik
-let velocityY = 0;
-let gravity = -0.008;
-
-// Game loop
-let speed = 0.2;
-let score = 0;
-
-function animate(){
-  requestAnimationFrame(animate);
-
-  // Bewegung
-  player.position.x += (lanes[currentLane]-player.position.x)*0.2;
-
-  // Springen
-  velocityY += gravity;
-  player.position.y += velocityY;
-  if(player.position.y < 0.5){
-    player.position.y = 0.5;
-    velocityY = 0;
-  }
-
-  // Boden bewegen
-  ground.forEach(tile=>{
-    tile.position.z -= speed;
-    if(tile.position.z < -5){
-      tile.position.z += 250;
-    }
-  });
-
-  // Hindernisse
-  if(Math.random()<0.02){
-    spawnObstacle(100);
-  }
-
-  obstacles.forEach((obs,i)=>{
-    obs.position.z -= speed;
-
-    // Kollision
-    if(
-      Math.abs(obs.position.z - player.position.z) < 1 &&
-      Math.abs(obs.position.x - player.position.x) < 1 &&
-      player.position.y < 1
-    ){
-      alert("Game Over! Score: "+score);
-      location.reload();
-    }
-
-    if(obs.position.z < -10){
-      scene.remove(obs);
-      obstacles.splice(i,1);
-    }
-  });
-
-  // Score
-  score++;
-  document.getElementById("score").innerText = score;
-
-  // Schwierigkeit
-  speed += 0.00002;
-
-  renderer.render(scene, camera);
-}
-
 animate();
 
-// Resize
-window.addEventListener("resize", ()=>{
-  camera.aspect = innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
+// RESIZE
+window.addEventListener("resize",()=>{
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
+ renderer.setSize(innerWidth,innerHeight);
 });
 </script>
 
