@@ -3,8 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimal Dark Timer with Zen Alarm</title>
+    <title>Zen Timer & Stoppuhr</title>
     <style>
+        :root {
+            --bg-main: #0c0812;
+            --bg-panel: #180e25;
+            --border-color: #26163a;
+            --text-main: #f3effa;
+            --text-muted: #6e568b;
+            --accent-pink: #d61c59;
+            --accent-hover: #fa2a73;
+            --btn-dark: #1f1230;
+            --btn-dark-border: #361f54;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -12,44 +24,75 @@
         }
 
         body {
-            background-color: #0a0a0c;
-            color: #e2e8f0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
+            padding: 20px;
         }
 
-        .timer-container {
+        .app {
+            width: 100%;
+            max-width: 600px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 35px 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             text-align: center;
             user-select: none;
         }
 
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
         /* Container für Eingabe und Anzeige */
         .timer-box {
-            font-size: 7.5rem;
+            font-size: 5.5rem;
             font-weight: 200;
-            margin-bottom: 2.5rem;
-            color: #f8fafc;
-            text-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+            margin-bottom: 30px;
+            color: var(--text-main);
+            background: #08050c;
+            border: 2px dashed var(--btn-dark-border);
+            border-radius: 8px;
+            padding: 25px 10px;
             display: flex;
             justify-content: center;
             align-items: center;
+            transition: border-color 0.25s, background-color 0.25s;
+        }
+
+        .timer-box:hover {
+            border-color: var(--border-color);
         }
 
         /* Styling für die Input-Felder */
         .timer-box input {
             background: transparent;
             border: none;
-            color: #f8fafc;
-            font-size: 7.5rem;
+            color: var(--text-main);
+            font-size: 5.5rem;
             font-weight: 200;
-            width: 160px;
+            width: 115px;
             text-align: center;
             font-family: inherit;
             outline: none;
+        }
+
+        .timer-box input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.3;
         }
 
         /* Entfernt Pfeile bei Inputs */
@@ -65,63 +108,85 @@
         .time-display {
             font-variant-numeric: tabular-nums;
             letter-spacing: -2px;
+            width: 100%;
         }
 
         /* Buttons */
         .controls {
             display: flex;
-            gap: 1.25rem;
+            gap: 15px;
             justify-content: center;
         }
 
         button {
-            background: rgba(255, 255, 255, 0.03);
-            color: #94a3b8;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 0.8rem 2rem;
-            font-size: 1rem;
-            font-weight: 500;
-            border-radius: 50px;
+            width: 100%;
+            padding: 14px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
+            border: none;
         }
 
-        button:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: #f8fafc;
-            border-color: rgba(255, 255, 255, 0.2);
+        #startStopBtn {
+            background: var(--accent-pink);
+            color: white;
+        }
+
+        #startStopBtn:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 0 12px rgba(214, 28, 89, 0.4);
+        }
+
+        #resetBtn {
+            background: var(--btn-dark);
+            color: var(--text-main);
+            border: 1px solid var(--btn-dark-border);
+        }
+
+        #resetBtn:hover {
+            background: var(--border-color);
+            border-color: var(--text-muted);
         }
 
         button:active {
-            transform: scale(0.96);
+            transform: scale(0.98);
         }
 
+        /* Spezialzustand wenn Timer läuft */
         button.running {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.3);
-            color: #f87171;
+            background: #441118 !important;
+            border: 1px solid #7f1d1d;
+            color: #f87171 !important;
+            box-shadow: none !important;
         }
 
         button.running:hover {
-            background: rgba(239, 68, 68, 0.18);
-            color: #fca5a5;
+            background: #55161e !important;
+            color: #fca5a5 !important;
         }
 
-        /* Sanftes Pulsieren am Ende */
+        /* Edles Pulsieren bei Alarm-Ende */
         @keyframes alarm-pulse {
-            0% { opacity: 1; color: #f8fafc; }
-            50% { opacity: 0.4; color: #a78bfa; }
-            100% { opacity: 1; color: #f8fafc; }
+            0% { border-color: var(--accent-pink); box-shadow: 0 0 10px rgba(214, 28, 89, 0.2); color: var(--text-main); }
+            50% { border-color: var(--accent-hover); box-shadow: 0 0 25px rgba(214, 28, 89, 0.5); color: var(--accent-hover); }
+            100% { border-color: var(--accent-pink); box-shadow: 0 0 10px rgba(214, 28, 89, 0.2); color: var(--text-main); }
         }
 
-        .alarm {
-            animation: alarm-pulse 2s infinite ease-in-out;
+        .timer-box.alarm {
+            animation: alarm-pulse 1.5s infinite ease-in-out;
+            background: #160714;
+            border-style: solid;
         }
     </style>
 </head>
 <body>
 
-    <div class="timer-container">
+    <div class="app">
+        <h2>Zen Timer & Stoppuhr</h2>
+        <p class="subtitle">Beliebig Zeit eintragen oder bei 00:00:00 starten für Stoppuhr.</p>
+
         <div class="timer-box" id="timerBox">
             <div id="inputs">
                 <input type="number" id="hrs" placeholder="00" min="0" max="99" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2);">:
@@ -132,184 +197,165 @@
         </div>
         
         <div class="controls">
-            <button id="startStopBtn">Start</button>
             <button id="resetBtn">Reset</button>
+            <button id="startStopBtn">Start</button>
         </div>
     </div>
 
     <script>
-       let timerInterval;
-let alarmInterval;
+        let timerInterval;
+        let alarmInterval;
 
-let totalSeconds = 0;
-let isRunning = false;
-let isPaused = false;
-let stopwatchMode = false;
+        let totalSeconds = 0;
+        let isRunning = false;
+        let isPaused = false;
+        let stopwatchMode = false;
 
-let audioCtx = null;
+        let audioCtx = null;
 
-const startStopBtn = document.getElementById("startStopBtn");
-const resetBtn = document.getElementById("resetBtn");
+        const startStopBtn = document.getElementById("startStopBtn");
+        const resetBtn = document.getElementById("resetBtn");
 
-const inputsDiv = document.getElementById("inputs");
-const displayDiv = document.getElementById("display");
-const timerBox = document.getElementById("timerBox");
+        const inputsDiv = document.getElementById("inputs");
+        const displayDiv = document.getElementById("display");
+        const timerBox = document.getElementById("timerBox");
 
-const hrsInput = document.getElementById("hrs");
-const minsInput = document.getElementById("mins");
-const secsInput = document.getElementById("secs");
+        const hrsInput = document.getElementById("hrs");
+        const minsInput = document.getElementById("mins");
+        const secsInput = document.getElementById("secs");
 
-function playZenChime() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
+        function playZenChime() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
 
-    const now = audioCtx.currentTime;
-    const notes = [329.63, 440.0, 493.88, 659.25];
+            const now = audioCtx.currentTime;
+            const notes = [329.63, 440.0, 493.88, 659.25]; // Harmonischer E-Moll Akkord
 
-    notes.forEach((freq, i) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+            notes.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
 
-        osc.type = "sine";
-        osc.frequency.value = freq;
+                osc.type = "sine";
+                osc.frequency.value = freq;
 
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
 
-        gain.gain.setValueAtTime(0, now + i * 0.12);
-        gain.gain.linearRampToValueAtTime(0.15, now + i * 0.12 + 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.12 + 1.5);
+                gain.gain.setValueAtTime(0, now + i * 0.12);
+                gain.gain.linearRampToValueAtTime(0.15, now + i * 0.12 + 0.04);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.12 + 1.5);
 
-        osc.start(now + i * 0.12);
-        osc.stop(now + i * 0.12 + 1.5);
-    });
-}
+                osc.start(now + i * 0.12);
+                osc.stop(now + i * 0.12 + 1.5);
+            });
+        }
 
-function startAlarm() {
-    timerBox.classList.add("alarm");
+        function startAlarm() {
+            timerBox.classList.add("alarm");
+            playZenChime();
+            alarmInterval = setInterval(playZenChime, 3000);
+        }
 
-    playZenChime();
-    alarmInterval = setInterval(playZenChime, 3000);
-}
+        function stopAlarm() {
+            clearInterval(alarmInterval);
+            timerBox.classList.remove("alarm");
+        }
 
-function stopAlarm() {
-    clearInterval(alarmInterval);
-    timerBox.classList.remove("alarm");
-}
+        function updateDisplay() {
+            const h = Math.floor(totalSeconds / 3600);
+            const m = Math.floor((totalSeconds % 3600) / 60);
+            const s = totalSeconds % 60;
 
-function updateDisplay() {
-    const h = Math.floor(totalSeconds / 3600);
-    const m = Math.floor((totalSeconds % 3600) / 60);
-    const s = totalSeconds % 60;
+            displayDiv.textContent =
+                `${String(h).padStart(2, "0")}:` +
+                `${String(m).padStart(2, "0")}:` +
+                `${String(s).padStart(2, "0")}`;
+        }
 
-    displayDiv.textContent =
-        `${String(h).padStart(2, "0")}:` +
-        `${String(m).padStart(2, "0")}:` +
-        `${String(s).padStart(2, "0")}`;
-}
+        function startTimer() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
 
-function startTimer() {
+            if (!isPaused) {
+                const h = parseInt(hrsInput.value) || 0;
+                const m = parseInt(minsInput.value) || 0;
+                const s = parseInt(secsInput.value) || 0;
 
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
+                totalSeconds = h * 3600 + m * 60 + s;
+                stopwatchMode = totalSeconds === 0;
+            }
 
-    if (!isPaused) {
+            inputsDiv.style.display = "none";
+            displayDiv.style.display = "block";
 
-        const h = parseInt(hrsInput.value) || 0;
-        const m = parseInt(minsInput.value) || 0;
-        const s = parseInt(secsInput.value) || 0;
-
-        totalSeconds = h * 3600 + m * 60 + s;
-
-        stopwatchMode = totalSeconds === 0;
-    }
-
-    inputsDiv.style.display = "none";
-    displayDiv.style.display = "block";
-
-    updateDisplay();
-
-    isRunning = true;
-    isPaused = false;
-
-    startStopBtn.textContent = "Pause";
-    startStopBtn.classList.add("running");
-
-    timerInterval = setInterval(() => {
-
-        if (stopwatchMode) {
-
-            totalSeconds++;
             updateDisplay();
 
-            return;
+            isRunning = true;
+            isPaused = false;
+
+            startStopBtn.textContent = "Pause";
+            startStopBtn.classList.add("running");
+
+            timerInterval = setInterval(() => {
+                if (stopwatchMode) {
+                    totalSeconds++;
+                    updateDisplay();
+                    return;
+                }
+
+                totalSeconds--;
+                updateDisplay();
+
+                if (totalSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    startStopBtn.style.display = "none";
+                    startAlarm();
+                }
+            }, 1000);
         }
 
-        totalSeconds--;
-
-        updateDisplay();
-
-        if (totalSeconds <= 0) {
-
+        function pauseTimer() {
             clearInterval(timerInterval);
-
             isRunning = false;
+            isPaused = true;
 
-            startStopBtn.style.display = "none";
-
-            startAlarm();
+            startStopBtn.textContent = "Weiter";
+            startStopBtn.classList.remove("running");
         }
 
-    }, 1000);
-}
+        function resetTimer() {
+            clearInterval(timerInterval);
+            stopAlarm();
 
-function pauseTimer() {
+            totalSeconds = 0;
+            isRunning = false;
+            isPaused = false;
+            stopwatchMode = false;
 
-    clearInterval(timerInterval);
+            hrsInput.value = "";
+            minsInput.value = "";
+            secsInput.value = "";
 
-    isRunning = false;
-    isPaused = true;
+            inputsDiv.style.display = "block";
+            displayDiv.style.display = "none";
 
-    startStopBtn.textContent = "Continue";
-    startStopBtn.classList.remove("running");
-}
+            startStopBtn.style.display = "inline-block";
+            startStopBtn.textContent = "Start";
+            startStopBtn.classList.remove("running");
+        }
 
-function resetTimer() {
+        startStopBtn.addEventListener("click", () => {
+            if (!isRunning) {
+                startTimer();
+            } else {
+                pauseTimer();
+            }
+        });
 
-    clearInterval(timerInterval);
-    stopAlarm();
-
-    totalSeconds = 0;
-
-    isRunning = false;
-    isPaused = false;
-    stopwatchMode = false;
-
-    hrsInput.value = "";
-    minsInput.value = "";
-    secsInput.value = "";
-
-    inputsDiv.style.display = "block";
-    displayDiv.style.display = "none";
-
-    startStopBtn.style.display = "inline-block";
-    startStopBtn.textContent = "Start";
-    startStopBtn.classList.remove("running");
-}
-
-startStopBtn.addEventListener("click", () => {
-
-    if (!isRunning) {
-        startTimer();
-    } else {
-        pauseTimer();
-    }
-
-});
-
-resetBtn.addEventListener("click", resetTimer);
+        resetBtn.addEventListener("click", resetTimer);
     </script>
 </body>
 </html>
