@@ -3,254 +3,189 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>ULTRA 3D Runner</title>
+<title>Dino Runner</title>
 <style>
-body { margin:0; overflow:hidden; background:black; }
+body {
+  margin:0;
+  overflow:hidden;
+  background:#f7f7f7;
+  font-family:sans-serif;
+}
+canvas {
+  display:block;
+}
 #ui {
- position:absolute; top:10px; left:10px;
- color:white; font-family:sans-serif;
+  position:absolute;
+  top:10px;
+  left:10px;
+  color:#333;
+}
+#gameover {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  font-size:30px;
+  display:none;
 }
 </style>
 </head>
 <body>
+
 <div id="ui">
 Score: <span id="score">0</span><br>
-Coins: <span id="coins">0</span><br>
 Highscore: <span id="high">0</span>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<div id="gameover">GAME OVER<br><small>Drücke R zum Neustarten</small></div>
+
+<canvas id="game"></canvas>
 
 <script>
-// BASIC SETUP
-let scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0x000000,10,100);
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-let camera = new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,1000);
-let renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(innerWidth,innerHeight);
-document.body.appendChild(renderer.domElement);
-
-// LIGHT
-let light = new THREE.PointLight(0xffffff,1);
-light.position.set(0,10,5);
-scene.add(light);
-
-// PLAYER
-let player = new THREE.Mesh(
- new THREE.BoxGeometry(1,1,1),
- new THREE.MeshStandardMaterial({color:0x00ffff})
-);
-player.position.y = 0.5;
-scene.add(player);
-
-// LANES
-let lanes=[-2,0,2];
-let lane=1;
-
-// GROUND
-let ground=[];
-for(let i=0;i<60;i++){
- let g=new THREE.Mesh(
-  new THREE.BoxGeometry(6,0.1,5),
-  new THREE.MeshStandardMaterial({color:0x111111})
- );
- g.position.z=i*5;
- scene.add(g);
- ground.push(g);
-}
-
-// OBJECTS
-let obstacles=[], coins=[], particles=[];
-
-// AUDIO
-let ctx=new AudioContext();
-function beep(freq){
- let o=ctx.createOscillator();
- let g=ctx.createGain();
- o.frequency.value=freq;
- o.connect(g); g.connect(ctx.destination);
- o.start();
- g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.2);
-}
-
-// SPAWN
-function spawnObstacle(z){
- let o=new THREE.Mesh(
-  new THREE.BoxGeometry(1,1,1),
-  new THREE.MeshStandardMaterial({color:0xff0000})
- );
- o.position.set(lanes[Math.floor(Math.random()*3)],0.5,z);
- scene.add(o);
- obstacles.push(o);
-}
-
-function spawnCoin(z){
- let c=new THREE.Mesh(
-  new THREE.TorusGeometry(0.4,0.15,8,16),
-  new THREE.MeshStandardMaterial({color:0xffff00})
- );
- c.position.set(lanes[Math.floor(Math.random()*3)],0.7,z);
- scene.add(c);
- coins.push(c);
-}
-
-// PARTICLES
-function explode(x,y,z){
- for(let i=0;i<10;i++){
-  let p=new THREE.Mesh(
-   new THREE.SphereGeometry(0.1),
-   new THREE.MeshBasicMaterial({color:0xff00ff})
-  );
-  p.position.set(x,y,z);
-  p.vx=(Math.random()-0.5)*0.2;
-  p.vy=Math.random()*0.2;
-  p.vz=(Math.random()-0.5)*0.2;
-  scene.add(p);
-  particles.push(p);
- }
-}
-
-// CONTROL
-document.addEventListener("keydown",e=>{
- if(e.key==="ArrowLeft" && lane>0) lane--;
- if(e.key==="ArrowRight" && lane<2) lane++;
- if(e.key===" " && player.y<=0.5) velocity=0.15;
- if(e.key==="p") paused=!paused;
-});
-
-// PHYSICS
-let velocity=0, gravity=-0.008;
+canvas.width = innerWidth;
+canvas.height = innerHeight;
 
 // GAME STATE
-let speed=0.2, score=0, coinScore=0;
-let high=localStorage.high||0;
-document.getElementById("high").innerText=high;
+let groundY = canvas.height - 100;
+let gravity = 0.6;
+let velocity = 0;
+let jumpForce = -12;
 
-let shield=false, boost=0;
-let paused=false;
+let dino = {
+  x:100,
+  y:groundY,
+  w:40,
+  h:40
+};
 
-function gameOver(){
- beep(100);
- explode(player.position.x,player.position.y,player.position.z);
+let obstacles = [];
+let speed = 6;
+let score = 0;
+let high = localStorage.high || 0;
+document.getElementById("high").innerText = high;
 
- if(score>high){
-  localStorage.high=score;
- }
+let running = true;
 
- setTimeout(()=>location.reload(),1000);
+// INPUT
+document.addEventListener("keydown", e=>{
+  if((e.key===" " || e.key==="ArrowUp") && dino.y >= groundY){
+    velocity = jumpForce;
+  }
+  if(e.key==="r" && !running){
+    restart();
+  }
+});
+
+// SPAWN
+function spawnObstacle(){
+  obstacles.push({
+    x: canvas.width,
+    y: groundY,
+    w: 20 + Math.random()*20,
+    h: 40 + Math.random()*20
+  });
 }
 
 // LOOP
-function animate(){
- requestAnimationFrame(animate);
- if(paused) return;
+function update(){
+  if(!running) return;
 
- player.position.x+=(lanes[lane]-player.position.x)*0.2;
+  // PHYSICS
+  velocity += gravity;
+  dino.y += velocity;
 
- // JUMP
- velocity+=gravity;
- player.position.y+=velocity;
- if(player.position.y<0.5){
-  player.position.y=0.5;
-  velocity=0;
- }
-
- // GROUND LOOP
- ground.forEach(g=>{
-  g.position.z-=speed;
-  if(g.position.z<-5) g.position.z+=300;
- });
-
- // SPAWN
- if(Math.random()<0.03) spawnObstacle(100);
- if(Math.random()<0.05) spawnCoin(100);
-
- // OBSTACLES
- obstacles.forEach((o,i)=>{
-  o.position.z-=speed;
-
-  if(Math.abs(o.position.z)<1 &&
-     Math.abs(o.position.x-player.position.x)<1 &&
-     player.position.y<1){
-
-     if(!shield) gameOver();
-     else shield=false;
+  if(dino.y > groundY){
+    dino.y = groundY;
+    velocity = 0;
   }
 
-  if(o.position.z<-10){
-   scene.remove(o);
-   obstacles.splice(i,1);
-  }
- });
-
- // COINS
- coins.forEach((c,i)=>{
-  c.rotation.y+=0.1;
-  c.position.z-=speed;
-
-  if(Math.abs(c.position.z)<1 &&
-     Math.abs(c.position.x-player.position.x)<1){
-
-     beep(800);
-     coinScore++;
-     scene.remove(c);
-     coins.splice(i,1);
-
-     // RANDOM POWERUP
-     if(Math.random()<0.2){
-       shield=true;
-     }
-     if(Math.random()<0.2){
-       boost=200;
-     }
+  // SPAWN
+  if(Math.random() < 0.02){
+    spawnObstacle();
   }
 
-  if(c.position.z<-10){
-   scene.remove(c);
-   coins.splice(i,1);
-  }
- });
+  // OBSTACLES
+  obstacles.forEach((o,i)=>{
+    o.x -= speed;
 
- // BOOST
- if(boost>0){
-  speed=0.4;
-  boost--;
- } else {
-  speed+=0.00005;
- }
+    // COLLISION
+    if(
+      dino.x < o.x + o.w &&
+      dino.x + dino.w > o.x &&
+      dino.y < o.y + o.h &&
+      dino.y + dino.h > o.y
+    ){
+      gameOver();
+    }
 
- // PARTICLES
- particles.forEach((p,i)=>{
-  p.position.x+=p.vx;
-  p.position.y+=p.vy;
-  p.position.z+=p.vz;
-  p.vy-=0.01;
+    // REMOVE
+    if(o.x + o.w < 0){
+      obstacles.splice(i,1);
+    }
+  });
 
-  if(p.position.y<0){
-   scene.remove(p);
-   particles.splice(i,1);
-  }
- });
+  // SCORE
+  score++;
+  document.getElementById("score").innerText = score;
 
- // UI
- score++;
- document.getElementById("score").innerText=score;
- document.getElementById("coins").innerText=coinScore;
-
- renderer.render(scene,camera);
+  // DIFFICULTY
+  speed += 0.002;
 }
 
-camera.position.set(0,3,-6);
-camera.lookAt(0,0,5);
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-animate();
+  // GROUND
+  ctx.fillStyle = "#333";
+  ctx.fillRect(0, groundY + dino.h, canvas.width, 5);
+
+  // DINO
+  ctx.fillStyle = "#222";
+  ctx.fillRect(dino.x, dino.y, dino.w, dino.h);
+
+  // OBSTACLES
+  ctx.fillStyle = "#228B22";
+  obstacles.forEach(o=>{
+    ctx.fillRect(o.x, o.y, o.w, o.h);
+  });
+}
+
+function gameOver(){
+  running = false;
+  document.getElementById("gameover").style.display = "block";
+
+  if(score > high){
+    localStorage.high = score;
+  }
+}
+
+function restart(){
+  obstacles = [];
+  speed = 6;
+  score = 0;
+  velocity = 0;
+  dino.y = groundY;
+  running = true;
+  document.getElementById("gameover").style.display = "none";
+}
+
+// MAIN LOOP
+function loop(){
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+loop();
 
 // RESIZE
-window.addEventListener("resize",()=>{
- camera.aspect=innerWidth/innerHeight;
- camera.updateProjectionMatrix();
- renderer.setSize(innerWidth,innerHeight);
+window.addEventListener("resize", ()=>{
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+  groundY = canvas.height - 100;
 });
 </script>
 
