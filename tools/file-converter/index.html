@@ -1,261 +1,477 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>File Converter</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File & Core Matrix Transcoder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Cyberpunk Design Tokens */
+        :root {
+            --background: #0d0714;
+            --surface: rgba(26, 12, 38, .65);
+            --primary: #ff007f;
+            --secondary: #00f0ff;
+            --text: #f4f4ff;
+            --text-secondary: #a0a0c0;
+            --border: rgba(255, 255, 255, .08);
+            --font-main: 'Outfit', 'Segoe UI', sans-serif;
+            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
 
-<style>
-:root {
-  --primary: #ff007f;
-  --secondary: #00f0ff;
-  --bg: rgba(255,255,255,0.05);
-  --text: #e0e0ff;
-}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-}
+        body {
+            background: transparent; /* Seamless iframe inclusion */
+            color: var(--text);
+            font-family: var(--font-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-body {
-  background: transparent; /* IMPORTANT for iframe */
-  color: var(--text);
-  display: flex;
-  justify-content: center;
-  padding: 20px;
-}
+        /* Glassmorphic Container Dashboard Styling */
+        .tool-wrapper {
+            width: 100%;
+            max-width: 550px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 240, 255, 0.02);
+        }
 
-/* CARD */
-.app {
-  width: 100%;
-  max-width: 500px;
-  background: var(--bg);
-  backdrop-filter: blur(15px);
-  border-radius: 15px;
-  padding: 20px;
-  border: 1px solid #ffffff11;
-}
+        .header-group {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
 
-/* TITLE */
-h2 {
-  text-align: center;
-  margin-bottom: 10px;
-  color: var(--primary);
-}
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--text) 30%, var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-p.subtitle {
-  text-align: center;
-  font-size: 13px;
-  opacity: 0.7;
-  margin-bottom: 20px;
-}
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
 
-/* DROP ZONE */
-.drop {
-  border: 2px dashed var(--secondary);
-  border-radius: 12px;
-  padding: 30px;
-  text-align: center;
-  cursor: pointer;
-  transition: 0.3s;
-  margin-bottom: 20px;
-}
+        /* Cyberpunk Active Drop Zone */
+        .drop-zone {
+            border: 2px dashed rgba(0, 240, 255, 0.3);
+            border-radius: 16px;
+            padding: 3rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.2);
+            transition: var(--transition-smooth);
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
 
-.drop:hover {
-  background: #00f0ff11;
-}
+        .drop-zone:hover {
+            border-color: var(--secondary);
+            background: rgba(0, 240, 255, 0.03);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+        }
 
-.drop.active {
-  border-color: var(--primary);
-}
+        .drop-zone.active {
+            border-color: var(--primary);
+            background: rgba(255, 0, 127, 0.05);
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.15);
+        }
 
-/* FILE INFO */
-.file {
-  display: none;
-  margin-bottom: 15px;
-}
+        .drop-icon {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 0.75rem;
+            display: block;
+            transition: var(--transition-smooth);
+        }
 
-.file-name {
-  font-weight: bold;
-}
+        .drop-zone:hover .drop-icon {
+            transform: translateY(-4px);
+            color: var(--primary);
+        }
 
-.file-size {
-  font-size: 12px;
-  opacity: 0.6;
-}
+        .drop-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
 
-/* SELECT */
-select {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  border: 1px solid #ffffff22;
-  background: #0d0714;
-  color: white;
-}
+        .drop-text strong {
+            color: var(--text);
+        }
 
-/* BUTTONS */
-button {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background: var(--primary);
-  color: white;
-  cursor: pointer;
-  transition: 0.2s;
-}
+        /* File Metric Info Panel */
+        .file-status-box {
+            display: none;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeIn 0.3s ease forwards;
+        }
 
-button:hover {
-  background: #ff3399;
-}
+        .file-details {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            padding-right: 10px;
+        }
 
-.download {
-  display: none;
-  margin-top: 10px;
-  background: var(--secondary);
-  color: black;
-}
+        .file-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text);
+            margin-bottom: 0.2rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-.download:hover {
-  background: #33f7ff;
-}
-</style>
+        .file-size {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .btn-remove {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-remove:hover {
+            color: var(--primary);
+        }
+
+        /* Control Input Forms */
+        .config-row {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            color: var(--text);
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a0a0c0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+        }
+
+        /* Action Buttons with Light Sweep/Neon Glow Effects */
+        .btn-action {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-family: var(--font-main);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary-action {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(255, 0, 127, 0.2);
+        }
+
+        .btn-primary-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 0, 127, 0.4);
+            background: #ff1a8c;
+        }
+
+        .btn-secondary-action {
+            display: none;
+            margin-top: 1rem;
+            background: transparent;
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+            box-shadow: 0 4px 15px rgba(0, 240, 255, 0.05);
+            animation: slideUp 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+
+        .btn-secondary-action:hover {
+            transform: translateY(-2px);
+            background: rgba(0, 240, 255, 0.08);
+            box-shadow: 0 6px 25px rgba(0, 240, 255, 0.25);
+        }
+
+        /* Animations Framework */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="app">
+    <div class="tool-wrapper">
+        <div class="header-group">
+            <h2>File Transcoder Node</h2>
+            <p class="subtitle">Client-side translation logic across abstract media streams</p>
+        </div>
 
-  <h2>File Converter</h2>
-  <p class="subtitle">Convert files directly in your browser</p>
+        <div class="drop-zone" id="dropZone">
+            <span class="drop-icon">⇪</span>
+            <p class="drop-text">Drag matrix entity here or <strong>browse local nodes</strong></p>
+            <input type="file" id="fileInput" hidden>
+        </div>
 
-  <div class="drop" id="drop">
-    Drop file here or click
-    <input type="file" id="fileInput" hidden>
-  </div>
+        <div class="file-status-box" id="fileStatusBox">
+            <div class="file-details">
+                <div class="file-name" id="fileName">Stream_Core.csv</div>
+                <div class="file-size" id="fileSize">0.0 KB</div>
+            </div>
+            <button class="btn-remove" id="btnRemove" title="Clear Stream">×</button>
+        </div>
 
-  <div class="file" id="fileInfo">
-    <div class="file-name" id="fileName"></div>
-    <div class="file-size" id="fileSize"></div>
-  </div>
+        <div class="config-row">
+            <label for="formatSelect">Target Format Node</label>
+            <select id="formatSelect">
+                <option value="" disabled selected>Load entry matrix file first...</option>
+            </select>
+        </div>
 
-  <select id="format"></select>
+        <button class="btn-action btn-primary-action" id="convertBtn">Execute Translation</button>
+        <button class="btn-action btn-secondary-action" id="downloadBtn">Deploy Output Stream</button>
+    </div>
 
-  <button id="convertBtn">Convert</button>
-  <button id="downloadBtn" class="download">Download</button>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM References utilizing strict descriptive syntax
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const fileStatusBox = document.getElementById('fileStatusBox');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const btnRemove = document.getElementById('btnRemove');
+            const formatSelect = document.getElementById('formatSelect');
+            const convertBtn = document.getElementById('convertBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
 
-</div>
+            let activeFile = null;
+            let outputBlob = null;
 
-<script>
-const drop = document.getElementById("drop");
-const fileInput = document.getElementById("fileInput");
-const fileInfo = document.getElementById("fileInfo");
-const fileName = document.getElementById("fileName");
-const fileSize = document.getElementById("fileSize");
-const format = document.getElementById("format");
-const convertBtn = document.getElementById("convertBtn");
-const downloadBtn = document.getElementById("downloadBtn");
+            // Supported format vectors
+            const formatMatrix = {
+                csv: ['json', 'txt'],
+                txt: ['json', 'md'],
+                md: ['html', 'txt'],
+                png: ['jpeg', 'webp'],
+                jpg: ['png', 'webp'],
+                jpeg: ['png', 'webp']
+            };
 
-let file = null;
-let blob = null;
+            // Setup drop zone triggers
+            dropZone.addEventListener('click', () => fileInput.click());
 
-/* FORMAT MAP */
-const formats = {
-  csv: ["json", "txt"],
-  txt: ["json", "md"],
-  md: ["html", "txt"],
-  png: ["jpeg"],
-  jpg: ["png"]
-};
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('active');
+            });
 
-/* DROP EVENTS */
-drop.onclick = () => fileInput.click();
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('active'));
 
-drop.ondragover = e => {
-  e.preventDefault();
-  drop.classList.add("active");
-};
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('active');
+                if (e.dataTransfer.files.length > 0) {
+                    processIncomingFile(e.dataTransfer.files[0]);
+                }
+            });
 
-drop.ondragleave = () => drop.classList.remove("active");
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    processIncomingFile(e.target.files[0]);
+                }
+            });
 
-drop.ondrop = e => {
-  e.preventDefault();
-  drop.classList.remove("active");
-  handleFile(e.dataTransfer.files[0]);
-};
+            btnRemove.addEventListener('click', () => resetState());
 
-fileInput.onchange = e => handleFile(e.target.files[0]);
+            // Central stream processing function
+            const processIncomingFile = (file) => {
+                if (!file) return;
 
-function handleFile(f) {
-  if (!f) return;
+                const fileExtension = file.name.split('.').pop().toLowerCase();
 
-  const ext = f.name.split(".").pop().toLowerCase();
+                if (!formatMatrix[fileExtension]) {
+                    alert('Error: Unsupported binary payload type allocation.');
+                    return;
+                }
 
-  if (!formats[ext]) {
-    alert("Unsupported file type");
-    return;
-  }
+                activeFile = file;
+                outputBlob = null;
+                downloadBtn.style.display = 'none';
 
-  file = f;
-  blob = null;
-  downloadBtn.style.display = "none";
+                // Render metrics view safely
+                fileName.textContent = file.name;
+                fileSize.textContent = `${(file.size / 1024).toFixed(2)} KB`;
+                fileStatusBox.style.display = 'flex';
 
-  fileName.textContent = f.name;
-  fileSize.textContent = (f.size / 1024).toFixed(1) + " KB";
-  fileInfo.style.display = "block";
+                // Re-populate target select values
+                formatSelect.innerHTML = '';
+                formatMatrix[fileExtension].forEach(targetFormat => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = targetFormat;
+                    optionElement.textContent = targetFormat.toUpperCase();
+                    formatSelect.appendChild(optionElement);
+                });
+            };
 
-  format.innerHTML = "";
-  formats[ext].forEach(t => {
-    const opt = document.createElement("option");
-    opt.value = t;
-    opt.textContent = t.toUpperCase();
-    format.appendChild(opt);
-  });
-}
+            const resetState = () => {
+                activeFile = null;
+                outputBlob = null;
+                fileInput.value = '';
+                fileStatusBox.style.display = 'none';
+                downloadBtn.style.display = 'none';
+                formatSelect.innerHTML = '<option value="" disabled selected>Load entry matrix file first...</option>';
+            };
 
-/* CONVERT */
-convertBtn.onclick = () => {
-  if (!file) return;
+            // Transformation Processing Engine (Adds complete Text + Canvas Image transformation processing logic)
+            convertBtn.addEventListener('click', () => {
+                if (!activeFile) {
+                    alert('Error: Data payload unassigned.');
+                    return;
+                }
 
-  const reader = new FileReader();
-  const ext = file.name.split(".").pop().toLowerCase();
-  const target = format.value;
+                const sourceExtension = activeFile.name.split('.').pop().toLowerCase();
+                const targetExtension = formatSelect.value;
+                const reader = new FileReader();
 
-  reader.onload = e => {
-    if (ext === "csv" && target === "json") {
-      const lines = e.target.result.split("\n");
-      const headers = lines[0].split(",");
-      const data = lines.slice(1).map(l => {
-        const obj = {};
-        l.split(",").forEach((v, i) => obj[headers[i]] = v);
-        return obj;
-      });
-      blob = new Blob([JSON.stringify(data, null, 2)]);
-    } else {
-      blob = new Blob([e.target.result]);
-    }
+                // Check processing pipe layout logic (Image vs String manipulation)
+                if (['png', 'jpg', 'jpeg'].includes(sourceExtension)) {
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            
+                            canvas.toBlob((blob) => {
+                                outputBlob = blob;
+                                downloadBtn.style.display = 'flex';
+                            }, `image/${targetExtension}`, 0.92);
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(activeFile);
+                } else {
+                    // String manipulation data pipelines
+                    reader.onload = (event) => {
+                        const textContent = event.target.result;
 
-    downloadBtn.style.display = "block";
-  };
+                        if (sourceExtension === 'csv' && targetExtension === 'json') {
+                            const matrixLines = textContent.split(/\r?\n/).filter(line => line.trim() !== '');
+                            if (matrixLines.length === 0) return;
+                            
+                            const headers = matrixLines[0].split(',');
+                            const structuredOutput = matrixLines.slice(1).map(row => {
+                                const activeRowValues = row.split(',');
+                                const entityObject = {};
+                                headers.forEach((header, index) => {
+                                    entityObject[header.trim()] = activeRowValues[index] ? activeRowValues[index].trim() : '';
+                                });
+                                return entityObject;
+                            });
+                            outputBlob = new Blob([JSON.stringify(structuredOutput, null, 2)], { type: 'application/json' });
+                        } else if (sourceExtension === 'md' && targetExtension === 'html') {
+                            // High readability clean inline markdown to HTML converter implementation
+                            let convertedHtml = textContent
+                                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                                .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+                                .replace(/\*(.*)\*/gim, '<em>$1</em>');
+                            
+                            outputBlob = new Blob([convertedHtml], { type: 'text/html' });
+                        } else {
+                            // Direct stream container mapping fallback
+                            outputBlob = new Blob([textContent], { type: 'text/plain' });
+                        }
 
-  reader.readAsText(file);
-};
+                        downloadBtn.style.display = 'flex';
+                    };
+                    reader.readAsText(activeFile);
+                }
+            });
 
-/* DOWNLOAD */
-downloadBtn.onclick = () => {
-  if (!blob) return;
+            // Stream deployment pipeline
+            downloadBtn.addEventListener('click', () => {
+                if (!outputBlob) return;
 
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "converted." + format.value;
-  a.click();
-};
-</script>
+                const baseNameWithoutExtension = activeFile.name.substring(0, activeFile.name.lastIndexOf('.'));
+                const deploymentAnchor = document.createElement('a');
+                
+                deploymentAnchor.href = URL.createObjectURL(outputBlob);
+                deploymentAnchor.download = `${baseNameWithoutExtension}_converted.${formatSelect.value}`;
+                deploymentAnchor.click();
 
+                // Memory cleanup hook
+                setTimeout(() => URL.revokeObjectURL(deploymentAnchor.href), 100);
+            });
+        });
+    </script>
 </body>
 </html>
