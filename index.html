@@ -96,7 +96,6 @@ h1 {
 
 /* CARD */
 .card {
-  position: relative; /* Wichtig für das absolut positionierte Herz/Stern */
   background: var(--glass);
   border-radius: 15px;
   padding: 15px;
@@ -111,18 +110,41 @@ h1 {
   box-shadow: 0 0 20px #ff007f55;
 }
 
+/* PLACEHOLDER IMAGE */
+.card-image {
+  height: 120px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: black;
+}
+
+/* CARD HEADER (Title & Star aligned) */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
 /* FAVORITE BUTTON */
 .fav-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
   font-size: 22px;
   color: rgba(255, 255, 255, 0.2);
   background: none;
   border: none;
   cursor: pointer;
-  z-index: 10;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  line-height: 1;
 }
 
 .fav-btn:hover {
@@ -131,36 +153,17 @@ h1 {
 }
 
 .fav-btn.active {
-  color: #ffd700; /* Gold */
+  color: #ffd700;
   text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
 }
 
-/* PLACEHOLDER IMAGE */
-.card-image {
-  height: 120px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  color: black;
-  margin-top: 5px;
-}
-
 /* TEXT */
-.card-title {
-  font-size: 18px;
-  margin-bottom: 5px;
-}
-
 .card-desc {
   font-size: 14px;
   opacity: 0.7;
 }
 
-/* POPUP */
+/* POPUP & CONTROLS */
 .popup {
   position: fixed;
   top: 0;
@@ -174,26 +177,55 @@ h1 {
   z-index: 1000;
 }
 
+.popup-controls {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  z-index: 1010;
+}
+
+.control-btn {
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  background: none;
+  border: none;
+  outline: none;
+  transition: color 0.3s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-btn:hover {
+  color: var(--secondary);
+  transform: scale(1.1);
+}
+
+.close-btn {
+  font-size: 40px;
+}
+
+.close-btn:hover {
+  color: var(--primary);
+}
+
 .popup iframe {
   width: 80%;
   height: 80%;
   border: none;
   border-radius: 12px;
   background: white;
+  transition: width 0.3s, height 0.3s, border-radius 0.3s;
 }
 
-.close-btn {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  font-size: 40px;
-  color: white;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.close-btn:hover {
-  color: var(--primary);
+.popup.fullscreen-mode iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0px !important;
 }
 
 /* NO RESULTS */
@@ -219,60 +251,61 @@ h1 {
 
 <div id="grid" class="grid">
 
-  <!-- Calculator Card -->
   <div class="card" data-id="calc" data-name="calculator" onclick="openTool('tools/calculator/index.html')">
-    <button class="fav-btn" onclick="toggleFav(event, 'calc')">★</button>
     <div class="card-image">CALC</div>
-    <div class="card-title">Calculator</div>
+    <div class="card-header">
+      <div class="card-title">Calculator</div>
+      <button class="fav-btn" onclick="toggleFav(event, 'calc')">★</button>
+    </div>
     <div class="card-desc">Simple math calculator</div>
   </div>
 
-  <!-- Text Cleaner Card -->
   <div class="card" data-id="text" data-name="text cleaner" onclick="openTool('tools/textcleaner/index.html')">
-    <button class="fav-btn" onclick="toggleFav(event, 'text')">★</button>
     <div class="card-image">TEXT</div>
-    <div class="card-title">Text Cleaner</div>
+    <div class="card-header">
+      <div class="card-title">Text Cleaner</div>
+      <button class="fav-btn" onclick="toggleFav(event, 'text')">★</button>
+    </div>
     <div class="card-desc">Simple text formatting</div>
   </div>
 
-  <!-- Converter Card -->
   <div class="card" data-id="conv" data-name="converter file" onclick="openTool('tools/file-converter/index.html')">
-    <button class="fav-btn" onclick="toggleFav(event, 'conv')">★</button>
     <div class="card-image">CONV</div>
-    <div class="card-title">File Converter</div>
+    <div class="card-header">
+      <div class="card-title">File Converter</div>
+      <button class="fav-btn" onclick="toggleFav(event, 'conv')">★</button>
+    </div>
     <div class="card-desc">Convert files easily</div>
   </div>
 
-  <!-- Timer Card -->
   <div class="card" data-id="timer" data-name="timer" onclick="openTool('tools/timer/index.html')">
-    <button class="fav-btn" onclick="toggleFav(event, 'timer')">★</button>
     <div class="card-image">TIME</div>
-    <div class="card-title">Timer</div>
+    <div class="card-header">
+      <div class="card-title">Timer</div>
+      <button class="fav-btn" onclick="toggleFav(event, 'timer')">★</button>
+    </div>
     <div class="card-desc">Countdown & Stopwatch</div>
   </div>
 
 </div>
 
-<!-- No Results Message -->
 <div id="noResults" class="no-results">
   No tools found.
 </div>
 
-<!-- Popup Container -->
 <div id="popup" class="popup">
-  <span class="close-btn" onclick="closeTool()">&times;</span>
+  <div class="popup-controls">
+    <button id="fullscreenBtn" class="control-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">🗖</button>
+    <button class="control-btn close-btn" onclick="closeTool()" title="Close">&times;</button>
+  </div>
   <iframe id="toolFrame" src=""></iframe>
 </div>
 
-<!-- JavaScript for Interactivity -->
 <script>
-  // --- Favorites System Variables ---
   let favorites = JSON.parse(localStorage.getItem('utilityHubFavs')) || [];
   let showFavoritesOnly = false;
 
-  // --- Initialize on Load ---
   function init() {
-    // Set active class on favorited cards
     document.querySelectorAll('.card').forEach(card => {
       const id = card.getAttribute('data-id');
       if (favorites.includes(id)) {
@@ -281,11 +314,10 @@ h1 {
     });
   }
 
-  // --- Toggle Favorite Status ---
+  // --- Favorites ---
   function toggleFav(event, id) {
-    event.stopPropagation(); // Verhindert, dass sich die Karte öffnet, wenn man den Stern klickt
+    event.stopPropagation();
     const btn = event.target;
-    
     if (favorites.includes(id)) {
       favorites = favorites.filter(favId => favId !== id);
       btn.classList.remove('active');
@@ -293,29 +325,17 @@ h1 {
       favorites.push(id);
       btn.classList.add('active');
     }
-    
-    // In LocalStorage speichern
     localStorage.setItem('utilityHubFavs', JSON.stringify(favorites));
-    
-    // Ansicht aktualisieren, falls der Filter gerade aktiv ist
     filterCards();
   }
 
-  // --- Toggle Favorites Filter Button ---
   function toggleFavFilter() {
     showFavoritesOnly = !showFavoritesOnly;
     const btn = document.getElementById('favFilterBtn');
-    
-    if (showFavoritesOnly) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
-    
+    btn.classList.toggle('active', showFavoritesOnly);
     filterCards();
   }
 
-  // --- Combined Filter Logic (Search + Favorites) ---
   function filterCards() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     const cards = document.querySelectorAll('.card');
@@ -324,7 +344,6 @@ h1 {
     cards.forEach(card => {
       const toolName = card.getAttribute('data-name').toLowerCase();
       const id = card.getAttribute('data-id');
-      
       const matchesSearch = toolName.includes(searchTerm);
       const matchesFav = !showFavoritesOnly || favorites.includes(id);
 
@@ -339,10 +358,9 @@ h1 {
     document.getElementById('noResults').style.display = hasVisibleCards ? 'none' : 'block';
   }
 
-  // Event Listener for Search
   document.getElementById('searchInput').addEventListener('input', filterCards);
 
-  // --- Popup Functions ---
+  // --- Popup & Fullscreen Logic ---
   function openTool(url) {
     const popup = document.getElementById('popup');
     const iframe = document.getElementById('toolFrame');
@@ -353,15 +371,53 @@ h1 {
   function closeTool() {
     const popup = document.getElementById('popup');
     const iframe = document.getElementById('toolFrame');
+    
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(err => console.log(err));
+    }
+    
+    popup.classList.remove('fullscreen-mode');
+    document.getElementById('fullscreenBtn').innerText = '🗖';
+    
     popup.style.display = 'none';
     iframe.src = '';
   }
 
-  document.getElementById('popup').addEventListener('click', function(e) {
-    if (e.target === this) closeTool();
+  function toggleFullscreen() {
+    const popup = document.getElementById('popup');
+    const btn = document.getElementById('fullscreenBtn');
+
+    if (!document.fullscreenElement) {
+      popup.requestFullscreen()
+        .then(() => {
+          btn.innerText = '🗗';
+          popup.classList.add('fullscreen-mode');
+        })
+        .catch(err => {
+          console.log(`Fullscreen error: ${err.message}`);
+          popup.classList.toggle('fullscreen-mode');
+          btn.innerText = popup.classList.contains('fullscreen-mode') ? '🗗' : '🗖';
+        });
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  document.addEventListener('fullscreenchange', () => {
+    const popup = document.getElementById('popup');
+    const btn = document.getElementById('fullscreenBtn');
+    if (!document.fullscreenElement) {
+      popup.classList.remove('fullscreen-mode');
+      btn.innerText = '🗖';
+    }
   });
 
-  // Run initialization
+  document.getElementById('popup').addEventListener('click', function(e) {
+    if (e.target === this && !document.fullscreenElement) {
+      closeTool();
+    }
+  });
+
   init();
 </script>
 
