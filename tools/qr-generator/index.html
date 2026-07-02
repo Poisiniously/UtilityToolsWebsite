@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Immersive Dark QR Studio</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at center, #111115 0%, #040406 100%);
+            --panel-bg: rgba(255, 255, 255, 0.01);
+            --border-color: rgba(255, 255, 255, 0.04);
+            --text-primary: #f8fafc;
+            --text-secondary: #64748b;
+            --accent-glow: rgba(167, 139, 250, 0.15);
+            --accent-color: #a78bfa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 40px;
+        }
+
+        /* Das Haupt-Dashboard */
+        .workspace {
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            width: 100%;
+            max-width: 1200px;
+            height: 70vh;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 40px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+        }
+
+        /* LINKE SEITE: Eingabe & Steuerung */
+        .input-panel {
+            border-right: 1px solid var(--border-color);
+            padding: 4rem 3rem;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 200;
+            letter-spacing: -1px;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        textarea {
+            width: 100%;
+            height: 180px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            color: var(--text-primary);
+            padding: 1.5rem;
+            font-size: 1.2rem;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 4px 20px rgba(0,0,0,0.2);
+            margin-bottom: 2rem;
+        }
+
+        textarea:focus {
+            border-color: rgba(167, 139, 250, 0.4);
+            box-shadow: 0 0 30px var(--accent-glow), inset 0 4px 20px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Download Button */
+        button.download-btn {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            color: #ffffff;
+            padding: 1.2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: auto;
+        }
+
+        button.download-btn:hover {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border-color: rgba(167, 139, 250, 0.5);
+            box-shadow: 0 0 40px rgba(167, 139, 250, 0.2);
+            transform: translateY(-2px);
+        }
+
+        button.download-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* RECHTE SEITE: QR Code Anzeige */
+        .preview-panel {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: radial-gradient(circle at center, rgba(167, 139, 250, 0.03) 0%, transparent 70%);
+        }
+
+        /* Der Rahmen um den QR-Code */
+        .qr-frame {
+            background: #ffffff; /* Weißer Hintergrund für perfekte Scanbarkeit */
+            padding: 2rem;
+            border-radius: 32px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 50px var(--accent-glow);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .qr-frame:hover {
+            transform: scale(1.02);
+        }
+
+        /* Versteckt das von qrcode.js generierte img-Tag, wir nutzen das Canvas */
+        #qrcode img {
+            display: none !important;
+        }
+        
+        #qrcode canvas {
+            display: block;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="workspace">
+        <div class="input-panel">
+            <h1 class="header-title">QR Studio</h1>
+            <p class="header-subtitle">Live-Generierung. Tippe Text, URLs oder WLAN-Daten ein.</p>
+            
+            <textarea id="qr-text" placeholder="https://deine-website.de..."></textarea>
+            
+            <button class="download-btn" onclick="downloadQR()">QR-Code speichern (.png)</button>
+        </div>
+
+        <div class="preview-panel">
+            <div class="qr-frame">
+                <div id="qrcode"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const qrContainer = document.getElementById('qrcode');
+        const textInput = document.getElementById('qr-text');
+        
+        // Initialer QR Code (Platzhalter)
+        let qrcode = new QRCode(qrContainer, {
+            text: "https://example.com",
+            width: 280,
+            height: 280,
+            colorDark : "#0a0a0c", // Tiefschwarz/Dunkelgrau für den Code (passt zum Theme)
+            colorLight : "#ffffff", // Weißer Hintergrund
+            correctLevel : QRCode.CorrectLevel.H // Hohe Fehlerkorrektur
+        });
+
+        // Live-Update beim Tippen
+        textInput.addEventListener('input', () => {
+            const val = textInput.value.trim();
+            qrcode.clear(); // Alten Code löschen
+            
+            if(!val) {
+                // Wenn das Feld leer ist, zeige einen Platzhalter
+                qrcode.makeCode("https://example.com");
+            } else {
+                // Erstelle neuen Code mit dem eingegebenen Text
+                qrcode.makeCode(val);
+            }
+        });
+
+        // Funktion zum Herunterladen des QR-Codes als Bild
+        function downloadQR() {
+            // qrcode.js generiert ein <canvas> Element im Container
+            const canvas = document.querySelector('#qrcode canvas');
+            if (canvas) {
+                // Konvertiere Canvas zu einer Data-URL
+                const url = canvas.toDataURL("image/png");
+                
+                // Erstelle einen temporären Link und klicke ihn an
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Zen_QRCode.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        }
+    </script>
+</body>
+</html>
