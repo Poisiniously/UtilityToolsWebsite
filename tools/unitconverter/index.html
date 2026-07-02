@@ -3,175 +3,290 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Einfacher Unit Converter — Schwarz & Lila</title>
+<title>Premium Unit Converter — Schwarz & Lila</title>
 <style>
-  :root{
-    --bg:#070707;
-    --panel:#0d0d0d;
-    --accent:#8a5cff;
-    --accent-2:#6f3fe6;
-    --glass: rgba(255,255,255,0.03);
-    --text:#eaeaf2;
-    --sub:#bdbdd0;
-    --shadow: 0 12px 40px rgba(0,0,0,0.7);
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  :root {
+    --bg: #050508;
+    --panel: #0d0d12;
+    --border: #1c1926;
+    --accent: #8a5cff;
+    --accent-2: #6f3fe6;
+    --accent-glow: rgba(138, 92, 255, 0.25);
+    --glass: rgba(255, 255, 255, 0.02);
+    --text: #eaeaf2;
+    --sub: #8e8eab;
+    --shadow: 0 20px 50px rgba(0,0,0,0.8);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
 
-  html,body{ height:100%; margin:0; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+  /* Dark-Mode für Systemkomponenten (wie native Dropdown-Listen) erzwingen */
+  html {
+    color-scheme: dark;
+  }
 
-  /* Centered container */
-  .wrap{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:24px;
+  html, body { 
+    height: 100%; 
+    margin: 0; 
+    background: var(--bg); 
+    color: var(--text); 
+    -webkit-font-smoothing: antialiased; 
+    -moz-osx-font-smoothing: grayscale; 
+    overflow: hidden; /* Verhindert das Scrollen der Hauptseite im Desktop-Modus */
+  }
+
+  /* Globale Custom Dark Scrollbar für Container (z.B. Verlauf oder Mobile-Fallback) */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #221f30;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+  }
+
+  /* Zentrierter Wrapper */
+  .wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-sizing: border-box;
   }
 
   /* Card */
-  .card{
-    width:920px;
-    max-width:100%;
-    border-radius:14px;
-    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    box-shadow:var(--shadow);
-    overflow:hidden;
-    display:grid;
+  .card {
+    width: 940px;
+    max-width: 100%;
+    border-radius: 16px;
+    background: var(--panel);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: grid;
     grid-template-columns: 1fr 360px;
-    gap:0;
-    border:1px solid rgba(255,255,255,0.03);
+    gap: 0;
+    border: 1px solid var(--border);
   }
 
-  /* Left: main simple UI */
-  .main{
-    padding:28px;
-    background:var(--panel);
-    display:flex;
-    flex-direction:column;
-    gap:18px;
+  /* Linke Seite: Haupt-UI */
+  .main {
+    padding: 32px;
+    background: var(--panel);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
 
-  .brand{
-    display:flex;
-    gap:12px;
-    align-items:center;
+  .brand {
+    display: flex;
+    gap: 16px;
+    align-items: center;
   }
-  .logo{
-    width:56px;height:56px;border-radius:12px;
-    background:linear-gradient(135deg,var(--accent),var(--accent-2));
-    display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:20px;
-    box-shadow:0 8px 30px rgba(111,63,230,0.14);
+  .logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 20px;
+    box-shadow: 0 8px 24px var(--accent-glow);
   }
-  .title{ font-size:18px; font-weight:700; color:var(--text); }
-  .subtitle{ color:var(--sub); font-size:13px; }
+  .title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+  .subtitle { color: var(--sub); font-size: 13px; margin-top: 2px; }
 
-  /* Big input area */
-  .input-area{
-    display:flex;
-    gap:12px;
-    align-items:center;
+  /* Grid für Inputs */
+  .input-area {
+    display: flex;
+    gap: 14px;
+    align-items: center;
   }
-  .value-input{
-    flex:1;
-    display:flex;
-    gap:10px;
-    align-items:center;
+  .value-input {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    align-items: center;
   }
-  input[type="number"]{
-    width:100%;
-    padding:18px 16px;
-    border-radius:12px;
-    background:var(--glass);
-    border:1px solid rgba(255,255,255,0.03);
-    color:var(--text);
-    font-size:20px;
-    outline:none;
-    box-shadow: inset 0 -6px 18px rgba(0,0,0,0.6);
+  
+  input[type="number"] {
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    background: #060609;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 20px;
+    outline: none;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+    transition: all 0.2s ease;
   }
-  .unit-select{
-    width:160px;
-    padding:12px 10px;
-    border-radius:12px;
-    background:transparent;
-    border:1px solid rgba(255,255,255,0.03);
-    color:var(--text);
-    font-size:15px;
-  }
-
-  /* Convert button large */
-  .convert-row{
-    display:flex;
-    gap:12px;
-    align-items:center;
-  }
-  .btn{
-    padding:14px 18px;
-    border-radius:12px;
-    background:linear-gradient(90deg,var(--accent),var(--accent-2));
-    color:white;
-    font-weight:700;
-    border:none;
-    cursor:pointer;
-    box-shadow: 0 10px 30px rgba(111,63,230,0.14);
-    font-size:15px;
-  }
-  .btn.secondary{
-    background:transparent;
-    border:1px solid rgba(255,255,255,0.04);
-    color:var(--accent);
-    font-weight:700;
+  
+  .unit-select {
+    width: 160px;
+    padding: 16px 12px;
+    border-radius: 12px;
+    background: #111017;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
   }
 
-  /* Result */
-  .result{
-    margin-top:6px;
-    padding:18px;
-    border-radius:12px;
-    background:linear-gradient(90deg, rgba(138,92,255,0.03), transparent);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    border:1px solid rgba(255,255,255,0.02);
+  /* Buttons */
+  .convert-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
   }
-  .result .big{
-    font-size:28px;
-    font-weight:800;
-    color:var(--text);
+  .btn {
+    padding: 14px 24px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color: white;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 6px 20px var(--accent-glow);
+    font-size: 15px;
+    transition: all 0.2s ease;
   }
-  .result .small{
-    color:var(--sub);
-    font-size:13px;
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 26px rgba(138, 92, 255, 0.4);
   }
-
-  /* Right: presets & history */
-  .side{
-    padding:22px;
-    background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-    border-left:1px solid rgba(255,255,255,0.02);
+  .btn.secondary {
+    background: #111017;
+    border: 1px solid var(--border);
+    color: var(--accent);
+    box-shadow: none;
   }
-  .section-title{ color:var(--sub); font-size:13px; margin-bottom:6px; }
-  .preset-grid{ display:flex; flex-direction:column; gap:8px; }
-  .preset{ padding:10px 12px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.02); cursor:pointer; color:var(--text); font-weight:700; text-align:left; }
-  .history{ display:flex; flex-direction:column; gap:8px; max-height:260px; overflow:auto; padding-right:6px; }
-  .hist-item{ padding:10px 12px; border-radius:10px; background:transparent; border:1px dashed rgba(255,255,255,0.02); color:var(--sub); font-size:13px; cursor:pointer; }
-
-  /* small helpers */
-  .muted{ color:var(--sub); font-size:13px; }
-  .hint{ font-size:13px; color:var(--sub); }
-
-  /* responsive */
-  @media (max-width:880px){
-    .card{ grid-template-columns: 1fr; }
-    .side{ order:2; border-left:none; border-top:1px solid rgba(255,255,255,0.02); }
+  .btn.secondary:hover {
+    background: #161420;
+    border-color: var(--accent);
+    color: #a480ff;
   }
 
-  /* subtle animations */
-  input[type="number"]:focus, .unit-select:focus{ box-shadow: 0 8px 30px rgba(138,92,255,0.12); transform:translateY(-2px); }
-  .preset:hover, .hist-item:hover{ transform:translateY(-4px); transition:transform .18s; box-shadow:0 10px 30px rgba(0,0,0,0.6); }
+  /* Ergebnis-Box */
+  .result {
+    margin-top: 6px;
+    padding: 20px;
+    border-radius: 14px;
+    background: linear-gradient(90deg, rgba(138,92,255,0.04), transparent);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid rgba(138, 92, 255, 0.1);
+  }
+  .result .big {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text);
+    transition: opacity 0.12s ease;
+  }
+  .result .small {
+    color: var(--sub);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  /* Rechte Seite: Sidebar */
+  .side {
+    padding: 28px;
+    background: #09090d;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-left: 1px solid var(--border);
+  }
+  .section-title { color: var(--sub); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .preset-grid { display: flex; flex-direction: column; gap: 8px; }
+  
+  .preset { 
+    padding: 12px; 
+    border-radius: 10px; 
+    background: #111017; 
+    border: 1px solid var(--border); 
+    cursor: pointer; 
+    color: var(--text); 
+    font-weight: 600; 
+    text-align: left; 
+    transition: all 0.2s ease;
+  }
+  .preset:hover {
+    border-color: var(--accent);
+    background: #161420;
+    transform: translateX(4px);
+  }
+
+  .history { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px; 
+    max-height: 220px; 
+    overflow-y: auto; 
+    padding-right: 4px; 
+  }
+  .hist-item { 
+    padding: 12px; 
+    border-radius: 10px; 
+    background: transparent; 
+    border: 1px dashed var(--border); 
+    color: var(--sub); 
+    font-size: 13px; 
+    cursor: pointer; 
+    transition: all 0.2s ease;
+  }
+  .hist-item:hover {
+    border-color: var(--accent);
+    color: var(--text);
+    background: rgba(138, 92, 255, 0.02);
+  }
+
+  .muted { color: var(--sub); font-size: 13px; }
+  .hint { font-size: 13px; color: var(--sub); opacity: 0.7; }
+
+  /* Fokus-Effekte */
+  input[type="number"]:focus, .unit-select:focus { 
+    border-color: var(--accent); 
+    box-shadow: 0 0 12px var(--accent-glow); 
+  }
+
+  /* Responsive Anpassungen */
+  @media (max-width:880px) {
+    html, body {
+      overflow: auto; /* Aktiviert die dunkle Scrollbar auf Mobilgeräten, falls nötig */
+    }
+    .wrap {
+      padding: 12px;
+    }
+    .card { 
+      grid-template-columns: 1fr; 
+    }
+    .side { 
+      order: 2; 
+      border-left: none; 
+      border-top: 1px solid var(--border); 
+    }
+    .input-area {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .unit-select {
+      width: 100%;
+    }
+  }
 </style>
 </head>
 <body>
@@ -182,49 +297,45 @@
         <div class="logo">UC</div>
         <div>
           <div class="title">Unit Converter</div>
-          <div class="subtitle">Extrem einfach zu bedienen — Schwarz mit lila Akzenten</div>
+          <div class="subtitle">Extrem einfach zu bedienen — Premium Dark Design</div>
         </div>
       </div>
 
-      <!-- Category selector simplified -->
       <div>
-        <label class="muted" for="category">Kategorie</label>
-        <select id="category" class="unit-select" aria-label="Kategorie auswählen"></select>
+        <label class="muted" style="display:block; margin-bottom:8px;" for="category">Kategorie</label>
+        <select id="category" class="unit-select" style="width:100%;" aria-label="Kategorie auswählen"></select>
       </div>
 
-      <!-- Big input row -->
       <div class="input-area">
         <div class="value-input">
           <input id="value" type="number" step="any" value="1" aria-label="Wert eingeben" />
           <select id="fromUnit" class="unit-select" aria-label="Von Einheit"></select>
         </div>
-        <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
-          <button id="swap" class="btn secondary" title="Tauschen" aria-label="Tauschen">⇄</button>
+        <div style="display:flex; justify-content:center;">
+          <button id="swap" class="btn secondary" style="padding: 16px 20px;" title="Tauschen" aria-label="Tauschen">⇄</button>
         </div>
-        <div style="width:160px;">
+        <div>
           <select id="toUnit" class="unit-select" aria-label="Nach Einheit"></select>
         </div>
       </div>
 
-      <!-- Convert button and auto-convert toggle -->
       <div class="convert-row">
         <button id="convert" class="btn">Konvertieren</button>
         <button id="clear" class="btn secondary">Zurücksetzen</button>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+        <div style="margin-left:auto; display:flex; align-items:center; gap:8px;">
           <label class="muted" for="auto">Auto</label>
-          <input id="auto" type="checkbox" aria-label="Automatisch konvertieren" checked />
+          <input id="auto" type="checkbox" style="accent-color: var(--accent); width: 16px; height: 16px;" aria-label="Automatisch konvertieren" checked />
         </div>
       </div>
 
-      <!-- Result -->
       <div class="result" id="resultCard" aria-live="polite">
         <div>
           <div class="big" id="resultValue">—</div>
           <div class="small" id="resultDetail">—</div>
         </div>
         <div style="text-align:right">
-          <div class="muted">Genauigkeit</div>
-          <select id="precision" class="unit-select" aria-label="Genauigkeit">
+          <div class="muted" style="margin-bottom:6px;">Genauigkeit</div>
+          <select id="precision" class="unit-select" style="padding: 8px 12px; width:110px; font-size:13px;" aria-label="Genauigkeit">
             <option value="4" selected>4 Dez.</option>
             <option value="2">2 Dez.</option>
             <option value="0">Ganzzahl</option>
@@ -232,26 +343,24 @@
         </div>
       </div>
 
-      <div class="hint">Tipp: Tippe Wert ein — bei aktiviertem "Auto" wird sofort konvertiert.</div>
+      <div class="hint">Tipp: Tippe einen Wert ein — bei aktiviertem "Auto" wird sofort live konvertiert.</div>
     </div>
 
     <div class="side" aria-hidden="false">
       <div>
         <div class="section-title">Schnellvorlagen</div>
         <div class="preset-grid" id="presets">
-          <!-- presets populated by JS -->
-        </div>
+          </div>
       </div>
 
       <div>
         <div class="section-title">Verlauf</div>
         <div class="history" id="history" aria-label="Verlauf">
-          <!-- history items -->
-        </div>
+          </div>
       </div>
 
-      <div style="margin-top:auto">
-        <div class="muted" style="font-size:12px">Version 1.1 • Einfach</div>
+      <div style="margin-top:auto; padding-top: 10px;">
+        <div class="muted" style="font-size:12px; opacity:0.5;">Version 1.2 • No-Scroll UI</div>
       </div>
     </div>
   </div>
@@ -259,7 +368,7 @@
 
 <script>
 /* -------------------------
-   Vereinfachte Unit-Logik
+   Vereinfachte Unit-Logik (Unverändert)
    ------------------------- */
 
 const categories = {
@@ -302,17 +411,10 @@ function init(){
 function populateUnits(cat){
   fromEl.innerHTML = ''; toEl.innerHTML = '';
   const c = categories[cat];
-  if(c.special){
-    Object.keys(c.units).forEach(u=>{
-      const o1 = document.createElement('option'); o1.value = u; o1.textContent = u; fromEl.appendChild(o1);
-      const o2 = o1.cloneNode(true); toEl.appendChild(o2);
-    });
-  } else {
-    Object.keys(c.units).forEach(u=>{
-      const o1 = document.createElement('option'); o1.value = u; o1.textContent = u; fromEl.appendChild(o1);
-      const o2 = o1.cloneNode(true); toEl.appendChild(o2);
-    });
-  }
+  Object.keys(c.units).forEach(u=>{
+    const o1 = document.createElement('option'); o1.value = u; o1.textContent = u; fromEl.appendChild(o1);
+    const o2 = o1.cloneNode(true); toEl.appendChild(o2);
+  });
   fromEl.value = fromEl.options[0]?.value || '';
   toEl.value = toEl.options[1]?.value || fromEl.value;
 }
@@ -359,7 +461,7 @@ function showResult(raw){
 let history = [];
 function pushHistory(item){
   history.unshift(item);
-  if(history.length > 8) history.pop();
+  if(history.length > 5) history.pop(); // Begrenzt auf 5 Einträge, um Scrollbars zu minimieren
   renderHistory();
 }
 function renderHistory(){
@@ -367,7 +469,8 @@ function renderHistory(){
   history.forEach(h=>{
     const d = document.createElement('div');
     d.className = 'hist-item';
-    d.textContent = `${h.input} ${h.from} → ${h.output} ${h.to} (${h.cat})`;
+    d.textContent = `${h.input} ${h.from} → ${h.output} ${h.to}`;
+    d.title = `${h.input} ${h.from} → ${h.output} ${h.to} (${h.cat})`;
     d.addEventListener('click', ()=> {
       categoryEl.value = h.cat;
       populateUnits(h.cat);
@@ -442,11 +545,10 @@ valueEl.addEventListener('keydown', (e)=> { if(e.key === 'Enter') doConvert(); }
 /* Initialize UI */
 init();
 
-/* Pre-fill a few history items */
+/* Pre-fill history items */
 pushHistory({cat:"Länge", from:"km", to:"m", input:1, output:"1000"});
 pushHistory({cat:"Temperatur", from:"°C", to:"°F", input:20, output:"68"});
 pushHistory({cat:"Daten", from:"GB", to:"MB", input:1, output:"1024"});
-
 </script>
 </body>
 </html>
