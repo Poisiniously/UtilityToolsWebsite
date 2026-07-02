@@ -1,0 +1,76 @@
+:root {
+    --background: #0d0714;
+    --surface: rgba(26, 12, 38, .65);
+    --primary: #ff007f;
+    --secondary: #00f0ff;
+    --text: #f4f4ff;
+    --text-secondary: #a0a0c0;
+    --border: rgba(255, 255, 255, .08);
+    --font-main: 'Outfit', 'Segoe UI', sans-serif;
+}
+
+body {
+    background-color: transparent; /* Allows backdrop-filter inside the frame wrapper */
+    color: var(--text);
+    font-family: var(--font-main);
+    padding: 2rem;
+    margin: 0;
+}
+
+.tool-wrapper {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+input[type="text"], input[type="number"], select, textarea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    font-family: var(--font-main);
+    transition: all 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    font-family: var(--font-main);
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(255, 0, 127, 0.3);
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(255, 0, 127, 0.5);
+}
