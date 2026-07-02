@@ -44,7 +44,7 @@ h1 {
   justify-content: center;
   align-items: center;
   gap: 15px;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
 }
 
 .search-input {
@@ -72,9 +72,6 @@ h1 {
   outline: none;
   transition: all 0.3s;
   font-weight: bold;
-  display: flex;
-  align-items: center;
-  gap: 5px;
 }
 
 .filter-btn:hover {
@@ -85,6 +82,39 @@ h1 {
   background: var(--primary);
   color: white;
   box-shadow: 0 0 15px #ff007f55;
+}
+
+/* CATEGORIES (TAGS) */
+.tags-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.tag-btn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--glass);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.tag-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--secondary);
+}
+
+.tag-btn.active {
+  background: var(--secondary);
+  color: #000;
+  border-color: var(--secondary);
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
 }
 
 /* GRID */
@@ -249,9 +279,16 @@ h1 {
   <button id="favFilterBtn" class="filter-btn" onclick="toggleFavFilter()">★ Favorites</button>
 </div>
 
+<div class="tags-container">
+  <button class="tag-btn active" onclick="setCategory('all', this)">All</button>
+  <button class="tag-btn" onclick="setCategory('math', this)">Math</button>
+  <button class="tag-btn" onclick="setCategory('text', this)">Text</button>
+  <button class="tag-btn" onclick="setCategory('utility', this)">Utility</button>
+</div>
+
 <div id="grid" class="grid">
 
-  <div class="card" data-id="calc" data-name="calculator" onclick="openTool('tools/calculator/index.html')">
+  <div class="card" data-id="calc" data-name="calculator" data-category="math" onclick="openTool('tools/calculator/index.html')">
     <div class="card-image">CALC</div>
     <div class="card-header">
       <div class="card-title">Calculator</div>
@@ -260,7 +297,7 @@ h1 {
     <div class="card-desc">Simple math calculator</div>
   </div>
 
-  <div class="card" data-id="text" data-name="text cleaner" onclick="openTool('tools/textcleaner/index.html')">
+  <div class="card" data-id="text" data-name="text cleaner" data-category="text" onclick="openTool('tools/textcleaner/index.html')">
     <div class="card-image">TEXT</div>
     <div class="card-header">
       <div class="card-title">Text Cleaner</div>
@@ -269,7 +306,7 @@ h1 {
     <div class="card-desc">Simple text formatting</div>
   </div>
 
-  <div class="card" data-id="conv" data-name="converter file" onclick="openTool('tools/file-converter/index.html')">
+  <div class="card" data-id="conv" data-name="converter file" data-category="utility" onclick="openTool('tools/file-converter/index.html')">
     <div class="card-image">CONV</div>
     <div class="card-header">
       <div class="card-title">File Converter</div>
@@ -278,7 +315,7 @@ h1 {
     <div class="card-desc">Convert files easily</div>
   </div>
 
-  <div class="card" data-id="timer" data-name="timer" onclick="openTool('tools/timer/index.html')">
+  <div class="card" data-id="timer" data-name="timer" data-category="utility" onclick="openTool('tools/timer/index.html')">
     <div class="card-image">TIME</div>
     <div class="card-header">
       <div class="card-title">Timer</div>
@@ -290,11 +327,12 @@ h1 {
 </div>
 
 <div id="noResults" class="no-results">
-  No tools found.
+  No tools found matching your filters.
 </div>
 
 <div id="popup" class="popup">
   <div class="popup-controls">
+    <button class="control-btn" onclick="openInNewTab()" title="Open in new Tab">↗</button>
     <button id="fullscreenBtn" class="control-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">🗖</button>
     <button class="control-btn close-btn" onclick="closeTool()" title="Close">&times;</button>
   </div>
@@ -304,6 +342,8 @@ h1 {
 <script>
   let favorites = JSON.parse(localStorage.getItem('utilityHubFavs')) || [];
   let showFavoritesOnly = false;
+  let activeCategory = 'all';
+  let currentToolUrl = ''; // Speichert die aktuell geöffnete URL
 
   function init() {
     document.querySelectorAll('.card').forEach(card => {
@@ -314,7 +354,18 @@ h1 {
     });
   }
 
-  // --- Favorites ---
+  // --- Category System ---
+  function setCategory(category, btnElement) {
+    activeCategory = category;
+    
+    // Visuelles Feedback für die Buttons
+    document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
+    btnElement.classList.add('active');
+    
+    filterCards();
+  }
+
+  // --- Favorites System ---
   function toggleFav(event, id) {
     event.stopPropagation();
     const btn = event.target;
@@ -336,6 +387,7 @@ h1 {
     filterCards();
   }
 
+  // --- Master Filter (Search + Favorites + Category) ---
   function filterCards() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     const cards = document.querySelectorAll('.card');
@@ -344,10 +396,13 @@ h1 {
     cards.forEach(card => {
       const toolName = card.getAttribute('data-name').toLowerCase();
       const id = card.getAttribute('data-id');
+      const cardCategory = card.getAttribute('data-category');
+      
       const matchesSearch = toolName.includes(searchTerm);
       const matchesFav = !showFavoritesOnly || favorites.includes(id);
+      const matchesCat = activeCategory === 'all' || activeCategory === cardCategory;
 
-      if (matchesSearch && matchesFav) {
+      if (matchesSearch && matchesFav && matchesCat) {
         card.style.display = 'block';
         hasVisibleCards = true;
       } else {
@@ -360,12 +415,20 @@ h1 {
 
   document.getElementById('searchInput').addEventListener('input', filterCards);
 
-  // --- Popup & Fullscreen Logic ---
+  // --- Popup & Interactivity ---
   function openTool(url) {
+    currentToolUrl = url; // Merken für den "Neuer Tab"-Button
     const popup = document.getElementById('popup');
     const iframe = document.getElementById('toolFrame');
     iframe.src = url;
     popup.style.display = 'flex';
+  }
+
+  function openInNewTab() {
+    if (currentToolUrl) {
+      window.open(currentToolUrl, '_blank');
+      closeTool(); // Popup schließen, da es jetzt in einem neuen Tab ist
+    }
   }
 
   function closeTool() {
@@ -381,6 +444,7 @@ h1 {
     
     popup.style.display = 'none';
     iframe.src = '';
+    currentToolUrl = ''; // Zurücksetzen
   }
 
   function toggleFullscreen() {
