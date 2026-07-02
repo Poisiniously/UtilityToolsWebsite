@@ -6,210 +6,410 @@
 <title>File Converter</title>
 
 <style>
-/* CSS Tokens nach offizieller Design-Spezifikation */
-:root {
-  --background: #0d0714;
-  --surface: rgba(26, 12, 38, 0.65);
-  --primary: #ff007f;
-  --secondary: #00f0ff;
-  --text: #f4f4ff;
-  --text-secondary: #a0a0c0;
-  --border: rgba(255, 255, 255, 0.08);
-  --neon-glow: 0 0 15px rgba(255, 0, 127, 0.4);
-  --secondary-glow: 0 0 15px rgba(0, 240, 255, 0.4);
+
+:root{
+    --bg-main:#0c0812;
+    --bg-panel:#180e25;
+    --border-color:#26163a;
+
+    --text-main:#f3effa;
+    --text-muted:#6e568b;
+
+    --accent-pink:#d61c59;
+    --accent-hover:#fa2a73;
+
+    --btn-dark:#1f1230;
+    --btn-dark-border:#361f54;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Outfit', 'Segoe UI', sans-serif;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
 }
 
-body {
-  background: var(--bg-panel)
-  color: var(--text);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 20px;
+body{
+
+    background:var(--bg-main);
+
+    color:var(--text-main);
+
+    min-height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:20px;
+
 }
 
-/* Glassmorphic App Container */
-.app {
-  width: 100%;
-  max-width: 500px;
-  background: var(--surface);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
-  padding: 30px;
-  border: 1px solid var(--border);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.app{
+
+    width:100%;
+    max-width:700px;
+
+    background:var(--bg-panel);
+
+    border:1px solid var(--border-color);
+
+    border-radius:12px;
+
+    padding:30px;
+
+    box-shadow:0 8px 32px rgba(0,0,0,.5);
+
 }
 
-/* Typografie */
-h2 {
-  text-align: center;
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: var(--text);
-  text-shadow: 0 0 10px rgba(244, 244, 255, 0.2);
+h2{
+
+    text-align:center;
+
+    font-size:1.8rem;
+
+    margin-bottom:8px;
+
 }
 
-p.subtitle {
-  text-align: center;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  margin-bottom: 25px;
+.subtitle{
+
+    text-align:center;
+
+    color:var(--text-muted);
+
+    margin-bottom:25px;
+
 }
 
-/* Cyberpunk Drop Zone mit Neon-Gradients */
-.drop {
-  position: relative;
-  border: 2px dashed rgba(0, 240, 255, 0.3);
-  border-radius: 16px;
-  padding: 40px 20px;
-  text-align: center;
-  cursor: pointer;
-  background: rgba(8, 5, 12, 0.4);
-  color: var(--text-secondary);
-  font-weight: 500;
-  transition: all 0.3s ease;
-  overflow: hidden;
+.drop{
+
+    width:100%;
+
+    padding:45px 20px;
+
+    border:2px dashed var(--btn-dark-border);
+
+    border-radius:8px;
+
+    text-align:center;
+
+    cursor:pointer;
+
+    background:#08050c;
+
+    transition:.25s;
+
 }
 
-.drop:hover {
-  border-color: var(--secondary);
-  background: rgba(0, 240, 255, 0.05);
-  color: var(--text);
-  box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.1), var(--secondary-glow);
+.drop:hover{
+
+    border-color:var(--accent-pink);
+
+    background:#120a1c;
+
 }
 
-.drop.active {
-  border-color: var(--primary);
-  background: rgba(255, 0, 127, 0.05);
-  box-shadow: inset 0 0 15px rgba(255, 0, 127, 0.1), var(--neon-glow);
+.drop.active{
+
+    border-color:var(--accent-pink);
+
+    background:#120a1c;
+
 }
 
-/* Info Box für hochgeladene Dateien */
-.file {
-  display: none;
-  margin: 20px 0;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+.file{
+
+    display:none;
+
+    margin-top:20px;
+
+    background:#08050c;
+
+    border:1px solid var(--btn-dark-border);
+
+    border-radius:8px;
+
+    padding:15px;
+
 }
 
-.file-name {
-  font-weight: 600;
-  color: var(--text);
-  word-break: break-all;
-  margin-bottom: 4px;
+.file-name{
+
+    font-weight:bold;
+
+    margin-bottom:5px;
+
+    word-break:break-word;
+
 }
 
-.file-size {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
+.file-size{
+
+    color:var(--text-muted);
+
+    font-size:.85rem;
+
 }
 
-/* Custom Styled Select Dropdown */
-select {
-  width: 100%;
-  padding: 12px 16px;
-  margin-bottom: 20px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: #0d0714;
-  color: var(--text);
-  font-size: 0.95rem;
-  outline: none;
-  cursor: pointer;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+select{
+
+    width:100%;
+
+    margin-top:20px;
+
+    padding:12px;
+
+    background:#08050c;
+
+    color:var(--text-main);
+
+    border:1px solid var(--btn-dark-border);
+
+    border-radius:8px;
+
+    font-size:.95rem;
+
+    transition:.25s;
+
 }
 
-select:focus {
-  border-color: var(--secondary);
-  box-shadow: var(--secondary-glow);
+select:focus{
+
+    outline:none;
+
+    border-color:var(--accent-pink);
+
 }
 
-/* Premium Buttons mit Glow- & Skalierungs-Effekten */
-button {
-  width: 100%;
-  padding: 14px;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+button{
+
+    width:100%;
+
+    margin-top:15px;
+
+    padding:12px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+    font-size:.95rem;
+
+    transition:.2s;
+
 }
 
-#convertBtn {
-  background: var(--primary);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(255, 0, 127, 0.2);
+#convertBtn{
+
+    background:var(--btn-dark);
+
+    color:var(--text-main);
+
+    border:1px solid var(--btn-dark-border);
+
 }
 
-#convertBtn:hover {
-  background: #ff3399;
-  box-shadow: var(--neon-glow);
-  transform: translateY(-1px);
+#convertBtn:hover{
+
+    background:var(--border-color);
+
+    border-color:var(--text-muted);
+
 }
 
-#convertBtn:active {
-  transform: translateY(1px);
+.download{
+
+    display:none;
+
+    background:var(--accent-pink);
+
+    border:none;
+
+    color:white;
+
+    font-weight:bold;
+
 }
 
-.download {
-  display: none;
-  margin-top: 12px;
-  background: transparent;
-  color: var(--secondary);
-  border: 1px solid var(--secondary);
-  box-shadow: 0 4px 12px rgba(0, 240, 255, 0.1);
+.download:hover{
+
+    background:var(--accent-hover);
+
+    box-shadow:0 0 12px rgba(214,28,89,.4);
+
 }
 
-.download:hover {
-  background: rgba(0, 240, 255, 0.1);
-  box-shadow: var(--secondary-glow);
-  transform: translateY(-1px);
-}
-
-.download:active {
-  transform: translateY(1px);
-}
 </style>
+
 </head>
 
 <body>
 
 <div class="app">
-  <h2>File Converter</h2>
-  <p class="subtitle">Convert files directly in your browser</p>
 
-  <div class="drop" id="drop">
-    <span>Drop file here or click to browse</span>
-    <input type="file" id="fileInput" hidden>
-  </div>
+<h2>File Converter</h2>
 
-  <div class="file" id="fileInfo">
-    <div class="file-name" id="fileName"></div>
-    <div class="file-size" id="fileSize"></div>
-  </div>
+<p class="subtitle">
+Convert files directly in your browser.
+</p>
 
-  <select id="format"></select>
+<div class="drop" id="drop">
 
-  <button id="convertBtn">Convert File</button>
-  <button id="downloadBtn" class="download">Download Converted File</button>
+<span>
+Drop file here or click to browse
+</span>
+
+<input
+type="file"
+id="fileInput"
+hidden>
+
+</div>
+
+<div
+class="file"
+id="fileInfo">
+
+<div
+class="file-name"
+id="fileName">
+</div>
+
+<div
+class="file-size"
+id="fileSize">
+</div>
+
+</div>
+
+<select id="format"></select>
+
+<button id="convertBtn">
+Convert File
+</button>
+
+<button
+id="downloadBtn"
+class="download">
+Download Converted File
+</button>
+
 </div>
 
 <script>
-// Strikt lesbare Referenzen mit const gem. Richtlinie
+
+const drop=document.getElementById("drop");
+const fileInput=document.getElementById("fileInput");
+const fileInfo=document.getElementById("fileInfo");
+
+const fileName=document.getElementById("fileName");
+const fileSize=document.getElementById("fileSize");
+
+const format=document.getElementById("format");
+
+const convertBtn=document.getElementById("convertBtn");
+const downloadBtn=document.getElementById("downloadBtn");
+
+let currentFile=null;
+let currentBlob=null;
+
+const allowedFormats={
+
+csv:["json","txt"],
+
+txt:["json","md"],
+
+md:["html","txt"],
+
+png:["jpeg"],
+
+jpg:["png"]
+
+};
+
+drop.addEventListener("click",()=>fileInput.click());
+
+drop.addEventListener("dragover",(e)=>{
+
+e.preventDefault();
+
+drop.classList.add("active");
+
+});
+
+drop.addEventListener("dragleave",()=>{
+
+drop.classList.remove("active");
+
+});
+
+drop.addEventListener("drop",(e)=>{
+
+e.preventDefault();
+
+drop.classList.remove("active");
+
+if(e.dataTransfer.files.length){
+
+handleFile(e.dataTransfer.files[0]);
+
+}
+
+});
+
+fileInput.addEventListener("change",(e)=>{
+
+if(e.target.files.length){
+
+handleFile(e.target.files[0]);
+
+}
+
+});
+
+function handleFile(file){
+
+const ext=file.name.split(".").pop().toLowerCase();
+
+if(!allowedFormats[ext]){
+
+alert("Unsupported file type.");
+
+return;
+
+}
+
+currentFile=file;
+
+currentBlob=null;
+
+downloadBtn.style.display="none";
+
+fileName.textContent=file.name;
+
+fileSize.textContent=(file.size/1024).toFixed(1)+" KB";
+
+fileInfo.style.display="block";
+
+format.innerHTML="";
+
+allowedFormats[ext].forEach(type=>{
+
+const option=document.createElement("option");
+
+option.value=type;
+
+option.textContent=type.toUpperCase();
+
+format.appendChild(option);
+
+});
+
+}
+</html>
+  
+<script>
 const drop = document.getElementById("drop");
 const fileInput = document.getElementById("fileInput");
 const fileInfo = document.getElementById("fileInfo");
@@ -223,116 +423,220 @@ let currentFile = null;
 let currentBlob = null;
 
 const allowedFormats = {
-  csv: ["json", "txt"],
-  txt: ["json", "md"],
-  md: ["html", "txt"],
-  png: ["jpeg"],
-  jpg: ["png"]
+    csv: ["json", "txt", "xml"],
+    txt: ["md", "json"],
+    md: ["html", "txt"],
+    json: ["txt"],
+    png: ["jpg"],
+    jpg: ["png"],
+    jpeg: ["png"]
 };
 
-// Event Listeners (Saubere Trennung vom HTML-Markup)
+// ---------- Drag & Drop ----------
 drop.addEventListener("click", () => fileInput.click());
 
-drop.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  drop.classList.add("active");
+drop.addEventListener("dragover", e => {
+    e.preventDefault();
+    drop.classList.add("active");
 });
 
-drop.addEventListener("dragleave", () => drop.classList.remove("active"));
-
-drop.addEventListener("drop", (e) => {
-  e.preventDefault();
-  drop.classList.remove("active");
-  if (e.dataTransfer.files.length > 0) {
-    handleFileRegistration(e.dataTransfer.files[0]);
-  }
+drop.addEventListener("dragleave", () => {
+    drop.classList.remove("active");
 });
 
-fileInput.addEventListener("change", (e) => {
-  if (e.target.files.length > 0) {
-    handleFileRegistration(e.target.files[0]);
-  }
+drop.addEventListener("drop", e => {
+    e.preventDefault();
+    drop.classList.remove("active");
+
+    if (e.dataTransfer.files.length) {
+        registerFile(e.dataTransfer.files[0]);
+    }
 });
 
-function handleFileRegistration(fileObj) {
-  if (!fileObj) return;
+fileInput.addEventListener("change", e => {
+    if (e.target.files.length) {
+        registerFile(e.target.files[0]);
+    }
+});
 
-  const fileExtension = fileObj.name.split(".").pop().toLowerCase();
+// ---------- Register File ----------
+function registerFile(file){
 
-  if (!allowedFormats[fileExtension]) {
-    alert("Unsupported file type. Please use CSV, TXT, MD, PNG, or JPG.");
-    return;
-  }
+    currentFile = file;
+    currentBlob = null;
 
-  currentFile = fileObj;
-  currentBlob = null;
-  downloadBtn.style.display = "none";
+    const extension = file.name.split(".").pop().toLowerCase();
 
-  fileName.textContent = fileObj.name;
-  fileSize.textContent = (fileObj.size / 1024).toFixed(1) + " KB";
-  fileInfo.style.display = "block";
-
-  format.innerHTML = "";
-  allowedFormats[fileExtension].forEach(targetExt => {
-    const optionElement = document.createElement("option");
-    optionElement.value = targetExt;
-    optionElement.textContent = targetExt.toUpperCase();
-    format.appendChild(optionElement);
-  });
-}
-
-// Konvertierungslogik
-convertBtn.addEventListener("click", () => {
-  if (!currentFile) {
-    alert("Please upload a file first.");
-    return;
-  }
-
-  const reader = new FileReader();
-  const fileExtension = currentFile.name.split(".").pop().toLowerCase();
-  const targetFormat = format.value;
-
-  reader.onload = (e) => {
-    if (fileExtension === "csv" && targetFormat === "json") {
-      const lines = e.target.result.split("\n");
-      if (lines.length > 0) {
-        const headers = lines[0].split(",");
-        const data = lines.slice(1).filter(line => line.trim() !== "").map(line => {
-          const obj = {};
-          const currentline = line.split(",");
-          headers.forEach((header, index) => {
-            obj[header.trim()] = currentline[index] ? currentline[index].trim() : "";
-          });
-          return obj;
-        });
-        currentBlob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-      }
-    } else {
-      let mimeType = "text/plain";
-      if (targetFormat === "html") mimeType = "text/html";
-      if (targetFormat === "json") mimeType = "application/json";
-      currentBlob = new Blob([e.target.result], { type: mimeType });
+    if(!allowedFormats[extension]){
+        alert("Unsupported file type.");
+        return;
     }
 
-    downloadBtn.style.display = "block";
-  };
+    fileInfo.style.display = "block";
+    downloadBtn.style.display = "none";
 
-  reader.readAsText(currentFile);
+    fileName.textContent = file.name;
+    fileSize.textContent = (file.size/1024).toFixed(1)+" KB";
+
+    format.innerHTML = "";
+
+    allowedFormats[extension].forEach(type=>{
+
+        const option=document.createElement("option");
+        option.value=type;
+        option.innerText=type.toUpperCase();
+
+        format.appendChild(option);
+
+    });
+
+}
+
+// ---------- Convert ----------
+convertBtn.addEventListener("click",()=>{
+
+    if(!currentFile){
+        alert("Select a file first.");
+        return;
+    }
+
+    const extension=currentFile.name.split(".").pop().toLowerCase();
+    const target=format.value;
+
+    if(["png","jpg","jpeg"].includes(extension)){
+        convertImage(target);
+    }else{
+        convertText(extension,target);
+    }
+
 });
 
-// Download Trigger
-downloadBtn.addEventListener("click", () => {
-  if (!currentBlob) return;
+// ---------- Text ----------
+function convertText(ext,target){
 
-  const downloadAnchor = document.createElement("a");
-  downloadAnchor.href = URL.createObjectURL(currentBlob);
-  downloadAnchor.download = `converted_${Date.now()}.${format.value}`;
-  downloadAnchor.click();
-  
-  // Memory Cleanup
-  setTimeout(() => URL.revokeObjectURL(downloadAnchor.href), 100);
+    const reader=new FileReader();
+
+    reader.onload=e=>{
+
+        let text=e.target.result;
+        let output=text;
+        let mime="text/plain";
+
+        if(ext==="csv" && target==="json"){
+
+            const lines=text.trim().split("\n");
+
+            const headers=lines.shift().split(",");
+
+            const data=lines.map(line=>{
+
+                const values=line.split(",");
+
+                let obj={};
+
+                headers.forEach((h,i)=>{
+                    obj[h.trim()]=values[i]?.trim()||"";
+                });
+
+                return obj;
+
+            });
+
+            output=JSON.stringify(data,null,2);
+            mime="application/json";
+
+        }
+
+        else if(ext==="md" && target==="html"){
+
+            output=text
+            .replace(/^# (.*)$/gm,"<h1>$1</h1>")
+            .replace(/^## (.*)$/gm,"<h2>$1</h2>")
+            .replace(/^### (.*)$/gm,"<h3>$1</h3>")
+            .replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>")
+            .replace(/\*(.*?)\*/g,"<em>$1</em>")
+            .replace(/\n/g,"<br>");
+
+            mime="text/html";
+
+        }
+
+        else if(ext==="csv" && target==="txt"){
+
+            output=text.replace(/,/g," ");
+
+        }
+
+        currentBlob=new Blob([output],{type:mime});
+
+        downloadBtn.style.display="block";
+
+    };
+
+    reader.readAsText(currentFile);
+
+}
+
+// ---------- Image ----------
+function convertImage(target){
+
+    const reader=new FileReader();
+
+    reader.onload=e=>{
+
+        const img=new Image();
+
+        img.onload=()=>{
+
+            const canvas=document.createElement("canvas");
+            canvas.width=img.width;
+            canvas.height=img.height;
+
+            const ctx=canvas.getContext("2d");
+
+            ctx.drawImage(img,0,0);
+
+            canvas.toBlob(blob=>{
+
+                currentBlob=blob;
+                downloadBtn.style.display="block";
+
+            },"image/"+target,0.95);
+
+        };
+
+        img.src=e.target.result;
+
+    };
+
+    reader.readAsDataURL(currentFile);
+
+}
+
+// ---------- Download ----------
+downloadBtn.addEventListener("click",()=>{
+
+    if(!currentBlob) return;
+
+    const a=document.createElement("a");
+
+    const url=URL.createObjectURL(currentBlob);
+
+    a.href=url;
+
+    const name=currentFile.name.substring(0,currentFile.name.lastIndexOf("."));
+
+    a.download=name+"."+format.value;
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+
 });
 </script>
-
 </body>
 </html>
