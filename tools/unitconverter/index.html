@@ -5,34 +5,34 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Premium Unit Converter — Schwarz & Lila</title>
 <style>
-  :root {
-    --bg: #050508;
-    --panel: #0d0d12;
-    --border: #1c1926;
-    --accent: #8a5cff;
-    --accent-2: #6f3fe6;
-    --accent-glow: rgba(138, 92, 255, 0.25);
-    --glass: rgba(255, 255, 255, 0.02);
-    --text: #eaeaf2;
-    --sub: #8e8eab;
-    --shadow: 0 20px 50px rgba(0,0,0,0.8);
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  }
+ :root {
+    --bg-main: #0c0812;
+    --bg-panel: #180e25;
+    --border-color: #26163a;
+    --text-main: #f3effa;
+    --text-muted: #6e568b;
+    --accent-pink: #d61c59;
+    --accent-hover: #fa2a73;
+    --btn-dark: #1f1230;
+    --btn-dark-border: #361f54;
+}
 
   /* Dark-Mode für Systemkomponenten erzwingen */
   html {
     color-scheme: dark;
   }
 
-  html, body { 
-    height: 100%; 
-    margin: 0; 
-    background: var(--bg); 
-    color: var(--text); 
-    -webkit-font-smoothing: antialiased; 
-    -moz-osx-font-smoothing: grayscale; 
-    overflow: hidden; 
-  }
+  html, body{
+    margin:0;
+    padding:20px;
+    background:var(--bg-main);
+    color:var(--text-main);
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
 
   /* Globale Custom Dark Scrollbar für Container */
   ::-webkit-scrollbar {
@@ -87,22 +87,7 @@
     display: flex;
     gap: 16px;
     align-items: center;
-  }
-  .logo {
-    width: 56px;
-    height: 56px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 800;
-    font-size: 20px;
-    box-shadow: 0 8px 24px var(--accent-glow);
-  }
-  .title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
-  .subtitle { color: var(--sub); font-size: 13px; margin-top: 2px; }
+
 
   /* Grid für Inputs */
   .input-area {
