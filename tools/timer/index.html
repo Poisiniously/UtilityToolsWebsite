@@ -136,192 +136,180 @@
             <button id="resetBtn">Reset</button>
         </div>
     </div>
-let timer;
+
+    <script>
+       let timerInterval;
+let alarmInterval;
+
 let totalSeconds = 0;
+let isRunning = false;
+let isPaused = false;
 let stopwatchMode = false;
 
-function startTimer() {
-    const hours = parseInt(hoursInput.value) || 0;
-    const minutes = parseInt(minutesInput.value) || 0;
-    const seconds = parseInt(secondsInput.value) || 0;
+let audioCtx = null;
 
-    totalSeconds = hours * 3600 + minutes * 60 + seconds;
+const startStopBtn = document.getElementById("startStopBtn");
+const resetBtn = document.getElementById("resetBtn");
 
-    // If 00:00:00 -> start stopwatch
-    if (totalSeconds === 0) {
-        stopwatchMode = true;
+const inputsDiv = document.getElementById("inputs");
+const displayDiv = document.getElementById("display");
+const timerBox = document.getElementById("timerBox");
 
-        timer = setInterval(() => {
-            totalSeconds++;
+const hrsInput = document.getElementById("hrs");
+const minsInput = document.getElementById("mins");
+const secsInput = document.getElementById("secs");
 
-            const h = Math.floor(totalSeconds / 3600);
-            const m = Math.floor((totalSeconds % 3600) / 60);
-            const s = totalSeconds % 60;
-
-            updateDisplay(h, m, s);
-        }, 1000);
-
-        return;
+function playZenChime() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
 
-    // Countdown mode
-    stopwatchMode = false;
+    const now = audioCtx.currentTime;
+    const notes = [329.63, 440.0, 493.88, 659.25];
 
-    timer = setInterval(() => {
-        if (totalSeconds <= 0) {
-            clearInterval(timer);
+    notes.forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.value = freq;
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        gain.gain.setValueAtTime(0, now + i * 0.12);
+        gain.gain.linearRampToValueAtTime(0.15, now + i * 0.12 + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.12 + 1.5);
+
+        osc.start(now + i * 0.12);
+        osc.stop(now + i * 0.12 + 1.5);
+    });
+}
+
+function startAlarm() {
+    timerBox.classList.add("alarm");
+
+    playZenChime();
+    alarmInterval = setInterval(playZenChime, 3000);
+}
+
+function stopAlarm() {
+    clearInterval(alarmInterval);
+    timerBox.classList.remove("alarm");
+}
+
+function updateDisplay() {
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+
+    displayDiv.textContent =
+        `${String(h).padStart(2, "0")}:` +
+        `${String(m).padStart(2, "0")}:` +
+        `${String(s).padStart(2, "0")}`;
+}
+
+function startTimer() {
+
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    if (!isPaused) {
+
+        const h = parseInt(hrsInput.value) || 0;
+        const m = parseInt(minsInput.value) || 0;
+        const s = parseInt(secsInput.value) || 0;
+
+        totalSeconds = h * 3600 + m * 60 + s;
+
+        stopwatchMode = totalSeconds === 0;
+    }
+
+    inputsDiv.style.display = "none";
+    displayDiv.style.display = "block";
+
+    updateDisplay();
+
+    isRunning = true;
+    isPaused = false;
+
+    startStopBtn.textContent = "Pause";
+    startStopBtn.classList.add("running");
+
+    timerInterval = setInterval(() => {
+
+        if (stopwatchMode) {
+
+            totalSeconds++;
+            updateDisplay();
+
             return;
         }
 
         totalSeconds--;
 
-        const h = Math.floor(totalSeconds / 3600);
-        const m = Math.floor((totalSeconds % 3600) / 60);
-        const s = totalSeconds % 60;
+        updateDisplay();
 
-        updateDisplay(h, m, s);
+        if (totalSeconds <= 0) {
+
+            clearInterval(timerInterval);
+
+            isRunning = false;
+
+            startStopBtn.style.display = "none";
+
+            startAlarm();
+        }
+
     }, 1000);
 }
 
-function updateDisplay(h, m, s) {
-    hoursInput.value = String(h).padStart(2, "0");
-    minutesInput.value = String(m).padStart(2, "0");
-    secondsInput.value = String(s).padStart(2, "0");
+function pauseTimer() {
+
+    clearInterval(timerInterval);
+
+    isRunning = false;
+    isPaused = true;
+
+    startStopBtn.textContent = "Continue";
+    startStopBtn.classList.remove("running");
 }
-    <script>
-        let countdownInterval;
-        let alarmInterval;
-        let totalSeconds = 0;
-        let isRunning = false;
-        let isPaused = false;
-        let audioCtx = null;
 
-        const startStopBtn = document.getElementById('startStopBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const inputsDiv = document.getElementById('inputs');
-        const displayDiv = document.getElementById('display');
-        const timerBox = document.getElementById('timerBox');
+function resetTimer() {
 
-        const hrsInput = document.getElementById('hrs');
-        const minsInput = document.getElementById('mins');
-        const secsInput = document.getElementById('secs');
+    clearInterval(timerInterval);
+    stopAlarm();
 
-        function playZenChime() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            
-            const now = audioCtx.currentTime;
-            const notes = [329.63, 440.00, 493.88, 659.25]; 
+    totalSeconds = 0;
 
-            notes.forEach((freq, index) => {
-                const osc = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, now + index * 0.12);
-                
-                gainNode.gain.setValueAtTime(0, now + index * 0.12);
-                gainNode.gain.linearRampToValueAtTime(0.15, now + index * 0.12 + 0.04);
-                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.12 + 1.5);
-                
-                osc.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                
-                osc.start(now + index * 0.12);
-                osc.stop(now + index * 0.12 + 1.5);
-            });
-        }
+    isRunning = false;
+    isPaused = false;
+    stopwatchMode = false;
 
-        function startAlarm() {
-            timerBox.classList.add('alarm');
-            playZenChime();
-            alarmInterval = setInterval(playZenChime, 3000);
-        }
+    hrsInput.value = "";
+    minsInput.value = "";
+    secsInput.value = "";
 
-        function stopAlarm() {
-            clearInterval(alarmInterval);
-            timerBox.classList.remove('alarm');
-        }
+    inputsDiv.style.display = "block";
+    displayDiv.style.display = "none";
 
-        function updateDisplay(seconds) {
-            let h = Math.floor(seconds / 3600);
-            let m = Math.floor((seconds % 3600) / 60);
-            let s = seconds % 60;
-            displayDiv.textContent = 
-                `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        }
+    startStopBtn.style.display = "inline-block";
+    startStopBtn.textContent = "Start";
+    startStopBtn.classList.remove("running");
+}
 
-        function startTimer() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
+startStopBtn.addEventListener("click", () => {
 
-            if (!isPaused) {
-                let h = parseInt(hrsInput.value) || 0;
-                let m = parseInt(minsInput.value) || 0;
-                let s = parseInt(secsInput.value) || 0;
-                totalSeconds = (h * 3600) + (m * 60) + s;
-                if (totalSeconds <= 0) return;
-            }
+    if (!isRunning) {
+        startTimer();
+    } else {
+        pauseTimer();
+    }
 
-            inputsDiv.style.display = 'none';
-            displayDiv.style.display = 'block';
-            updateDisplay(totalSeconds);
+});
 
-            isRunning = true;
-            isPaused = false;
-            startStopBtn.textContent = "Pause";
-            startStopBtn.classList.add("running");
-
-            countdownInterval = setInterval(() => {
-                totalSeconds--;
-                updateDisplay(totalSeconds);
-
-                if (totalSeconds <= 0) {
-                    clearInterval(countdownInterval);
-                    isRunning = false;
-                    startStopBtn.style.display = 'none';
-                    startAlarm();
-                }
-            }, 1000);
-        }
-
-        function pauseTimer() {
-            clearInterval(countdownInterval);
-            isPaused = true;
-            isRunning = false;
-            startStopBtn.textContent = "Weiter";
-            startStopBtn.classList.remove("running");
-        }
-
-        function resetTimer() {
-            clearInterval(countdownInterval);
-            stopAlarm();
-            isRunning = false;
-            isPaused = false;
-            totalSeconds = 0;
-
-            hrsInput.value = '';
-            minsInput.value = '';
-            secsInput.value = '';
-            
-            inputsDiv.style.display = 'block';
-            displayDiv.style.display = 'none';
-            startStopBtn.style.display = 'inline-block';
-            startStopBtn.textContent = "Start";
-            startStopBtn.classList.remove("running");
-        }
-
-        startStopBtn.addEventListener('click', () => {
-            if (!isRunning) {
-                startTimer();
-            } else {
-                pauseTimer();
-            }
-        });
-
-        resetBtn.addEventListener('click', resetTimer);
+resetBtn.addEventListener("click", resetTimer);
     </script>
 </body>
 </html>
