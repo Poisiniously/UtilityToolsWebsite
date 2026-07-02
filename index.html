@@ -38,10 +38,12 @@ h1 {
   color: var(--primary);
 }
 
-/* SEARCH */
+/* SEARCH & FILTER */
 .search-container {
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 15px;
   margin-bottom: 30px;
 }
 
@@ -53,6 +55,36 @@ h1 {
   background: var(--glass);
   color: white;
   outline: none;
+  transition: box-shadow 0.3s;
+}
+
+.search-input:focus {
+  box-shadow: 0 0 10px var(--secondary);
+}
+
+.filter-btn {
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--primary);
+  background: var(--glass);
+  color: var(--primary);
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.filter-btn:hover {
+  background: rgba(255, 0, 127, 0.1);
+}
+
+.filter-btn.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 0 15px #ff007f55;
 }
 
 /* GRID */
@@ -64,6 +96,7 @@ h1 {
 
 /* CARD */
 .card {
+  position: relative; /* Wichtig für das absolut positionierte Herz/Stern */
   background: var(--glass);
   border-radius: 15px;
   padding: 15px;
@@ -78,6 +111,30 @@ h1 {
   box-shadow: 0 0 20px #ff007f55;
 }
 
+/* FAVORITE BUTTON */
+.fav-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 22px;
+  color: rgba(255, 255, 255, 0.2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.fav-btn:hover {
+  transform: scale(1.2);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.fav-btn.active {
+  color: #ffd700; /* Gold */
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+}
+
 /* PLACEHOLDER IMAGE */
 .card-image {
   height: 120px;
@@ -89,6 +146,7 @@ h1 {
   justify-content: center;
   font-weight: bold;
   color: black;
+  margin-top: 5px;
 }
 
 /* TEXT */
@@ -156,29 +214,38 @@ h1 {
 
 <div class="search-container">
   <input id="searchInput" class="search-input" placeholder="Search tools..." autocomplete="off">
+  <button id="favFilterBtn" class="filter-btn" onclick="toggleFavFilter()">★ Favorites</button>
 </div>
 
 <div id="grid" class="grid">
 
-  <div class="card" data-name="calculator" onclick="openTool('tools/calculator/index.html')">
+  <!-- Calculator Card -->
+  <div class="card" data-id="calc" data-name="calculator" onclick="openTool('tools/calculator/index.html')">
+    <button class="fav-btn" onclick="toggleFav(event, 'calc')">★</button>
     <div class="card-image">CALC</div>
     <div class="card-title">Calculator</div>
     <div class="card-desc">Simple math calculator</div>
   </div>
 
-  <div class="card" data-name="text cleaner" onclick="openTool('tools/textcleaner/index.html')">
+  <!-- Text Cleaner Card -->
+  <div class="card" data-id="text" data-name="text cleaner" onclick="openTool('tools/textcleaner/index.html')">
+    <button class="fav-btn" onclick="toggleFav(event, 'text')">★</button>
     <div class="card-image">TEXT</div>
     <div class="card-title">Text Cleaner</div>
     <div class="card-desc">Simple text formatting</div>
   </div>
 
-  <div class="card" data-name="converter file" onclick="openTool('tools/file-converter/index.html')">
+  <!-- Converter Card -->
+  <div class="card" data-id="conv" data-name="converter file" onclick="openTool('tools/file-converter/index.html')">
+    <button class="fav-btn" onclick="toggleFav(event, 'conv')">★</button>
     <div class="card-image">CONV</div>
     <div class="card-title">File Converter</div>
     <div class="card-desc">Convert files easily</div>
   </div>
 
-  <div class="card" data-name="timer" onclick="openTool('tools/timer/index.html')">
+  <!-- Timer Card -->
+  <div class="card" data-id="timer" data-name="timer" onclick="openTool('tools/timer/index.html')">
+    <button class="fav-btn" onclick="toggleFav(event, 'timer')">★</button>
     <div class="card-image">TIME</div>
     <div class="card-title">Timer</div>
     <div class="card-desc">Countdown & Stopwatch</div>
@@ -186,41 +253,82 @@ h1 {
 
 </div>
 
+<!-- No Results Message -->
 <div id="noResults" class="no-results">
-  No tools found matching your search.
+  No tools found.
 </div>
 
+<!-- Popup Container -->
 <div id="popup" class="popup">
   <span class="close-btn" onclick="closeTool()">&times;</span>
   <iframe id="toolFrame" src=""></iframe>
 </div>
 
+<!-- JavaScript for Interactivity -->
 <script>
-  // Open popup and load iframe
-  function openTool(url) {
-    const popup = document.getElementById('popup');
-    const iframe = document.getElementById('toolFrame');
-    iframe.src = url;
-    popup.style.display = 'flex';
+  // --- Favorites System Variables ---
+  let favorites = JSON.parse(localStorage.getItem('utilityHubFavs')) || [];
+  let showFavoritesOnly = false;
+
+  // --- Initialize on Load ---
+  function init() {
+    // Set active class on favorited cards
+    document.querySelectorAll('.card').forEach(card => {
+      const id = card.getAttribute('data-id');
+      if (favorites.includes(id)) {
+        card.querySelector('.fav-btn').classList.add('active');
+      }
+    });
   }
 
-  // Close popup and clear iframe
-  function closeTool() {
-    const popup = document.getElementById('popup');
-    const iframe = document.getElementById('toolFrame');
-    popup.style.display = 'none';
-    iframe.src = ''; // Clear source to stop media/timers if any
+  // --- Toggle Favorite Status ---
+  function toggleFav(event, id) {
+    event.stopPropagation(); // Verhindert, dass sich die Karte öffnet, wenn man den Stern klickt
+    const btn = event.target;
+    
+    if (favorites.includes(id)) {
+      favorites = favorites.filter(favId => favId !== id);
+      btn.classList.remove('active');
+    } else {
+      favorites.push(id);
+      btn.classList.add('active');
+    }
+    
+    // In LocalStorage speichern
+    localStorage.setItem('utilityHubFavs', JSON.stringify(favorites));
+    
+    // Ansicht aktualisieren, falls der Filter gerade aktiv ist
+    filterCards();
   }
 
-  // Search filter functionality
-  document.getElementById('searchInput').addEventListener('input', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
+  // --- Toggle Favorites Filter Button ---
+  function toggleFavFilter() {
+    showFavoritesOnly = !showFavoritesOnly;
+    const btn = document.getElementById('favFilterBtn');
+    
+    if (showFavoritesOnly) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+    
+    filterCards();
+  }
+
+  // --- Combined Filter Logic (Search + Favorites) ---
+  function filterCards() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     const cards = document.querySelectorAll('.card');
     let hasVisibleCards = false;
 
     cards.forEach(card => {
       const toolName = card.getAttribute('data-name').toLowerCase();
-      if (toolName.includes(searchTerm)) {
+      const id = card.getAttribute('data-id');
+      
+      const matchesSearch = toolName.includes(searchTerm);
+      const matchesFav = !showFavoritesOnly || favorites.includes(id);
+
+      if (matchesSearch && matchesFav) {
         card.style.display = 'block';
         hasVisibleCards = true;
       } else {
@@ -228,16 +336,33 @@ h1 {
       }
     });
 
-    // Toggle "No results" message
     document.getElementById('noResults').style.display = hasVisibleCards ? 'none' : 'block';
+  }
+
+  // Event Listener for Search
+  document.getElementById('searchInput').addEventListener('input', filterCards);
+
+  // --- Popup Functions ---
+  function openTool(url) {
+    const popup = document.getElementById('popup');
+    const iframe = document.getElementById('toolFrame');
+    iframe.src = url;
+    popup.style.display = 'flex';
+  }
+
+  function closeTool() {
+    const popup = document.getElementById('popup');
+    const iframe = document.getElementById('toolFrame');
+    popup.style.display = 'none';
+    iframe.src = '';
+  }
+
+  document.getElementById('popup').addEventListener('click', function(e) {
+    if (e.target === this) closeTool();
   });
 
-  // Close popup when clicking outside the iframe
-  document.getElementById('popup').addEventListener('click', function(e) {
-    if (e.target === this) {
-      closeTool();
-    }
-  });
+  // Run initialization
+  init();
 </script>
 
 </body>
