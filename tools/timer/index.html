@@ -136,7 +136,58 @@
             <button id="resetBtn">Reset</button>
         </div>
     </div>
+let timer;
+let totalSeconds = 0;
+let stopwatchMode = false;
 
+function startTimer() {
+    const hours = parseInt(hoursInput.value) || 0;
+    const minutes = parseInt(minutesInput.value) || 0;
+    const seconds = parseInt(secondsInput.value) || 0;
+
+    totalSeconds = hours * 3600 + minutes * 60 + seconds;
+
+    // If 00:00:00 -> start stopwatch
+    if (totalSeconds === 0) {
+        stopwatchMode = true;
+
+        timer = setInterval(() => {
+            totalSeconds++;
+
+            const h = Math.floor(totalSeconds / 3600);
+            const m = Math.floor((totalSeconds % 3600) / 60);
+            const s = totalSeconds % 60;
+
+            updateDisplay(h, m, s);
+        }, 1000);
+
+        return;
+    }
+
+    // Countdown mode
+    stopwatchMode = false;
+
+    timer = setInterval(() => {
+        if (totalSeconds <= 0) {
+            clearInterval(timer);
+            return;
+        }
+
+        totalSeconds--;
+
+        const h = Math.floor(totalSeconds / 3600);
+        const m = Math.floor((totalSeconds % 3600) / 60);
+        const s = totalSeconds % 60;
+
+        updateDisplay(h, m, s);
+    }, 1000);
+}
+
+function updateDisplay(h, m, s) {
+    hoursInput.value = String(h).padStart(2, "0");
+    minutesInput.value = String(m).padStart(2, "0");
+    secondsInput.value = String(s).padStart(2, "0");
+}
     <script>
         let countdownInterval;
         let alarmInterval;
