@@ -110,7 +110,7 @@
         /* Sanftes Pulsieren am Ende */
         @keyframes alarm-pulse {
             0% { opacity: 1; color: #f8fafc; }
-            50% { opacity: 0.4; color: #a78bfa; } /* Sanftes Lila statt aggressivem Rot */
+            50% { opacity: 0.4; color: #a78bfa; }
             100% { opacity: 1; color: #f8fafc; }
         }
 
@@ -124,9 +124,9 @@
     <div class="timer-container">
         <div class="timer-box" id="timerBox">
             <div id="inputs">
-                <input type="number" id="hrs" placeholder="00" min="0" max="99">:
-                <input type="number" id="mins" placeholder="00" min="0" max="59">:
-                <input type="number" id="secs" placeholder="00" min="0" max="59">
+                <input type="number" id="hrs" placeholder="00" min="0" max="99" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2);">:
+                <input type="number" id="mins" placeholder="00" min="0" max="59" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2);">:
+                <input type="number" id="secs" placeholder="00" min="0" max="59" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2);">
             </div>
             <div id="display" class="time-display" style="display: none;">00:00:00</div>
         </div>
@@ -155,25 +155,21 @@
         const minsInput = document.getElementById('mins');
         const secsInput = document.getElementById('secs');
 
-        // Funktion zur Erzeugung eines entspannten, harmonischen Wecktons
         function playZenChime() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
             
             const now = audioCtx.currentTime;
-            // Harmonische, weiche Frequenzen (E-Dur/Pentatonisch angehaucht)
             const notes = [329.63, 440.00, 493.88, 659.25]; 
 
             notes.forEach((freq, index) => {
                 const osc = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
                 
-                // Reine Sinuswelle für einen extrem klaren, weichen Ton
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(freq, now + index * 0.12);
                 
-                // Sanftes Einblenden (Attack) und langes Ausklingen (Decay)
                 gainNode.gain.setValueAtTime(0, now + index * 0.12);
                 gainNode.gain.linearRampToValueAtTime(0.15, now + index * 0.12 + 0.04);
                 gainNode.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.12 + 1.5);
@@ -189,7 +185,6 @@
         function startAlarm() {
             timerBox.classList.add('alarm');
             playZenChime();
-            // Den entspannten Ton alle 3 Sekunden wiederholen
             alarmInterval = setInterval(playZenChime, 3000);
         }
 
@@ -207,7 +202,6 @@
         }
 
         function startTimer() {
-            // Audio-Kontext direkt beim Klick initialisieren (Browser-Sicherheitsrichtlinie)
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
