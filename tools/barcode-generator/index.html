@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barcode Generator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
+    <title>QR Code Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --bg-main: #0c0812;
@@ -33,11 +33,12 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            overflow: hidden; /* Verhindert das Scrollen der Seite */
         }
 
         .app {
             width: 100%;
-            max-width: 700px;
+            max-width: 600px;
             background: var(--bg-panel);
             border: 1px solid var(--border-color);
             border-radius: 12px;
@@ -60,7 +61,7 @@
 
         .preview {
             width: 100%;
-            min-height: 220px;
+            min-height: 320px;
             padding: 30px;
             margin-bottom: 25px;
             border: 2px dashed var(--btn-dark-border);
@@ -81,17 +82,19 @@
         .empty-state {
             color: var(--text-muted);
             font-size: 0.95rem;
+            text-align: center;
         }
 
-        #barcode {
+        #qrcode {
             background: white;
-            padding: 15px 25px;
-            border-radius: 8px;
+            padding: 18px;
+            border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             transition: transform 0.3s ease;
+            display: inline-block;
         }
 
-        .preview:hover #barcode {
+        .preview:hover #qrcode {
             transform: scale(1.02);
         }
 
@@ -107,49 +110,22 @@
             font-weight: bold;
         }
 
-        input[type="text"], select {
+        textarea {
             width: 100%;
-            padding: 12px;
+            height: 120px;
+            padding: 14px;
             background: #08050c;
             color: var(--text-main);
             border: 1px solid var(--btn-dark-border);
             border-radius: 8px;
             font-size: .95rem;
+            resize: none;
             transition: .25s;
         }
 
-        input[type="text"]:focus, select:focus {
+        textarea:focus {
             outline: none;
             border-color: var(--accent-pink);
-        }
-
-        .options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .slider-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .slider-header label {
-            margin-bottom: 0;
-        }
-
-        .slider-header span {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            font-weight: bold;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            accent-color: var(--accent-pink);
-            cursor: pointer;
         }
 
         .controls {
@@ -200,157 +176,96 @@
 </head>
 <body>
     <div class="app">
-        <h2>Barcode Generator</h2>
-        <p class="subtitle">Erstelle und lade Barcodes herunter.</p>
+        <h2>QR Code Generator</h2>
+        <p class="subtitle">Der QR-Code wird live beim Tippen generiert.</p>
 
         <div class="preview">
-            <div id="barcode-container">
-                <svg id="barcode"></svg>
+            <div id="qrcode-container">
+                <div id="qrcode"></div>
             </div>
             <div id="empty" class="empty-state">
-                Der Barcode erscheint hier
+                Der QR-Code erscheint hier
             </div>
         </div>
 
         <div class="input-group">
-            <label for="text">Inhalt</label>
-            <input type="text" id="text" placeholder="z.B. 123456789012" value="123456789012">
-        </div>
-
-        <div class="input-group">
-            <label for="type">Barcode Typ</label>
-            <select id="type">
-                <option value="CODE128">CODE128 (empfohlen)</option>
-                <option value="EAN13">EAN-13</option>
-                <option value="EAN8">EAN-8</option>
-                <option value="CODE39">CODE39</option>
-                <option value="ITF14">ITF-14</option>
-                <option value="UPC">UPC-A</option>
-            </select>
-        </div>
-        
-        <div class="options">
-            <div class="input-group">
-                <div class="slider-header">
-                    <label for="width">Breite</label>
-                    <span id="widthVal">2.0</span>
-                </div>
-                <input type="range" id="width" min="1" max="4" step="0.1" value="2">
-            </div>
-            <div class="input-group">
-                <div class="slider-header">
-                    <label for="height">Höhe</label>
-                    <span id="heightVal">100px</span>
-                </div>
-                <input type="range" id="height" min="40" max="200" step="5" value="100">
-            </div>
+            <label for="text">Text oder URL</label>
+            <textarea id="text" placeholder="Gib hier den Text oder die URL ein, die in den QR-Code soll..."></textarea>
         </div>
 
         <div class="controls">
             <button onclick="clearInput()" class="btn-clear">Löschen</button>
-            <button onclick="downloadBarcode()" class="btn-download" id="downloadBtn" disabled>Als PNG herunterladen</button>
+            <button onclick="downloadQR()" class="btn-download" id="downloadBtn" disabled>Als PNG herunterladen</button>
         </div>
     </div>
 
     <script>
+        let qrcodeInstance = null;
         let currentText = '';
         
-        const input = document.getElementById('text');
-        const typeSelect = document.getElementById('type');
-        const widthSlider = document.getElementById('width');
-        const heightSlider = document.getElementById('height');
-        const widthVal = document.getElementById('widthVal');
-        const heightVal = document.getElementById('heightVal');
+        const textarea = document.getElementById('text');
         const downloadBtn = document.getElementById('downloadBtn');
         const emptyState = document.getElementById('empty');
-        const barcodeContainer = document.getElementById('barcode-container');
+        const qrcodeContainer = document.getElementById('qrcode-container');
         
-        function generateBarcode() {
-            const text = input.value.trim();
-            
-            if (!text) {
+        function generateQR(text) {
+            if (!text || text.trim() === '') {
                 emptyState.style.display = 'block';
-                barcodeContainer.style.display = 'none';
+                qrcodeContainer.style.display = 'none';
                 downloadBtn.disabled = true;
                 return;
             }
             
             emptyState.style.display = 'none';
-            barcodeContainer.style.display = 'block';
+            qrcodeContainer.style.display = 'block';
             
-            const svg = document.getElementById('barcode');
-            svg.innerHTML = '';
+            const qrDiv = document.getElementById('qrcode');
+            qrDiv.innerHTML = '';
             
-            try {
-                JsBarcode("#barcode", text, {
-                    format: typeSelect.value,
-                    lineColor: "#000000",
-                    width: parseFloat(widthSlider.value),
-                    height: parseFloat(heightSlider.value),
-                    displayValue: true,
-                    fontOptions: "bold",
-                    fontSize: 18,
-                    margin: 15,
-                    background: "#ffffff"
-                });
-                
-                currentText = text;
-                downloadBtn.disabled = false;
-            } catch (e) {
-                console.error(e);
-                emptyState.textContent = "Ungültiger Inhalt für diesen Barcode-Typ";
-                emptyState.style.display = 'block';
-                barcodeContainer.style.display = 'none';
-                downloadBtn.disabled = true;
-            }
+            qrcodeInstance = new QRCode(qrDiv, {
+                text: text,
+                width: 240,
+                height: 240,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            currentText = text;
+            downloadBtn.disabled = false;
         }
         
-        // Event Listener
-        input.addEventListener('input', generateBarcode);
-        typeSelect.addEventListener('change', generateBarcode);
-        
-        widthSlider.addEventListener('input', () => {
-            widthVal.textContent = parseFloat(widthSlider.value).toFixed(1);
-            generateBarcode();
+        // Live Update mit Debounce
+        let timeout = null;
+        textarea.addEventListener('input', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                generateQR(textarea.value.trim());
+            }, 250);
         });
         
-        heightSlider.addEventListener('input', () => {
-            heightVal.textContent = heightSlider.value + 'px';
-            generateBarcode();
-        });
-        
-        function downloadBarcode() {
+        function downloadQR() {
             if (!currentText) return;
             
-            const svg = document.getElementById('barcode');
-            const svgData = new XMLSerializer().serializeToString(svg);
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
+            const canvas = document.querySelector('#qrcode canvas');
+            if (!canvas) return;
             
-            const img = new Image();
-            img.onload = function() {
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
-                
-                const link = document.createElement('a');
-                link.download = 'barcode.png';
-                link.href = canvas.toDataURL('image/png', 1.0);
-                link.click();
-            };
-            
-            img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+            const link = document.createElement('a');
+            link.download = 'qrcode.png';
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
         }
         
         function clearInput() {
-            input.value = '';
-            generateBarcode();
-            input.focus();
+            textarea.value = '';
+            generateQR('');
+            textarea.focus();
         }
         
-        // Initial generieren
+        // Initialzustand
         window.onload = () => {
-            generateBarcode();
+            emptyState.style.display = 'block';
+            qrcodeContainer.style.display = 'none';
         };
     </script>
 </body>
