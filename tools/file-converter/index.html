@@ -1,643 +1,353 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>File Converter</title>
-
-<style>
-
-:root{
-    --bg-main:#0c0812;
-    --bg-panel:#180e25;
-    --border-color:#26163a;
-
-    --text-main:#f3effa;
-    --text-muted:#6e568b;
-
-    --accent-pink:#d61c59;
-    --accent-hover:#fa2a73;
-
-    --btn-dark:#1f1230;
-    --btn-dark-border:#361f54;
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-}
-
-body{
-
-    background:var(--bg-main);
-
-    color:var(--text-main);
-
-    min-height:100vh;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    padding:20px;
-
-}
-
-.app{
-
-    width:100%;
-    max-width:700px;
-
-    background:var(--bg-panel);
-
-    border:1px solid var(--border-color);
-
-    border-radius:12px;
-
-    padding:30px;
-
-    box-shadow:0 8px 32px rgba(0,0,0,.5);
-
-}
-
-h2{
-
-    text-align:center;
-
-    font-size:1.8rem;
-
-    margin-bottom:8px;
-
-}
-
-.subtitle{
-
-    text-align:center;
-
-    color:var(--text-muted);
-
-    margin-bottom:25px;
-
-}
-
-.drop{
-
-    width:100%;
-
-    padding:45px 20px;
-
-    border:2px dashed var(--btn-dark-border);
-
-    border-radius:8px;
-
-    text-align:center;
-
-    cursor:pointer;
-
-    background:#08050c;
-
-    transition:.25s;
-
-}
-
-.drop:hover{
-
-    border-color:var(--accent-pink);
-
-    background:#120a1c;
-
-}
-
-.drop.active{
-
-    border-color:var(--accent-pink);
-
-    background:#120a1c;
-
-}
-
-.file{
-
-    display:none;
-
-    margin-top:20px;
-
-    background:#08050c;
-
-    border:1px solid var(--btn-dark-border);
-
-    border-radius:8px;
-
-    padding:15px;
-
-}
-
-.file-name{
-
-    font-weight:bold;
-
-    margin-bottom:5px;
-
-    word-break:break-word;
-
-}
-
-.file-size{
-
-    color:var(--text-muted);
-
-    font-size:.85rem;
-
-}
-
-select{
-
-    width:100%;
-
-    margin-top:20px;
-
-    padding:12px;
-
-    background:#08050c;
-
-    color:var(--text-main);
-
-    border:1px solid var(--btn-dark-border);
-
-    border-radius:8px;
-
-    font-size:.95rem;
-
-    transition:.25s;
-
-}
-
-select:focus{
-
-    outline:none;
-
-    border-color:var(--accent-pink);
-
-}
-
-button{
-
-    width:100%;
-
-    margin-top:15px;
-
-    padding:12px;
-
-    border-radius:6px;
-
-    cursor:pointer;
-
-    font-size:.95rem;
-
-    transition:.2s;
-
-}
-
-#convertBtn{
-
-    background:var(--btn-dark);
-
-    color:var(--text-main);
-
-    border:1px solid var(--btn-dark-border);
-
-}
-
-#convertBtn:hover{
-
-    background:var(--border-color);
-
-    border-color:var(--text-muted);
-
-}
-
-.download{
-
-    display:none;
-
-    background:var(--accent-pink);
-
-    border:none;
-
-    color:white;
-
-    font-weight:bold;
-
-}
-
-.download:hover{
-
-    background:var(--accent-hover);
-
-    box-shadow:0 0 12px rgba(214,28,89,.4);
-
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Converter</title>
+
+    <style>
+        :root {
+            --bg-main: #0c0812;
+            --bg-panel: #180e25;
+            --border-color: #26163a;
+            --text-main: #f3effa;
+            --text-muted: #6e568b;
+            --accent-pink: #d61c59;
+            --accent-hover: #fa2a73;
+            --btn-dark: #1f1230;
+            --btn-dark-border: #361f54;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 700px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,.5);
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+        }
+
+        .drop {
+            width: 100%;
+            padding: 45px 20px;
+            border: 2px dashed var(--btn-dark-border);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            background: #08050c;
+            transition: .25s;
+        }
+
+        .drop:hover, .drop.active {
+            border-color: var(--accent-pink);
+            background: #120a1c;
+        }
+
+        .file {
+            display: none;
+            margin-top: 20px;
+            background: #08050c;
+            border: 1px solid var(--btn-dark-border);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .file-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+
+        .file-size {
+            color: var(--text-muted);
+            font-size: .85rem;
+        }
+
+        select {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background: #08050c;
+            color: var(--text-main);
+            border: 1px solid var(--btn-dark-border);
+            border-radius: 8px;
+            font-size: .95rem;
+            transition: .25s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent-pink);
+        }
+
+        button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: .95rem;
+            transition: .2s;
+        }
+
+        #convertBtn {
+            background: var(--btn-dark);
+            color: var(--text-main);
+            border: 1px solid var(--btn-dark-border);
+        }
+
+        #convertBtn:hover {
+            background: var(--border-color);
+            border-color: var(--text-muted);
+        }
+
+        .download {
+            display: none;
+            background: var(--accent-pink);
+            border: none;
+            color: white;
+            font-weight: bold;
+        }
+
+        .download:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 0 12px rgba(214,28,89,.4);
+        }
+    </style>
 </head>
 
 <body>
-
-<div class="app">
-
-<h2>File Converter</h2>
-
-<p class="subtitle">
-Convert files directly in your browser.
-</p>
-
-<div class="drop" id="drop">
-
-<span>
-Drop file here or click to browse
-</span>
-
-<input
-type="file"
-id="fileInput"
-hidden>
-
-</div>
-
-<div
-class="file"
-id="fileInfo">
-
-<div
-class="file-name"
-id="fileName">
-</div>
-
-<div
-class="file-size"
-id="fileSize">
-</div>
-
-</div>
-
-<select id="format"></select>
-
-<button id="convertBtn">
-Convert File
-</button>
-
-<button
-id="downloadBtn"
-class="download">
-Download Converted File
-</button>
-
-</div>
-
-<script>
-
-const drop=document.getElementById("drop");
-const fileInput=document.getElementById("fileInput");
-const fileInfo=document.getElementById("fileInfo");
-
-const fileName=document.getElementById("fileName");
-const fileSize=document.getElementById("fileSize");
-
-const format=document.getElementById("format");
-
-const convertBtn=document.getElementById("convertBtn");
-const downloadBtn=document.getElementById("downloadBtn");
-
-let currentFile=null;
-let currentBlob=null;
-
-const allowedFormats={
-
-csv:["json","txt"],
-
-txt:["json","md"],
-
-md:["html","txt"],
-
-png:["jpeg"],
-
-jpg:["png"]
-
-};
-
-drop.addEventListener("click",()=>fileInput.click());
-
-drop.addEventListener("dragover",(e)=>{
-
-e.preventDefault();
-
-drop.classList.add("active");
-
-});
-
-drop.addEventListener("dragleave",()=>{
-
-drop.classList.remove("active");
-
-});
-
-drop.addEventListener("drop",(e)=>{
-
-e.preventDefault();
-
-drop.classList.remove("active");
-
-if(e.dataTransfer.files.length){
-
-handleFile(e.dataTransfer.files[0]);
-
-}
-
-});
-
-fileInput.addEventListener("change",(e)=>{
-
-if(e.target.files.length){
-
-handleFile(e.target.files[0]);
-
-}
-
-});
-
-function handleFile(file){
-
-const ext=file.name.split(".").pop().toLowerCase();
-
-if(!allowedFormats[ext]){
-
-alert("Unsupported file type.");
-
-return;
-
-}
-
-currentFile=file;
-
-currentBlob=null;
-
-downloadBtn.style.display="none";
-
-fileName.textContent=file.name;
-
-fileSize.textContent=(file.size/1024).toFixed(1)+" KB";
-
-fileInfo.style.display="block";
-
-format.innerHTML="";
-
-allowedFormats[ext].forEach(type=>{
-
-const option=document.createElement("option");
-
-option.value=type;
-
-option.textContent=type.toUpperCase();
-
-format.appendChild(option);
-
-});
-
-}
-</html>
-  
-<script>
-const drop = document.getElementById("drop");
-const fileInput = document.getElementById("fileInput");
-const fileInfo = document.getElementById("fileInfo");
-const fileName = document.getElementById("fileName");
-const fileSize = document.getElementById("fileSize");
-const format = document.getElementById("format");
-const convertBtn = document.getElementById("convertBtn");
-const downloadBtn = document.getElementById("downloadBtn");
-
-let currentFile = null;
-let currentBlob = null;
-
-const allowedFormats = {
-    csv: ["json", "txt", "xml"],
-    txt: ["md", "json"],
-    md: ["html", "txt"],
-    json: ["txt"],
-    png: ["jpg"],
-    jpg: ["png"],
-    jpeg: ["png"]
-};
-
-// ---------- Drag & Drop ----------
-drop.addEventListener("click", () => fileInput.click());
-
-drop.addEventListener("dragover", e => {
-    e.preventDefault();
-    drop.classList.add("active");
-});
-
-drop.addEventListener("dragleave", () => {
-    drop.classList.remove("active");
-});
-
-<div class="drop" id="drop">
-    <span>Drop file here or click to browse</span>
-    <input
-        type="file"
-        id="fileInput"
-        accept="*/*"
-        style="display:none"
-    >
-</div>
-
-fileInput.addEventListener("change", e => {
-    if (e.target.files.length) {
-        registerFile(e.target.files[0]);
-    }
-});
-
-// ---------- Register File ----------
-function registerFile(file){
-
-    currentFile = file;
-    currentBlob = null;
-
-    const extension = file.name.split(".").pop().toLowerCase();
-
-    if(!allowedFormats[extension]){
-        alert("Unsupported file type.");
-        return;
-    }
-
-    fileInfo.style.display = "block";
-    downloadBtn.style.display = "none";
-
-    fileName.textContent = file.name;
-    fileSize.textContent = (file.size/1024).toFixed(1)+" KB";
-
-    format.innerHTML = "";
-
-    allowedFormats[extension].forEach(type=>{
-
-        const option=document.createElement("option");
-        option.value=type;
-        option.innerText=type.toUpperCase();
-
-        format.appendChild(option);
-
-    });
-
-}
-
-// ---------- Convert ----------
-convertBtn.addEventListener("click",()=>{
-
-    if(!currentFile){
-        alert("Select a file first.");
-        return;
-    }
-
-    const extension=currentFile.name.split(".").pop().toLowerCase();
-    const target=format.value;
-
-    if(["png","jpg","jpeg"].includes(extension)){
-        convertImage(target);
-    }else{
-        convertText(extension,target);
-    }
-
-});
-
-// ---------- Text ----------
-function convertText(ext,target){
-
-    const reader=new FileReader();
-
-    reader.onload=e=>{
-
-        let text=e.target.result;
-        let output=text;
-        let mime="text/plain";
-
-        if(ext==="csv" && target==="json"){
-
-            const lines=text.trim().split("\n");
-
-            const headers=lines.shift().split(",");
-
-            const data=lines.map(line=>{
-
-                const values=line.split(",");
-
-                let obj={};
-
-                headers.forEach((h,i)=>{
-                    obj[h.trim()]=values[i]?.trim()||"";
-                });
-
-                return obj;
-
-            });
-
-            output=JSON.stringify(data,null,2);
-            mime="application/json";
-
-        }
-
-        else if(ext==="md" && target==="html"){
-
-            output=text
-            .replace(/^# (.*)$/gm,"<h1>$1</h1>")
-            .replace(/^## (.*)$/gm,"<h2>$1</h2>")
-            .replace(/^### (.*)$/gm,"<h3>$1</h3>")
-            .replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>")
-            .replace(/\*(.*?)\*/g,"<em>$1</em>")
-            .replace(/\n/g,"<br>");
-
-            mime="text/html";
-
-        }
-
-        else if(ext==="csv" && target==="txt"){
-
-            output=text.replace(/,/g," ");
-
-        }
-
-        currentBlob=new Blob([output],{type:mime});
-
-        downloadBtn.style.display="block";
-
-    };
-
-    reader.readAsText(currentFile);
-
-}
-
-// ---------- Image ----------
-function convertImage(target){
-
-    const reader=new FileReader();
-
-    reader.onload=e=>{
-
-        const img=new Image();
-
-        img.onload=()=>{
-
-            const canvas=document.createElement("canvas");
-            canvas.width=img.width;
-            canvas.height=img.height;
-
-            const ctx=canvas.getContext("2d");
-
-            ctx.drawImage(img,0,0);
-
-            canvas.toBlob(blob=>{
-
-                currentBlob=blob;
-                downloadBtn.style.display="block";
-
-            },"image/"+target,0.95);
-
+    <div class="app">
+        <h2>File Converter</h2>
+        <p class="subtitle">Convert files directly in your browser.</p>
+
+        <div class="drop" id="drop">
+            <span>Drop file here or click to browse</span>
+            <input type="file" id="fileInput" accept="*/*" hidden>
+        </div>
+
+        <div class="file" id="fileInfo">
+            <div class="file-name" id="fileName"></div>
+            <div class="file-size" id="fileSize"></div>
+        </div>
+
+        <select id="format"></select>
+
+        <button id="convertBtn">Convert File</button>
+        <button id="downloadBtn" class="download">Download Converted File</button>
+    </div>
+
+    <script>
+        const drop = document.getElementById("drop");
+        const fileInput = document.getElementById("fileInput");
+        const fileInfo = document.getElementById("fileInfo");
+        const fileName = document.getElementById("fileName");
+        const fileSize = document.getElementById("fileSize");
+        const format = document.getElementById("format");
+        const convertBtn = document.getElementById("convertBtn");
+        const downloadBtn = document.getElementById("downloadBtn");
+
+        let currentFile = null;
+        let currentBlob = null;
+
+        const allowedFormats = {
+            csv: ["json", "txt", "xml"],
+            txt: ["md", "json"],
+            md: ["html", "txt"],
+            json: ["txt"],
+            png: ["jpg", "jpeg"],
+            jpg: ["png"],
+            jpeg: ["png"]
         };
 
-        img.src=e.target.result;
+        // ---------- Drag & Drop ----------
+        drop.addEventListener("click", () => fileInput.click());
 
-    };
+        drop.addEventListener("dragover", e => {
+            e.preventDefault();
+            drop.classList.add("active");
+        });
 
-    reader.readAsDataURL(currentFile);
+        drop.addEventListener("dragleave", () => {
+            drop.classList.remove("active");
+        });
 
-}
+        drop.addEventListener("drop", (e) => {
+            e.preventDefault();
+            drop.classList.remove("active");
+            if (e.dataTransfer.files.length) {
+                registerFile(e.dataTransfer.files[0]);
+            }
+        });
 
-// ---------- Download ----------
-downloadBtn.addEventListener("click",()=>{
+        fileInput.addEventListener("change", e => {
+            if (e.target.files.length) {
+                registerFile(e.target.files[0]);
+            }
+        });
 
-    if(!currentBlob) return;
+        // ---------- Register File ----------
+        function registerFile(file) {
+            currentFile = file;
+            currentBlob = null;
 
-    const a=document.createElement("a");
+            const extension = file.name.split(".").pop().toLowerCase();
 
-    const url=URL.createObjectURL(currentBlob);
+            if (!allowedFormats[extension]) {
+                alert("Unsupported file type.");
+                return;
+            }
 
-    a.href=url;
+            fileInfo.style.display = "block";
+            downloadBtn.style.display = "none";
 
-    const name=currentFile.name.substring(0,currentFile.name.lastIndexOf("."));
+            fileName.textContent = file.name;
+            fileSize.textContent = (file.size / 1024).toFixed(1) + " KB";
 
-    a.download=name+"."+format.value;
+            format.innerHTML = "";
 
-    document.body.appendChild(a);
+            allowedFormats[extension].forEach(type => {
+                const option = document.createElement("option");
+                option.value = type;
+                option.innerText = type.toUpperCase();
+                format.appendChild(option);
+            });
+        }
 
-    a.click();
+        // ---------- Convert ----------
+        convertBtn.addEventListener("click", () => {
+            if (!currentFile) {
+                alert("Select a file first.");
+                return;
+            }
 
-    document.body.removeChild(a);
+            const extension = currentFile.name.split(".").pop().toLowerCase();
+            const target = format.value;
 
-    URL.revokeObjectURL(url);
+            if (["png", "jpg", "jpeg"].includes(extension)) {
+                convertImage(target);
+            } else {
+                convertText(extension, target);
+            }
+        });
 
-});
-</script>
+        // ---------- Text ----------
+        function convertText(ext, target) {
+            const reader = new FileReader();
+
+            reader.onload = e => {
+                let text = e.target.result;
+                let output = text;
+                let mime = "text/plain";
+
+                if (ext === "csv" && target === "json") {
+                    const lines = text.trim().split("\n");
+                    const headers = lines.shift().split(",");
+
+                    const data = lines.map(line => {
+                        const values = line.split(",");
+                        let obj = {};
+                        headers.forEach((h, i) => {
+                            obj[h.trim()] = values[i]?.trim() || "";
+                        });
+                        return obj;
+                    });
+
+                    output = JSON.stringify(data, null, 2);
+                    mime = "application/json";
+                }
+                else if (ext === "md" && target === "html") {
+                    output = text
+                        .replace(/^# (.*)$/gm, "<h1>$1</h1>")
+                        .replace(/^## (.*)$/gm, "<h2>$1</h2>")
+                        .replace(/^### (.*)$/gm, "<h3>$1</h3>")
+                        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                        .replace(/\*(.*?)\*/g, "<em>$1</em>")
+                        .replace(/\n/g, "<br>");
+                    mime = "text/html";
+                }
+                else if (ext === "csv" && target === "txt") {
+                    output = text.replace(/,/g, " ");
+                }
+
+                currentBlob = new Blob([output], { type: mime });
+                downloadBtn.style.display = "block";
+            };
+
+            reader.readAsText(currentFile);
+        }
+
+        // ---------- Image ----------
+        function convertImage(target) {
+            const reader = new FileReader();
+
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0);
+
+                    canvas.toBlob(blob => {
+                        currentBlob = blob;
+                        downloadBtn.style.display = "block";
+                    }, "image/" + target, 0.95);
+                };
+                img.src = e.target.result;
+            };
+
+            reader.readAsDataURL(currentFile);
+        }
+
+        // ---------- Download ----------
+        downloadBtn.addEventListener("click", () => {
+            if (!currentBlob) return;
+
+            const a = document.createElement("a");
+            const url = URL.createObjectURL(currentBlob);
+            a.href = url;
+
+            const name = currentFile.name.substring(0, currentFile.name.lastIndexOf("."));
+            a.download = name + "." + format.value;
+
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    </script>
 </body>
 </html>
