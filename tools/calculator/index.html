@@ -3,8 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimal Dark Calculator</title>
+    <title>Immersive Dark Desktop Calculator</title>
     <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at center, #111115 0%, #040406 100%);
+            --panel-bg: rgba(255, 255, 255, 0.01);
+            --border-color: rgba(255, 255, 255, 0.04);
+            --text-primary: #f8fafc;
+            --text-secondary: #64748b;
+            --accent-glow: rgba(167, 139, 250, 0.15);
+            --accent-color: #a78bfa;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -12,155 +22,253 @@
         }
 
         body {
-            background-color: #0a0a0c;
-            color: #e2e8f0;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             overflow: hidden;
+            padding: 40px;
         }
 
-        .calc-container {
-            width: 340px;
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            padding: 2rem;
-            border-radius: 32px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        /* Das Dashboard füllt den Bildschirm elegant aus (max 1400px für perfekte Ergonomie) */
+        .workspace {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            width: 100%;
+            max-width: 1300px;
+            height: 80vh;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 40px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            backdrop-filter: blur(20px);
         }
 
-        /* Die Anzeige für die Zahlen */
-        .calc-display {
-            font-size: 3.5rem;
-            font-weight: 200;
-            color: #f8fafc;
+        /* LINKE SEITE: Die Historie vergangener Rechnungen */
+        .history-panel {
+            border-right: 1px solid var(--border-color);
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .history-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .history-log {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding-right: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.05) transparent;
+        }
+
+        .history-item {
+            text-align: right;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .history-expr {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .history-res {
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            font-weight: 300;
+        }
+
+        /* RECHTE SEITE: Hauptrechner */
+        .calc-panel {
+            display: flex;
+            flex-direction: column;
+            padding: 3rem;
+            justify-content: space-between;
+        }
+
+        /* Riesiges, kinoreifes Display */
+        .display-section {
             text-align: right;
             margin-bottom: 2rem;
-            padding: 0 0.5rem;
+        }
+
+        .formula-preview {
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            min-height: 2rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .main-display {
+            font-size: 5.5rem;
+            font-weight: 100;
+            letter-spacing: -2px;
+            color: #ffffff;
+            font-variant-numeric: tabular-nums;
             overflow-x: auto;
             white-space: nowrap;
-            font-variant-numeric: tabular-nums;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
-            /* Versteckt die Scrollbar */
-            scrollbar-width: none; 
+            margin-top: 0.5rem;
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.08);
+            scrollbar-width: none;
         }
-        .calc-display::-webkit-scrollbar {
-            display: none;
-        }
+        .main-display::-webkit-scrollbar { display: none; }
 
-        /* Tasten-Grid */
-        .calc-grid {
+        /* Großzügiges Desktop-Tasten-Grid */
+        .buttons-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 0.8rem;
+            gap: 1.2rem;
+            flex: 1;
+            max-height: 60%;
         }
 
-        /* Grundstyle für alle Tasten */
         button {
-            background: rgba(255, 255, 255, 0.03);
-            color: #e2e8f0;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            height: 64px;
-            font-size: 1.25rem;
-            font-weight: 400;
-            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.01);
+            color: #cbd5e1;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            font-size: 1.5rem;
+            font-weight: 300;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             justify-content: center;
             align-items: center;
-            user-select: none;
         }
 
         button:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
             border-color: rgba(255, 255, 255, 0.15);
-            color: #f8fafc;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
         }
 
         button:active {
-            transform: scale(0.95);
+            transform: translateY(1px);
         }
 
-        /* Spezial-Styling für Operatoren (+, -, *, /, =) */
+        /* Operatoren (+, -, *, /) */
         button.operator {
-            background: rgba(167, 139, 250, 0.05); /* Sanfter Lila-Touch passend zum Timer */
-            border-color: rgba(167, 139, 250, 0.15);
-            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.02);
+            border-color: rgba(167, 139, 250, 0.1);
+            color: var(--accent-color);
+            font-size: 1.7rem;
         }
 
         button.operator:hover {
-            background: rgba(167, 139, 250, 0.15);
+            background: rgba(167, 139, 250, 0.08);
             border-color: rgba(167, 139, 250, 0.3);
-            color: #c084fc;
+            box-shadow: 0 0 30px var(--accent-glow);
         }
 
-        /* Styling für die Gleich-Taste */
-        button.equals {
-            grid-column: span 2;
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-            color: #f8fafc;
-        }
-        button.equals:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        /* Löschen-Taste (C) */
+        /* Clear Button (C) */
         button.clear {
             color: #f87171;
-            background: rgba(239, 68, 68, 0.03);
-            border-color: rgba(239, 68, 68, 0.1);
+            background: rgba(239, 68, 68, 0.01);
+            border-color: rgba(239, 68, 68, 0.08);
         }
         button.clear:hover {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.25);
+            background: rgba(239, 68, 68, 0.06);
+            border-color: rgba(239, 68, 68, 0.2);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.1);
         }
+
+        /* Ist-Gleich Button (=) */
+        button.equals {
+            grid-column: span 2;
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-color: rgba(167, 139, 250, 0.3);
+            color: #ffffff;
+            font-weight: 500;
+        }
+        button.equals:hover {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border-color: rgba(167, 139, 250, 0.5);
+            box-shadow: 0 0 40px rgba(167, 139, 250, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Schöne Scrollbar für die Historie */
+        .history-log::-webkit-scrollbar { width: 4px; }
+        .history-log::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
     </style>
 </head>
 <body>
 
-    <div class="calc-container">
-        <div class="calc-display" id="display">0</div>
-        
-        <div class="calc-grid">
-            <button class="clear" onclick="clearDisplay()">C</button>
-            <button class="operator" onclick="appendOperator('/')">÷</button>
-            <button class="operator" onclick="appendOperator('*')">×</button>
-            <button class="operator" onclick="appendOperator('-')">−</button>
+    <div class="workspace">
+        <div class="history-panel">
+            <div class="history-title">Verlauf</div>
+            <div class="history-log" id="historyLog">
+                </div>
+        </div>
+
+        <div class="calc-panel">
+            <div class="display-section">
+                <div class="formula-preview" id="preview"></div>
+                <div class="main-display" id="display">0</div>
+            </div>
             
-            <button onclick="appendNumber('7')">7</button>
-            <button onclick="appendNumber('8')">8</button>
-            <button onclick="appendNumber('9')">9</button>
-            <button class="operator" onclick="appendOperator('+')">+</button>
-            
-            <button onclick="appendNumber('4')">4</button>
-            <button onclick="appendNumber('5')">5</button>
-            <button onclick="appendNumber('6')">6</button>
-            <button onclick="appendNumber('.')">.</button>
-            
-            <button onclick="appendNumber('1')">1</button>
-            <button onclick="appendNumber('2')">2</button>
-            <button onclick="appendNumber('3')">3</button>
-            <button onclick="appendNumber('0')">0</button>
-            
-            <button class="equals" style="grid-column: span 4;" onclick="calculate()">=</button>
+            <div class="buttons-grid">
+                <button class="clear" onclick="clearDisplay()">C</button>
+                <button class="operator" onclick="appendOperator('/')">÷</button>
+                <button class="operator" onclick="appendOperator('*')">×</button>
+                <button class="operator" onclick="appendOperator('-')">−</button>
+                
+                <button onclick="appendNumber('7')">7</button>
+                <button onclick="appendNumber('8')">8</button>
+                <button onclick="appendNumber('9')">9</button>
+                <button class="operator" onclick="appendOperator('+')">+</button>
+                
+                <button onclick="appendNumber('4')">4</button>
+                <button onclick="appendNumber('5')">5</button>
+                <button onclick="appendNumber('6')">6</button>
+                <button onclick="appendNumber('.')">.</button>
+                
+                <button onclick="appendNumber('1')">1</button>
+                <button onclick="appendNumber('2')">2</button>
+                <button onclick="appendNumber('3')">3</button>
+                <button onclick="appendNumber('0')">0</button>
+                
+                <button class="equals" style="grid-column: span 4;" onclick="calculate()">=</button>
+            </div>
         </div>
     </div>
 
     <script>
         const display = document.getElementById('display');
+        const preview = document.getElementById('preview');
+        const historyLog = document.getElementById('historyLog');
+        
         let currentInput = '0';
-        let shouldResetDisplay = false;
+        let isResultDisplayed = false;
 
         function appendNumber(num) {
-            if (currentInput === '0' && num !== '.' || shouldResetDisplay) {
+            if (currentInput === '0' && num !== '.' || isResultDisplayed) {
                 currentInput = num;
-                shouldResetDisplay = false;
+                isResultDisplayed = false;
             } else {
-                // Verhindert doppelte Dezimalpunkte in einer Zahl
                 if (num === '.' && currentInput.split(/[\+\-\*\/]/).pop().includes('.')) return;
                 currentInput += num;
             }
@@ -168,9 +276,8 @@
         }
 
         function appendOperator(op) {
-            if (shouldResetDisplay) shouldResetDisplay = false;
+            if (isResultDisplayed) isResultDisplayed = false;
             
-            // Verhindert, dass zwei Operatoren direkt hintereinander stehen
             const lastChar = currentInput.slice(-1);
             if (['+', '-', '*', '/'].includes(lastChar)) {
                 currentInput = currentInput.slice(0, -1) + op;
@@ -182,37 +289,54 @@
 
         function clearDisplay() {
             currentInput = '0';
+            preview.textContent = '';
             updateDisplay();
         }
 
         function calculate() {
             try {
-                // Berechnet das Ergebnis sicher aus dem String
-                let result = Function('"use strict";return (' + currentInput + ')')();
+                const rawExpression = currentInput;
+                let result = Function('"use strict";return (' + rawExpression + ')')();
                 
-                // Rundet lange Dezimalzahlen sinnvoll ab, um das Design nicht zu sprengen
                 if (result % 1 !== 0) {
                     result = parseFloat(result.toFixed(8));
                 }
-                
+
+                // Schön formatierte mathematische Zeichen für die Historie
+                const formattedExpr = rawExpression
+                    .replace(/\*/g, ' × ')
+                    .replace(/\//g, ' ÷ ')
+                    .replace(/\+/g, ' + ')
+                    .replace(/\-/g, ' − ');
+
+                addHistoryItem(formattedExpr, result);
+
+                preview.textContent = formattedExpr + ' =';
                 currentInput = result.toString();
-                shouldResetDisplay = true;
+                isResultDisplayed = true;
             } catch (error) {
                 currentInput = 'Error';
-                shouldResetDisplay = true;
+                isResultDisplayed = true;
             }
             updateDisplay();
         }
 
         function updateDisplay() {
-            // Ersetzt die mathematischen Zeichen für die Anzeige durch schönere Symbole
-            let displayText = currentInput
+            display.textContent = currentInput
                 .replace(/\*/g, ' × ')
                 .replace(/\//g, ' ÷ ')
                 .replace(/\+/g, ' + ')
                 .replace(/\-/g, ' − ');
-            
-            display.textContent = displayText;
+        }
+
+        function addHistoryItem(expr, res) {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `
+                <div class="history-expr">${expr}</div>
+                <div class="history-res">${res}</div>
+            `;
+            historyLog.insertBefore(item, historyLog.firstChild);
         }
     </script>
 </body>
