@@ -186,7 +186,7 @@
 
     function copyToClipboard() {
         if (!textarea.value.trim()) {
-            showStatus("Nichts zum Kopieren da!");
+            showStatus("Nothing to copy!");
             return;
         }
         
@@ -194,9 +194,9 @@
         textarea.setSelectionRange(0, 99999);
 
         navigator.clipboard.writeText(textarea.value).then(() => {
-            showStatus("Erfolgreich kopiert!");
+            showStatus("Copied to clipboard!");
         }).catch(() => {
-            showStatus("Fehler beim Kopieren.");
+            showStatus("Error during copying.");
         });
     }
 </script>
