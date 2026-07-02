@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Animated Unit Converter — Schwarz & Lila</title>
+<style>
+  :root{
+    --bg:#0b0b0b;
+    --panel:#0f0f10;
+    --muted:#1a1a1a;
+    --accent:#8a5cff; /* lila */
+    --accent-2:#6f3fe6;
+    --glass: rgba(255,255,255,0.03);
+    --glass-2: rgba(255,255,255,0.02);
+    --text:#e9e9ee;
+    --sub:#bdbdd0;
+    --success:#4ef08a;
+    --danger:#ff6b6b;
+    --shadow: 0 8px 30px rgba(0,0,0,0.7);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+
+  html,body{
+    height:100%;
+    margin:0;
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(138,92,255,0.06), transparent),
+                radial-gradient(900px 400px at 90% 90%, rgba(111,63,230,0.04), transparent),
+                var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* Layout */
+  .wrap{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:48px;
+    gap:28px;
+  }
+
+  .card{
+    width:980px;
+    max-width:calc(100% - 48px);
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    display:grid;
+    grid-template-columns: 420px 1fr;
+    border:1px solid rgba(255,255,255,0.03);
+    transform:translateY(0);
+    transition:transform .45s cubic-bezier(.2,.9,.3,1);
+  }
+
+  .card:hover{ transform:translateY(-6px); }
+
+  /* Left panel */
+  .left{
+    background:
+      linear-gradient(180deg, rgba(138,92,255,0.03), transparent),
+      linear-gradient(90deg, rgba(255,255,255,0.01), transparent),
+      var(--panel);
+    padding:28px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    border-right:1px solid rgba(255,255,255,0.02);
+  }
+
+  .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+
+  .logo{
+    width:56px;
+    height:56px;
+    border-radius:12px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-weight:700;
+    font-size:20px;
+    box-shadow: 0 6px 20px rgba(111,63,230,0.18);
+    transform:rotate(-8deg);
+    transition:transform .6s cubic-bezier(.2,.9,.3,1);
+  }
+  .card:hover .logo{ transform:rotate(0deg) scale(1.02); }
+
+  .title{
+    font-size:18px;
+    font-weight:700;
+    color:var(--text);
+    letter-spacing:0.2px;
+  }
+  .subtitle{
+    color:var(--sub);
+    font-size:13px;
+  }
+
+  /* Controls */
+  .controls{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:6px;
+  }
+
+  label{
+    font-size:12px;
+    color:var(--sub);
+    display:block;
+    margin-bottom:6px;
+  }
+
+  select, input[type="number"], .unit-select{
+    width:100%;
+    padding:12px 14px;
+    border-radius:10px;
+    background:var(--glass);
+    border:1px solid rgba(255,255,255,0.03);
+    color:var(--text);
+    outline:none;
+    transition:box-shadow .18s ease, transform .12s ease;
+    box-shadow: inset 0 -6px 18px rgba(0,0,0,0.6);
+    font-size:14px;
+  }
+  select:focus, input[type="number"]:focus{
+    box-shadow: 0 6px 30px rgba(138,92,255,0.12);
+    transform:translateY(-2px);
+  }
+
+  .row{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+
+  .big-input{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+
+  .swap-btn{
+    width:44px;
+    height:44px;
+    border-radius:10px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,0.03);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:var(--accent);
+    transition:transform .25s ease;
+  }
+  .swap-btn:hover{ transform:rotate(20deg) scale(1.04); }
+
+  /* Right panel */
+  .right{
+    padding:28px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    position:relative;
+  }
+
+  .result{
+    background: linear-gradient(90deg, rgba(138,92,255,0.03), transparent);
+    border-radius:12px;
+    padding:18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    border:1px solid rgba(255,255,255,0.02);
+  }
+
+  .result .value{
+    font-size:28px;
+    font-weight:800;
+    color:var(--text);
+    letter-spacing:0.4px;
+    display:flex;
+    gap:12px;
+    align-items:baseline;
+  }
+  .result .unit{
+    font-size:14px;
+    color:var(--sub);
+    font-weight:700;
+    padding:6px 10px;
+    border-radius:8px;
+    background:rgba(255,255,255,0.02);
+  }
+
+  /* Animated history / cards */
+  .history{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap:12px;
+  }
+
+  .mini{
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+    border-radius:10px;
+    padding:12px;
+    border:1px solid rgba(255,255,255,0.02);
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    transform-origin:center;
+    transition:transform .45s cubic-bezier(.2,.9,.3,1), box-shadow .25s;
+  }
+  .mini:hover{ transform:translateY(-6px) scale(1.01); box-shadow:0 10px 30px rgba(0,0,0,0.6); }
+
+  .mini .m-title{ color:var(--sub); font-size:12px; }
+  .mini .m-value{ font-weight:700; color:var(--text); font-size:16px; }
+
+  /* Animated gradient bar */
+  .accent-bar{
+    height:6px;
+    border-radius:999px;
+    background:linear-gradient(90deg, rgba(138,92,255,0.9), rgba(111,63,230,0.9));
+    box-shadow: 0 6px 30px rgba(111,63,230,0.12);
+    animation: slide 6s linear infinite;
+  }
+  @keyframes slide{
+    0%{ background-position:0% 50%; }
+    50%{ background-position:100% 50%; }
+    100%{ background-position:0% 50%; }
+  }
+
+  /* Fancy animated background shapes */
+  .bg-shape{
+    position:absolute;
+    right:-120px;
+    top:-60px;
+    width:420px;
+    height:420px;
+    border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, rgba(138,92,255,0.12), transparent 30%),
+                radial-gradient(circle at 70% 70%, rgba(111,63,230,0.08), transparent 30%);
+    filter: blur(40px);
+    transform: rotate(12deg);
+    pointer-events:none;
+    opacity:0.9;
+    animation: float 8s ease-in-out infinite;
+  }
+  @keyframes float{
+    0%{ transform: translateY(0) rotate(12deg); }
+    50%{ transform: translateY(-18px) rotate(6deg); }
+    100%{ transform: translateY(0) rotate(12deg); }
+  }
+
+  /* Ripple on convert */
+  .ripple{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%) scale(0);
+    width:20px;height:20px;border-radius:50%;
+    background: radial-gradient(circle, rgba(138,92,255,0.18), rgba(111,63,230,0.06));
+    pointer-events:none;
+    opacity:0;
+  }
+
+  /* Footer small */
+  .meta{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+    color:var(--sub);
+    font-size:13px;
+  }
+
+  /* Responsive */
+  @media (max-width:880px){
+    .card{ grid-template-columns: 1fr; }
+    .left{ order:2; }
+    .right{ order:1; }
+    .history{ grid-template-columns: 1fr; }
+  }
+
+  /* Tiny helpers */
+  .muted{ color:var(--sub); font-size:13px; }
+  .btn{
+    padding:10px 14px;
+    border-radius:10px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:white;
+    font-weight:700;
+    border:none;
+    cursor:pointer;
+    box-shadow: 0 8px 30px rgba(111,63,230,0.18);
+    transition:transform .18s ease, box-shadow .18s;
+  }
+  .btn:active{ transform:translateY(2px); box-shadow: 0 6px 20px rgba(111,63,230,0.12); }
+
+  /* small animated icons */
+  .icon{
+    width:18px;height:18px;display:inline-block;
+    background:linear-gradient(180deg,white,rgba(255,255,255,0.85));
+    mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M12 2L15 8H9L12 2zM12 22l-3-6h6l-3 6zM2 12l6 3V9L2 12zm18 0l-6-3v6l6-3z"/></svg>') center/contain no-repeat;
+    filter: drop-shadow(0 4px 12px rgba(111,63,230,0.12));
+    transform-origin:center;
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%{ transform:scale(1); opacity:0.95; }
+    50%{ transform:scale(1.08); opacity:1; }
+    100%{ transform:scale(1); opacity:0.95; }
+  }
+
+  /* subtle animated numbers */
+  .animated-number{
+    display:inline-block;
+    transition:transform .45s cubic-bezier(.2,.9,.3,1);
+  }
+
+  /* tiny tooltip */
+  .hint{
+    font-size:12px;
+    color:var(--sub);
+  }
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" role="application" aria-label="Animated Unit Converter">
+    <div class="left">
+      <div class="brand">
+        <div class="logo">UC</div>
+        <div>
+          <div class="title">Unit Converter</div>
+          <div class="subtitle">Schnell. Animiert. Schwarz mit lila Akzenten.</div>
+        </div>
+      </div>
+
+      <div class="controls" aria-hidden="false">
+        <div>
+          <label for="category">Kategorie</label>
+          <select id="category" aria-label="Kategorie">
+            <!-- categories populated by JS -->
+          </select>
+        </div>
+
+        <div class="row">
+          <div style="flex:1">
+            <label for="fromUnit">Von</label>
+            <select id="fromUnit" class="unit-select" aria-label="Von Einheit"></select>
+          </div>
+          <div style="width:56px;display:flex;align-items:flex-end;justify-content:center;">
+            <button id="swap" class="swap-btn" title="Tauschen" aria-label="Tauschen">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l-4 4 4 4"/><path d="M17 17l4-4-4-4"/><path d="M3 11h14a4 4 0 0 1 4 4v1"/></svg>
+            </button>
+          </div>
+          <div style="flex:1">
+            <label for="toUnit">Nach</label>
+            <select id="toUnit" class="unit-select" aria-label="Nach Einheit"></select>
+          </div>
+        </div>
+
+        <div>
+          <label for="value">Wert</label>
+          <div class="big-input">
+            <input id="value" type="number" step="any" value="1" aria-label="Wert eingeben" />
+            <button id="convert" class="btn" aria-label="Konvertieren">Konvertieren</button>
+          </div>
+          <div class="hint" style="margin-top:8px">Tipp: Drücke Enter im Eingabefeld, um zu konvertieren.</div>
+        </div>
+
+        <div style="margin-top:6px">
+          <label for="precision">Genauigkeit</label>
+          <select id="precision" aria-label="Genauigkeit">
+            <option value="6">6 Dez.</option>
+            <option value="4" selected>4 Dez.</option>
+            <option value="2">2 Dez.</option>
+            <option value="0">Ganzzahl</option>
+          </select>
+        </div>
+
+        <div style="margin-top:6px">
+          <label>Extras</label>
+          <div class="row">
+            <button id="swapTheme" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--accent);">Invert</button>
+            <button id="copy" class="btn" style="background:linear-gradient(90deg,var(--accent-2),var(--accent));">Kopieren</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:auto">
+        <div class="accent-bar" aria-hidden="true"></div>
+        <div style="height:12px"></div>
+        <div class="meta">
+          <div class="muted">Unterstützte Kategorien: <strong id="catCount">—</strong></div>
+          <div class="muted">Netherende • München</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div style="display:flex;gap:12px;align-items:center;">
+        <div style="flex:1">
+          <div class="result" id="resultCard" aria-live="polite">
+            <div>
+              <div class="value" id="resultValue">—</div>
+              <div class="muted" id="resultDetail">—</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+              <div style="display:flex;gap:8px;align-items:center">
+                <div class="icon" aria-hidden="true"></div>
+                <div class="muted">Live Vorschau</div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button id="animateCopy" class="btn" style="padding:8px 10px;font-size:13px">Teilen</button>
+                <button id="swapUnits" class="btn" style="padding:8px 10px;font-size:13px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--accent)">Umkehren</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="history" id="history" aria-label="Verlauf">
+        <!-- history cards -->
+      </div>
+
+      <div style="margin-top:6px">
+        <div class="mini" id="miniQuick">
+          <div class="m-title">Schnellkonvertierungen</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn quick" data-q="1 km to m">1 km → m</button>
+            <button class="btn quick" data-q="1 kg to g">1 kg → g</button>
+            <button class="btn quick" data-q="1 °C to °F">1 °C → °F</button>
+            <button class="btn quick" data-q="1 L to mL">1 L → mL</button>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="mini" style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="m-title">Hinweis</div>
+            <div class="m-value">Temperaturformeln & spezielle Umrechnungen sind berücksichtigt.</div>
+          </div>
+          <div style="text-align:right">
+            <div class="muted">Version</div>
+            <div style="font-weight:700">1.0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-shape" aria-hidden="true"></div>
+      <div class="ripple" id="ripple" aria-hidden="true"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   Unit definitions & logic
+   ========================= */
+
+/*
+  Structure:
+  categories = {
+    "Length": { base: "m", units: { "m":1, "km":1000, "cm":0.01, ... }, display: "Meter" },
+    ...
+  }
+  For temperature we use functions.
+*/
+
+const categories = {
+  "Länge": {
+    base: "m",
+    units: {
+      "m": {f:1, name:"Meter"},
+      "km": {f:1000, name:"Kilometer"},
+      "cm": {f:0.01, name:"Zentimeter"},
+      "mm": {f:0.001, name:"Millimeter"},
+      "µm": {f:1e-6, name:"Mikrometer"},
+      "nm": {f:1e-9, name:"Nanometer"},
+      "mi": {f:1609.344, name:"Meile"},
+      "yd": {f:0.9144, name:"Yard"},
+      "ft": {f:0.3048, name:"Fuß"},
+      "in": {f:0.0254, name:"Zoll"}
+    }
+  },
+  "Masse": {
+    base: "kg",
+    units: {
+      "kg": {f:1, name:"Kilogramm"},
+      "g": {f:0.001, name:"Gramm"},
+      "mg": {f:1e-6, name:"Milligramm"},
+      "µg": {f:1e-9, name:"Mikrogramm"},
+      "lb": {f:0.45359237, name:"Pfund"},
+      "oz": {f:0.028349523125, name:"Unze"},
+      "t": {f:1000, name:"Tonne"}
+    }
+  },
+  "Volumen": {
+    base: "L",
+    units: {
+      "L": {f:1, name:"Liter"},
+      "mL": {f:0.001, name:"Milliliter"},
+      "m³": {f:1000, name:"Kubikmeter"},
+      "cm³": {f:0.001, name:"Kubikzentimeter"},
+      "gal": {f:3.785411784, name:"US Gallone"},
+      "qt": {f:0.946352946, name:"Quart (US)"},
+      "pt": {f:0.473176473, name:"Pint (US)"},
+      "cup": {f:0.24, name:"Cup (approx)"}
+    }
+  },
+  "Fläche": {
+    base: "m²",
+    units: {
+      "m²": {f:1, name:"Quadratmeter"},
+      "km²": {f:1e6, name:"Quadratkilometer"},
+      "ha": {f:10000, name:"Hektar"},
+      "cm²": {f:0.0001, name:"Quadratzentimeter"},
+      "ft²": {f:0.09290304, name:"Quadratfuß"},
+      "in²": {f:0.00064516, name:"Quadratzoll"},
+      "acre": {f:4046.8564224, name:"Acre"}
+    }
+  },
+  "Geschwindigkeit": {
+    base: "m/s",
+    units: {
+      "m/s": {f:1, name:"Meter/Sekunde"},
+      "km/h": {f:0.27777777777778, name:"Kilometer/Stunde"},
+      "mph": {f:0.44704, name:"Meilen/Stunde"},
+      "knot": {f:0.51444444444444, name:"Knoten"}
+    }
+  },
+  "Zeit": {
+    base: "s",
+    units: {
+      "s": {f:1, name:"Sekunde"},
+      "min": {f:60, name:"Minute"},
+      "h": {f:3600, name:"Stunde"},
+      "d": {f:86400, name:"Tag"},
+      "wk": {f:604800, name:"Woche"},
+      "yr": {f:31557600, name:"Jahr (365.25d)"}
+    }
+  },
+  "Druck": {
+    base: "Pa",
+    units: {
+      "Pa": {f:1, name:"Pascal"},
+      "kPa": {f:1000, name:"Kilopascal"},
+      "bar": {f:100000, name:"Bar"},
+      "atm": {f:101325, name:"Atmosphäre"},
+      "psi": {f:6894.757293168, name:"Pound per square inch"}
+    }
+  },
+  "Energie": {
+    base: "J",
+    units: {
+      "J": {f:1, name:"Joule"},
+      "kJ": {f:1000, name:"Kilojoule"},
+      "cal": {f:4.184, name:"Kalorie"},
+      "kcal": {f:4184, name:"Kilokalorie"},
+      "Wh": {f:3600, name:"Wattstunde"},
+      "kWh": {f:3.6e6, name:"Kilowattstunde"}
+    }
+  },
+  "Leistung": {
+    base: "W",
+    units: {
+      "W": {f:1, name:"Watt"},
+      "kW": {f:1000, name:"Kilowatt"},
+      "hp": {f:745.699872, name:"Pferdestärke"}
+    }
+  },
+  "Daten": {
+    base: "B",
+    units: {
+      "B": {f:1, name:"Byte"},
+      "KB": {f:1024, name:"Kilobyte"},
+      "MB": {f:1024**2, name:"Megabyte"},
+      "GB": {f:1024**3, name:"Gigabyte"},
+      "TB": {f:1024**4, name:"Terabyte"},
+      "bit": {f:1/8, name:"Bit"}
+    }
+  },
+  "Winkel": {
+    base: "rad",
+    units: {
+      "rad": {f:1, name:"Radiant"},
+      "deg": {f:Math.PI/180, name:"Grad"},
+      "arcmin": {f:Math.PI/10800, name:"Bogenminute"},
+      "arcsec": {f:Math.PI/648000, name:"Bogensekunde"}
+    }
+  },
+  "Temperatur": {
+    base: "K",
+    units: {
+      "K": {name:"Kelvin"},
+      "°C": {name:"Celsius"},
+      "°F": {name:"Fahrenheit"},
+      "°R": {name:"Rankine"}
+    },
+    special: true
+  }
+};
+
+/* Helper: populate category select */
+const categoryEl = document.getElementById('category');
+const fromUnitEl = document.getElementById('fromUnit');
+const toUnitEl = document.getElementById('toUnit');
+const valueEl = document.getElementById('value');
+const convertBtn = document.getElementById('convert');
+const resultValueEl = document.getElementById('resultValue');
+const resultDetailEl = document.getElementById('resultDetail');
+const historyEl = document.getElementById('history');
+const precisionEl = document.getElementById('precision');
+const catCountEl = document.getElementById('catCount');
+const ripple = document.getElementById('ripple');
+
+function populateCategories(){
+  categoryEl.innerHTML = '';
+  const keys = Object.keys(categories);
+  keys.forEach(k=>{
+    const opt = document.createElement('option');
+    opt.value = k;
+    opt.textContent = k;
+    categoryEl.appendChild(opt);
+  });
+  catCountEl.textContent = keys.length;
+}
+function populateUnits(cat){
+  fromUnitEl.innerHTML = '';
+  toUnitEl.innerHTML = '';
+  const c = categories[cat];
+  if(!c) return;
+  const units = Object.keys(c.units);
+  units.forEach(u=>{
+    const o1 = document.createElement('option');
+    o1.value = u;
+    o1.textContent = u + ' — ' + (c.units[u].name || '');
+    fromUnitEl.appendChild(o1);
+    const o2 = o1.cloneNode(true);
+    toUnitEl.appendChild(o2);
+  });
+  // default picks
+  fromUnitEl.value = units[0];
+  toUnitEl.value = units[1] || units[0];
+}
+
+/* Temperature conversions */
+function tempToKelvin(val, unit){
+  switch(unit){
+    case "K": return val;
+    case "°C": return val + 273.15;
+    case "°F": return (val - 32) * 5/9 + 273.15;
+    case "°R": return val * 5/9;
+    default: return val;
+  }
+}
+function kelvinToTemp(k, unit){
+  switch(unit){
+    case "K": return k;
+    case "°C": return k - 273.15;
+    case "°F": return (k - 273.15) * 9/5 + 32;
+    case "°R": return k * 9/5;
+    default: return k;
+  }
+}
+
+/* Generic conversion */
+function convert(category, from, to, value){
+  const cat = categories[category];
+  if(!cat) return NaN;
+  if(cat.special && category === "Temperatur"){
+    const k = tempToKelvin(Number(value), from);
+    return kelvinToTemp(k, to);
+  } else {
+    const fromFactor = cat.units[from].f;
+    const toFactor = cat.units[to].f;
+    // convert to base then to target
+    return Number(value) * fromFactor / toFactor;
+  }
+}
+
+/* Animated number update */
+function animateNumber(el, newVal, decimals){
+  // simple tween
+  const start = parseFloat(el.dataset.current || 0);
+  const end = Number(newVal);
+  const dur = 420;
+  const startTime = performance.now();
+  function step(t){
+    const p = Math.min(1, (t - startTime)/dur);
+    const eased = 1 - Math.pow(1-p, 3);
+    const cur = start + (end - start) * eased;
+    el.textContent = Number(cur).toLocaleString('de-DE', {maximumFractionDigits:decimals, minimumFractionDigits:0});
+    if(p < 1) requestAnimationFrame(step);
+    else el.dataset.current = end;
+  }
+  requestAnimationFrame(step);
+}
+
+/* History management */
+let history = [];
+function pushHistory(item){
+  history.unshift(item);
+  if(history.length > 6) history.pop();
+  renderHistory();
+}
+function renderHistory(){
+  historyEl.innerHTML = '';
+  history.forEach(h=>{
+    const d = document.createElement('div');
+    d.className = 'mini';
+    d.innerHTML = `<div class="m-title">${h.category} • ${h.from} → ${h.to}</div>
+                   <div class="m-value">${h.input} → ${h.output}</div>`;
+    d.addEventListener('click', ()=> {
+      // quick reapply
+      categoryEl.value = h.category;
+      populateUnits(h.category);
+      fromUnitEl.value = h.from;
+      toUnitEl.value = h.to;
+      valueEl.value = h.input;
+      doConvert(true);
+    });
+    historyEl.appendChild(d);
+  });
+}
+
+/* UI interactions */
+document.getElementById('swap').addEventListener('click', ()=>{
+  const a = fromUnitEl.value;
+  fromUnitEl.value = toUnitEl.value;
+  toUnitEl.value = a;
+  animatePulse();
+});
+
+document.getElementById('swapUnits').addEventListener('click', ()=>{
+  const a = fromUnitEl.value;
+  fromUnitEl.value = toUnitEl.value;
+  toUnitEl.value = a;
+  doConvert();
+});
+
+document.getElementById('swapTheme').addEventListener('click', ()=>{
+  document.documentElement.style.setProperty('--bg', getComputedStyle(document.documentElement).getPropertyValue('--panel').trim() || '#0b0b0b');
+  document.documentElement.style.setProperty('--panel', getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0f0f10');
+  // small visual flip
+  document.querySelector('.card').classList.toggle('flipped');
+});
+
+document.getElementById('copy').addEventListener('click', ()=>{
+  const txt = `${valueEl.value} ${fromUnitEl.value} = ${resultValueEl.textContent} ${toUnitEl.value}`;
+  navigator.clipboard?.writeText(txt).then(()=> {
+    flashMini('Kopiert!');
+  }).catch(()=> flashMini('Kopieren fehlgeschlagen'));
+});
+
+document.getElementById('animateCopy').addEventListener('click', ()=>{
+  flashMini('Teilen nicht implementiert');
+});
+
+/* Quick buttons */
+document.querySelectorAll('.quick').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    const q = b.dataset.q;
+    // parse simple pattern "1 km to m"
+    const parts = q.split(' ');
+    if(parts.length >= 4){
+      valueEl.value = parts[0];
+      // find category that contains both units
+      const from = parts[1];
+      const to = parts[3];
+      for(const cat in categories){
+        if(categories[cat].units && categories[cat].units[from] && categories[cat].units[to]){
+          categoryEl.value = cat;
+          populateUnits(cat);
+          fromUnitEl.value = from;
+          toUnitEl.value = to;
+          doConvert();
+          break;
+        }
+      }
+    }
+  });
+});
+
+/* Enter key triggers convert */
+valueEl.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') doConvert();
+});
+
+/* Convert button */
+convertBtn.addEventListener('click', ()=> doConvert());
+
+/* ripple animation */
+function animatePulse(){
+  ripple.style.opacity = 1;
+  ripple.style.transform = 'translate(-50%,-50%) scale(0)';
+  ripple.style.left = (Math.random()*60 + 20) + '%';
+  ripple.style.top = (Math.random()*60 + 20) + '%';
+  ripple.animate([
+    { transform: 'translate(-50%,-50%) scale(0)', opacity: 0.9 },
+    { transform: 'translate(-50%,-50%) scale(12)', opacity: 0 }
+  ], { duration: 700, easing: 'cubic-bezier(.2,.9,.3,1)'});
+  setTimeout(()=> ripple.style.opacity = 0, 700);
+}
+
+/* small toast */
+function flashMini(msg){
+  const el = document.createElement('div');
+  el.textContent = msg;
+  el.style.position = 'fixed';
+  el.style.right = '20px';
+  el.style.bottom = '20px';
+  el.style.padding = '10px 14px';
+  el.style.background = 'linear-gradient(90deg,var(--accent),var(--accent-2))';
+  el.style.color = 'white';
+  el.style.borderRadius = '10px';
+  el.style.boxShadow = '0 10px 30px rgba(111,63,230,0.18)';
+  document.body.appendChild(el);
+  el.animate([{opacity:0, transform:'translateY(10px)'},{opacity:1, transform:'translateY(0)'}],{duration:260,fill:'forwards'});
+  setTimeout(()=> {
+    el.animate([{opacity:1, transform:'translateY(0)'},{opacity:0, transform:'translateY(10px)'}],{duration:260,fill:'forwards'});
+    setTimeout(()=> el.remove(), 300);
+  }, 1400);
+}
+
+/* main convert flow */
+function doConvert(skipHistory){
+  const cat = categoryEl.value;
+  const from = fromUnitEl.value;
+  const to = toUnitEl.value;
+  const val = Number(valueEl.value);
+  if(isNaN(val)){ flashMini('Ungültiger Wert'); return; }
+  const raw = convert(cat, from, to, val);
+  const prec = Number(precisionEl.value);
+  const formatted = Number(raw).toLocaleString('de-DE', {maximumFractionDigits:prec, minimumFractionDigits:0});
+  // animate number
+  animateNumber(resultValueEl, raw, prec);
+  resultDetailEl.textContent = `${val} ${from} → ${to}`;
+  // push history
+  if(!skipHistory){
+    pushHistory({
+      category:cat, from, to, input:val, output:formatted
+    });
+  }
+  animatePulse();
+}
+
+/* Initialize */
+populateCategories();
+populateUnits(categoryEl.value);
+doConvert(true);
+
+/* update units when category changes */
+categoryEl.addEventListener('change', ()=>{
+  populateUnits(categoryEl.value);
+});
+
+/* small accessibility: announce changes */
+const observer = new MutationObserver(()=> {
+  // animate result card slightly
+  const rc = document.getElementById('resultCard');
+  rc.animate([{transform:'translateY(6px)'},{transform:'translateY(0)'}],{duration:420,easing:'cubic-bezier(.2,.9,.3,1)'});
+});
+observer.observe(resultValueEl, {childList:true, characterData:true, subtree:true});
+
+/* Pre-fill some history examples */
+pushHistory({category:"Länge", from:"km", to:"m", input:1, output:"1000"});
+pushHistory({category:"Masse", from:"kg", to:"g", input:2.5, output:"2500"});
+pushHistory({category:"Temperatur", from:"°C", to:"°F", input:20, output:"68"});
+
+/* small easter egg: animated background color shift on hover */
+document.querySelector('.card').addEventListener('mousemove', (e)=>{
+  const rect = e.currentTarget.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / rect.width;
+  const y = (e.clientY - rect.top) / rect.height;
+  document.querySelector('.bg-shape').style.transform = `translate(${(x-0.5)*40}px, ${(y-0.5)*40}px) rotate(${(x-0.5)*20}deg)`;
+});
+
+/* Allow adding more units quickly (developer helper) */
+window.addUnit = function(category, code, factor, name){
+  if(categories[category] && !categories[category].special){
+    categories[category].units[code] = {f:factor, name:name};
+    if(categoryEl.value === category) populateUnits(category);
+  }
+};
+
+</script>
+</body>
+</html>
