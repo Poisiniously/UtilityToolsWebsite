@@ -246,13 +246,19 @@
 
     async function loadUnits() {
         try {
-            const response = await fetch('units.json');
-            if (!response.ok) throw new Error('units.json not found');
+            const response = await fetch('units.json');   // Gleicher Ordner
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             unitsData = await response.json();
+            console.log("✅ units.json erfolgreich geladen");
             init();
         } catch (err) {
-            console.error("Fehler beim Laden der units.json:", err);
-            document.querySelector('.main').innerHTML += `<p style="color:red; text-align:center;">Fehler: units.json konnte nicht geladen werden.</p>`;
+            console.error("Fehler beim Laden von units.json:", err);
+            document.querySelector('.main').insertAdjacentHTML('beforeend', `
+                <p style="color:#ff5555; text-align:center; margin:20px; padding:15px; background:rgba(255,0,0,0.1); border-radius:12px;">
+                    ❌ Konnte units.json nicht laden.<br>
+                    <small>Die Datei muss im selben Ordner wie index.html liegen.</small>
+                </p>
+            `);
         }
     }
 
