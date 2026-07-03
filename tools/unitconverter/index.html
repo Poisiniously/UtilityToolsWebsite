@@ -271,6 +271,13 @@
                 "pc³": 2.94e49 
             } 
         },
+        "Chemistry": {
+            units: {
+                "mol": 1, "mmol": 0.001, "µmol": 1e-6, "nmol": 1e-9,
+                "M": 1, "mM": 0.001, "µM": 1e-6, "nM": 1e-9,   // Konzentration (mol/L)
+                "L/mol": 1, "mL/mol": 0.001                     // Molarvolumen
+            }
+        },
         "Mass": { 
             units: { "kg": 1, "g": 0.001, "mg": 1e-6, "µg": 1e-9, "t": 1000 } 
         },
@@ -288,7 +295,7 @@
         "Pressure": { 
             units: { 
                 "Pa": 1, "kPa": 1000, "MPa": 1000000, "bar": 100000, 
-                "mbar": 100 
+                "mbar": 100, "atm": 101325 
             } 
         },
         "Energy": { 
@@ -336,8 +343,8 @@
        
         // Beispiel-Einträge
         pushHistory({ cat: "Length", from: "ly", to: "pc", input: 1, output: "0,3066" });
-        pushHistory({ cat: "Length", from: "km", to: "m", input: 5, output: "5.000" });
-        pushHistory({ cat: "Volume", from: "km³", to: "m³", input: 1, output: "1.000.000.000" });
+        pushHistory({ cat: "Chemistry", from: "mol", to: "mmol", input: 0.5, output: "500" });
+        pushHistory({ cat: "Chemistry", from: "M", to: "mM", input: 1, output: "1.000" });
        
         resultValueEl.textContent = '—';
         resultDetailEl.textContent = 'Ready to convert';
