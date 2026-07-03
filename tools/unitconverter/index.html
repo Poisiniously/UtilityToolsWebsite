@@ -28,12 +28,6 @@
             align-items: center;
         }
 
-        /* Custom Dark Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--background); }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-
         .card {
             width: 100%;
             max-width: 940px;
@@ -164,7 +158,7 @@
             margin-top: 6px;
         }
 
-        /* Sidebar */
+        /* Sidebar container */
         .side {
             background: rgba(0,0,0,0.2);
             border-left: 1px solid var(--border);
@@ -199,13 +193,29 @@
             transform: translateX(4px);
         }
 
+        /* Eigener, scrollbarer Verlauf-Bereich */
         .history-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            max-height: 250px;
+            max-height: 200px;
             overflow-y: auto;
-            padding-right: 8px;
+            padding-right: 6px;
+        }
+
+        /* Diskrete Scrollbar nur für die History */
+        .history-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .history-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .history-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        .history-list::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
         }
 
         .hist-item {
@@ -323,7 +333,7 @@
     const historyEl = document.getElementById('history');
 
     let historyData = [];
-    let isRestoring = false; // Flag um Endlosschleifen beim Verlauf-Wiederherstellen zu verhindern
+    let isRestoring = false;
 
     function init() {
         Object.keys(categories).forEach(k => {
@@ -337,11 +347,10 @@
         populateUnits(categoryEl.value);
         buildPresets();
         
-        // Initialer Verlauf ohne Duplikat-Fehler
+        // Initialer Verlauf (Maximal 8 Einträge im Speicher erlaubt)
         pushHistory({ cat: "Length", from: "km", to: "m", input: 1, output: "1,000" });
         pushHistory({ cat: "Temperature", from: "°C", to: "°F", input: 20, output: "68" });
         
-        // Beim Start bleibt alles leer, keine automatische Berechnung erzwingen
         resultValueEl.textContent = '—';
         resultDetailEl.textContent = 'Ready to convert';
     }
@@ -365,7 +374,6 @@
         toEl.value = toEl.options[1]?.value || fromEl.value;
     }
 
-    /* Temperature helpers */
     function tempToK(v, unit) {
         if (unit === "K") return Number(v);
         if (unit === "°C") return Number(v) + 273.15;
@@ -380,7 +388,6 @@
         return k;
     }
 
-    /* Core Conversion */
     function convert(cat, from, to, val) {
         if (categories[cat].special) {
             const kelvin = tempToK(val, from);
@@ -412,7 +419,6 @@
         const to = toEl.value;
         const val = Number(valueEl.value);
         
-        // Fängt leere Eingaben sowie das Tippen eines einzelnen Minuszeichens sauber ab
         if (valueEl.value === "" || valueEl.value === "-" || isNaN(val)) {
             resultValueEl.textContent = '—';
             resultDetailEl.textContent = 'Ready to convert';
@@ -427,9 +433,7 @@
         }
     }
 
-    /* History Management */
     function pushHistory(item) {
-        // Robustere Duplikat-Prüfung verhindert doppelte Zeilen
         if (historyData.length > 0 && 
             historyData[0].cat === item.cat &&
             historyData[0].from === item.from && 
@@ -439,7 +443,8 @@
         }
 
         historyData.unshift(item);
-        if (historyData.length > 5) historyData.pop();
+        // Erhöht auf 8 Einträge, damit man das Scrollen auch gut nutzen kann
+        if (historyData.length > 8) historyData.pop();
         renderHistory();
     }
 
@@ -452,7 +457,7 @@
             d.title = `Restore: ${h.cat}`;
             
             d.addEventListener('click', () => {
-                isRestoring = true; // Blockiert das Hinzufügen eines neuen Verlaufs-Eintrags während des Klicks
+                isRestoring = true;
                 categoryEl.value = h.cat;
                 populateUnits(h.cat);
                 fromEl.value = h.from;
@@ -465,7 +470,6 @@
         });
     }
 
-    /* Presets Builder */
     function buildPresets() {
         presetsEl.innerHTML = '';
         presetList.forEach(p => {
@@ -479,13 +483,12 @@
                 fromEl.value = p.from;
                 toEl.value = p.to;
                 valueEl.value = p.val;
-                doConvert(false); // Fügt Presets regulär dem Verlauf hinzu
+                doConvert(false);
             });
             presetsEl.appendChild(btn);
         });
     }
 
-    /* Event Listeners */
     swapBtn.addEventListener('click', () => {
         const temp = fromEl.value; 
         fromEl.value = toEl.value; 
@@ -501,7 +504,6 @@
     precisionEl.addEventListener('change', () => doConvert(true));
     valueEl.addEventListener('input', () => doConvert(true));
     
-    // Nur in History pushen, wenn das Feld verlassen wird UND sich der Wert vom letzten Verlaufseintrag unterscheidet
     valueEl.addEventListener('blur', () => { 
         if (valueEl.value !== "" && valueEl.value !== "-") {
             doConvert(false); 
@@ -514,11 +516,10 @@
     valueEl.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             doConvert(false);
-            valueEl.blur(); // Triggert blur, wird aber durch unseren Duplikat-Schutz abgefangen
+            valueEl.blur();
         }
     });
 
-    /* Start App */
     init();
 </script>
 </body>
