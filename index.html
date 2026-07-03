@@ -27,13 +27,11 @@ body {
   min-height: 100vh;
   padding: 30px;
 }
-/* TITLE */
 h1 {
   text-align: center;
   margin-bottom: 25px;
   color: var(--primary);
 }
-/* SEARCH & FILTER */
 .search-container {
   display: flex;
   justify-content: center;
@@ -73,7 +71,6 @@ h1 {
   color: white;
   box-shadow: 0 0 15px #ff007f55;
 }
-/* CATEGORIES (TAGS) */
 .tags-container {
   display: flex;
   justify-content: center;
@@ -102,13 +99,11 @@ h1 {
   font-weight: bold;
   box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
 }
-/* GRID */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;
 }
-/* CARD */
 .card {
   background: var(--glass);
   border-radius: 15px;
@@ -122,7 +117,6 @@ h1 {
   transform: translateY(-6px) scale(1.02);
   box-shadow: 0 0 20px #ff007f55;
 }
-/* PLACEHOLDER IMAGE */
 .card-image {
   height: 120px;
   border-radius: 10px;
@@ -134,7 +128,6 @@ h1 {
   font-weight: bold;
   color: black;
 }
-/* CARD HEADER */
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -145,7 +138,6 @@ h1 {
   font-size: 18px;
   font-weight: bold;
 }
-/* FAVORITE BUTTON */
 .fav-btn {
   font-size: 22px;
   color: rgba(255, 255, 255, 0.2);
@@ -163,12 +155,10 @@ h1 {
   color: #ffd700;
   text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
 }
-/* TEXT */
 .card-desc {
   font-size: 14px;
   opacity: 0.7;
 }
-/* POPUP & CONTROLS */
 .popup {
   position: fixed;
   top: 0;
@@ -226,7 +216,6 @@ h1 {
   height: 100% !important;
   border-radius: 0px !important;
 }
-/* NEON LOADING SPINNER */
 .spinner {
   position: absolute;
   width: 60px;
@@ -244,7 +233,6 @@ h1 {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-/* NO RESULTS */
 .no-results {
   text-align: center;
   margin-top: 20px;
@@ -298,11 +286,11 @@ async function loadTools() {
     renderTags();
     renderCards();
   } catch (err) {
-    console.error("Fehler beim Laden der tools.json:", err);
+    console.error("Error loading tools.json:", err);
     document.getElementById('grid').innerHTML = `
       <p style="color:red; text-align:center; grid-column: 1/-1;">
-        Fehler: tools.json konnte nicht geladen werden.<br>
-        Stelle sicher, dass die Datei im gleichen Ordner liegt.
+        Error: Could not load tools.json<br>
+        Please make sure the file is in the same folder.
       </p>`;
   }
 }
@@ -345,7 +333,6 @@ function renderCards(filteredTools = toolsData) {
     grid.appendChild(card);
   });
 
-  // Restore favorites
   document.querySelectorAll('.fav-btn').forEach(btn => {
     const id = btn.parentElement.parentElement.getAttribute('data-id');
     if (favorites.includes(id)) btn.classList.add('active');
@@ -386,11 +373,10 @@ function filterCards() {
   const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
   const filtered = toolsData.filter(tool => {
-    const matchesSearch = tool.name.toLowerCase().includes(searchTerm) || 
+    const matchesSearch = tool.name.toLowerCase().includes(searchTerm) ||
                          tool.title.toLowerCase().includes(searchTerm);
     const matchesFav = !showFavoritesOnly || favorites.includes(tool.id);
     const matchesCat = activeCategory === 'all' || activeCategory === tool.category;
-
     return matchesSearch && matchesFav && matchesCat;
   });
 
