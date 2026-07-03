@@ -12,16 +12,26 @@
   --text: #e0e0ff;
   --glass: rgba(255,255,255,0.05);
 }
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
 body {
-  background: radial-gradient(at 0% 0%, #ff007f33, transparent 50%),
-              radial-gradient(at 100% 0%, #00f0ff22, transparent 40%),
-              var(--bg);
+  background:
+    radial-gradient(at 0% 0%, #ff007f33, transparent 50%),
+    radial-gradient(at 100% 0%, #00f0ff22, transparent 40%),
+    var(--bg);
   color: var(--text);
   min-height: 100vh;
   padding: 30px;
 }
-h1 { text-align: center; margin-bottom: 25px; color: var(--primary); }
+h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: var(--primary);
+}
 .search-container {
   display: flex;
   justify-content: center;
@@ -37,8 +47,11 @@ h1 { text-align: center; margin-bottom: 25px; color: var(--primary); }
   background: var(--glass);
   color: white;
   outline: none;
+  transition: box-shadow 0.3s;
 }
-.search-input:focus { box-shadow: 0 0 10px var(--secondary); }
+.search-input:focus {
+  box-shadow: 0 0 10px var(--secondary);
+}
 .filter-btn {
   padding: 12px 20px;
   border-radius: 10px;
@@ -46,10 +59,17 @@ h1 { text-align: center; margin-bottom: 25px; color: var(--primary); }
   background: var(--glass);
   color: var(--primary);
   cursor: pointer;
+  outline: none;
+  transition: all 0.3s;
+  font-weight: bold;
+}
+.filter-btn:hover {
+  background: rgba(255, 0, 127, 0.1);
 }
 .filter-btn.active {
   background: var(--primary);
   color: white;
+  box-shadow: 0 0 15px #ff007f55;
 }
 .tags-container {
   display: flex;
@@ -61,14 +81,23 @@ h1 { text-align: center; margin-bottom: 25px; color: var(--primary); }
 .tag-btn {
   padding: 8px 16px;
   border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   background: var(--glass);
   color: var(--text);
   cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+.tag-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--secondary);
 }
 .tag-btn.active {
   background: var(--secondary);
   color: #000;
+  border-color: var(--secondary);
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
 }
 .grid {
   display: grid;
@@ -99,21 +128,42 @@ h1 { text-align: center; margin-bottom: 25px; color: var(--primary); }
   font-weight: bold;
   color: black;
 }
-.card-title { font-size: 18px; font-weight: bold; }
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.card-title {
+  font-size: 18px;
+  font-weight: bold;
+}
 .fav-btn {
   font-size: 22px;
+  color: rgba(255, 255, 255, 0.2);
   background: none;
   border: none;
   cursor: pointer;
+  transition: all 0.3s;
 }
-.fav-btn.active { color: #ffd700; }
-.card-desc { font-size: 14px; opacity: 0.7; }
-
-/* Popup */
+.fav-btn:hover {
+  transform: scale(1.2);
+  color: rgba(255, 255, 255, 0.6);
+}
+.fav-btn.active {
+  color: #ffd700;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+}
+.card-desc {
+  font-size: 14px;
+  opacity: 0.7;
+}
 .popup {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: none;
   background: rgba(0,0,0,0.85);
   justify-content: center;
@@ -125,17 +175,21 @@ h1 { text-align: center; margin-bottom: 25px; color: var(--primary); }
   top: 20px;
   right: 30px;
   display: flex;
+  align-items: center;
   gap: 20px;
   z-index: 1010;
 }
 .control-btn {
   font-size: 24px;
   color: white;
+  cursor: pointer;
   background: none;
   border: none;
-  cursor: pointer;
+  outline: none;
 }
-.close-btn { font-size: 40px; }
+.close-btn {
+  font-size: 40px;
+}
 .popup iframe {
   width: 80%;
   height: 80%;
@@ -149,7 +203,9 @@ h1 { text-align: center; margin-bottom: 25px; color: var(--primary); }
   text-align: center;
   margin-top: 20px;
   display: none;
+  opacity: 0.6;
   font-size: 18px;
+  width: 100%;
 }
 </style>
 </head>
@@ -165,7 +221,9 @@ h1 { text-align: center; margin-bottom: 25px; color: var(--primary); }
 
 <div id="grid" class="grid"></div>
 
-<div id="noResults" class="no-results">No tools found matching your filters.</div>
+<div id="noResults" class="no-results">
+  No tools found matching your filters.
+</div>
 
 <div id="popup" class="popup">
   <div class="popup-controls">
@@ -189,16 +247,16 @@ async function loadTools() {
     toolsData = await response.json();
     renderTags();
     renderCards();
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    console.error("Error loading tools.json:", err);
   }
 }
 
 function renderTags() {
   const container = document.getElementById('tagsContainer');
   container.innerHTML = `<button class="tag-btn active" onclick="setCategory('all', this)">All</button>`;
-  const cats = [...new Set(toolsData.map(t => t.category))];
-  cats.forEach(cat => {
+  const categories = [...new Set(toolsData.map(t => t.category))];
+  categories.forEach(cat => {
     const btn = document.createElement('button');
     btn.className = 'tag-btn';
     btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
@@ -207,10 +265,10 @@ function renderTags() {
   });
 }
 
-function renderCards(filtered = toolsData) {
+function renderCards(filteredTools = toolsData) {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
-  filtered.forEach(tool => {
+  filteredTools.forEach(tool => {
     const card = document.createElement('div');
     card.className = 'card';
     card.setAttribute('data-id', tool.id);
@@ -219,54 +277,75 @@ function renderCards(filtered = toolsData) {
     card.onclick = () => openTool(tool.url);
     card.innerHTML = `
       <div class="card-image">${tool.imageText}</div>
-      <div class="card-title">${tool.title}</div>
+      <div class="card-header">
+        <div class="card-title">${tool.title}</div>
+        <button class="fav-btn" onclick="toggleFav(event, '${tool.id}')">★</button>
+      </div>
       <div class="card-desc">${tool.desc}</div>
     `;
     grid.appendChild(card);
   });
 }
 
-function setCategory(cat, btn) {
-  activeCategory = cat;
-  document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+function setCategory(category, btnElement) {
+  activeCategory = category;
+  document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
+  btnElement.classList.add('active');
+  filterCards();
+}
+
+function toggleFav(event, id) {
+  event.stopPropagation();
+  // Favoriten-Logik hier (falls gewünscht)
+}
+
+function toggleFavFilter() {
+  showFavoritesOnly = !showFavoritesOnly;
+  document.getElementById('favFilterBtn').classList.toggle('active', showFavoritesOnly);
   filterCards();
 }
 
 function filterCards() {
-  const term = document.getElementById('searchInput').value.toLowerCase();
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
   const filtered = toolsData.filter(tool => {
-    const matchSearch = tool.name.toLowerCase().includes(term) || tool.title.toLowerCase().includes(term);
-    const matchCat = activeCategory === 'all' || tool.category === activeCategory;
-    return matchSearch && matchCat;
+    const matchesSearch = tool.name.toLowerCase().includes(searchTerm) || tool.title.toLowerCase().includes(searchTerm);
+    const matchesCat = activeCategory === 'all' || activeCategory === tool.category;
+    return matchesSearch && matchesCat;
   });
   renderCards(filtered);
+  document.getElementById('noResults').style.display = filtered.length ? 'none' : 'block';
 }
 
 function openTool(url) {
   currentToolUrl = url;
-  document.getElementById('toolFrame').src = url;
-  document.getElementById('popup').style.display = 'flex';
-}
-
-function closeTool() {
-  document.getElementById('popup').style.display = 'none';
-  document.getElementById('toolFrame').src = '';
+  const popup = document.getElementById('popup');
+  const iframe = document.getElementById('toolFrame');
+  iframe.src = url;
+  popup.style.display = 'flex';
 }
 
 function openInNewTab() {
   if (currentToolUrl) window.open(currentToolUrl, '_blank');
 }
 
-function toggleFullscreen() {
+function closeTool() {
   const popup = document.getElementById('popup');
-  if (!document.fullscreenElement) popup.requestFullscreen();
-  else document.exitFullscreen();
+  popup.style.display = 'none';
+  document.getElementById('toolFrame').src = '';
+  currentToolUrl = '';
 }
 
-// Init
-loadTools();
+function toggleFullscreen() {
+  const popup = document.getElementById('popup');
+  if (!document.fullscreenElement) {
+    popup.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+
 document.getElementById('searchInput').addEventListener('input', filterCards);
+loadTools();
 </script>
 </body>
 </html>
