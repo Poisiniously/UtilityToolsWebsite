@@ -15,24 +15,22 @@
             --border: rgba(255, 255, 255, .08);
             --font: 'Outfit', 'Segoe UI', sans-serif;
         }
-
         body {
             margin: 0;
             padding: 20px;
             background: var(--background);
             color: var(--text);
             font-family: var(--font);
-            height: 100vh; /* Fest auf Bildschirmhöhe */
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden; /* Verhindert das Scrollen des gesamten Fensters */
+            overflow: hidden;
         }
-
         .card {
             width: 100%;
             max-width: 940px;
-            max-height: 90vh; /* Verhindert, dass die Karte zu hoch wird */
+            max-height: 90vh;
             background: var(--surface);
             backdrop-filter: blur(20px);
             border: 1px solid var(--border);
@@ -40,29 +38,25 @@
             display: grid;
             grid-template-columns: 1fr 320px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            overflow: hidden; /* Innerhalb der Karte darf nichts rausragen */
+            overflow: hidden;
         }
-
         .main {
             padding: 40px;
             display: flex;
             flex-direction: column;
             gap: 24px;
         }
-
         .brand-title {
             font-size: 1.8rem;
             font-weight: 700;
             color: var(--secondary);
             margin: 0;
         }
-
         .brand-subtitle {
             color: var(--text-secondary);
             font-size: 0.95rem;
             margin-top: 4px;
         }
-
         label {
             display: block;
             margin-bottom: 8px;
@@ -72,7 +66,6 @@
             letter-spacing: 1px;
             font-weight: bold;
         }
-
         input, select {
             width: 100%;
             padding: 14px 16px;
@@ -85,25 +78,21 @@
             box-sizing: border-box;
             transition: all 0.3s ease;
         }
-
         input:focus, select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
         }
-
         .input-area {
             display: flex;
             align-items: center;
             gap: 16px;
         }
-
         .input-group {
             flex: 1;
             display: flex;
             gap: 12px;
         }
-
         .btn {
             background: var(--primary);
             color: white;
@@ -118,24 +107,20 @@
             align-items: center;
             justify-content: center;
         }
-
         .btn:hover {
             filter: brightness(1.2);
             box-shadow: 0 0 15px var(--primary);
         }
-
         .btn.secondary {
             background: rgba(0,0,0,0.3);
             border: 1px solid var(--border);
             color: var(--secondary);
             padding: 14px;
         }
-
         .btn.secondary:hover {
             border-color: var(--secondary);
             box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
         }
-
         .result-box {
             margin-top: 10px;
             padding: 24px;
@@ -146,21 +131,17 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .result-value {
             font-size: 2.5rem;
             font-weight: 800;
             color: var(--text);
             transition: opacity 0.2s ease;
         }
-
         .result-detail {
             color: var(--text-secondary);
             font-size: 0.95rem;
             margin-top: 6px;
         }
-
-        /* Sidebar container */
         .side {
             background: rgba(0,0,0,0.2);
             border-left: 1px solid var(--border);
@@ -169,13 +150,11 @@
             flex-direction: column;
             gap: 30px;
         }
-
         .preset-grid {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
-
         .preset-btn {
             padding: 12px 16px;
             border-radius: 10px;
@@ -188,14 +167,11 @@
             transition: all 0.2s ease;
             font-family: var(--font);
         }
-
         .preset-btn:hover {
             border-color: var(--primary);
             background: rgba(255,0,127,0.05);
             transform: translateX(4px);
         }
-
-        /* Eigener, scrollbarer Verlauf-Bereich */
         .history-list {
             display: flex;
             flex-direction: column;
@@ -204,22 +180,10 @@
             overflow-y: auto;
             padding-right: 6px;
         }
-
-        /* Diskrete Scrollbar nur für die History */
-        .history-list::-webkit-scrollbar {
-            width: 4px;
-        }
-        .history-list::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .history-list::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-        }
-        .history-list::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
-        }
-
+        .history-list::-webkit-scrollbar { width: 4px; }
+        .history-list::-webkit-scrollbar-track { background: transparent; }
+        .history-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+        .history-list::-webkit-scrollbar-thumb:hover { background: var(--primary); }
         .hist-item {
             padding: 12px;
             border-radius: 10px;
@@ -230,14 +194,11 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-
         .hist-item:hover {
             border-color: var(--secondary);
             color: var(--text);
             background: rgba(0,240,255,0.05);
         }
-
-        /* Responsive */
         @media (max-width: 880px) {
             .card { grid-template-columns: 1fr; }
             .side { border-left: none; border-top: 1px solid var(--border); padding: 30px; }
@@ -247,32 +208,28 @@
     </style>
 </head>
 <body>
-
 <div class="card">
     <div class="main">
         <div>
             <h1 class="brand-title">Unit Converter</h1>
-            <div class="brand-subtitle">Premium conversion tool — Utility Hub</div>
+            <div class="brand-subtitle">Metrisches System — Utility Hub</div>
         </div>
-
         <div>
             <label for="category">Category</label>
             <select id="category"></select>
         </div>
-
         <div class="input-area">
             <div class="input-group">
                 <input id="value" type="number" step="any" value="" placeholder="Enter value..." />
                 <select id="fromUnit"></select>
             </div>
-            
+           
             <button id="swapBtn" class="btn secondary" title="Swap Units">⇄</button>
-            
+           
             <div class="input-group">
                 <select id="toUnit"></select>
             </div>
         </div>
-
         <div class="result-box">
             <div>
                 <div class="result-value" id="resultValue">—</div>
@@ -288,13 +245,11 @@
             </div>
         </div>
     </div>
-
     <div class="side">
         <div>
             <label>Quick Presets</label>
             <div class="preset-grid" id="presets"></div>
         </div>
-
         <div>
             <label>History</label>
             <div class="history-list" id="history"></div>
@@ -303,26 +258,70 @@
 </div>
 
 <script>
-    /* -------------------------
-       Conversion Logic & Data
-       ------------------------- */
     const categories = {
-        "Length": { special: false, units: { "m": 1, "km": 1000, "cm": 0.01, "mm": 0.001, "mi": 1609.344, "ft": 0.3048, "in": 0.0254 } },
-        "Mass": { special: false, units: { "kg": 1, "g": 0.001, "mg": 1e-6, "lb": 0.45359237, "oz": 0.028349523125 } },
-        "Volume": { special: false, units: { "L": 1, "mL": 0.001, "m³": 1000, "cup": 0.24, "gal": 3.785411784 } },
-        "Time": { special: false, units: { "s": 1, "min": 60, "h": 3600, "d": 86400 } },
-        "Data": { special: false, units: { "B": 1, "KB": 1024, "MB": 1024**2, "GB": 1024**3 } },
-        "Temperature": { special: true, units: { "K": "K", "°C": "C", "°F": "F" } }
+        "Length": { 
+            units: { "m": 1, "km": 1000, "dm": 0.1, "cm": 0.01, "mm": 0.001, "µm": 1e-6, "nm": 1e-9 } 
+        },
+        "Mass": { 
+            units: { "kg": 1, "g": 0.001, "mg": 1e-6, "µg": 1e-9, "t": 1000 } 
+        },
+        "Volume": { 
+            units: { 
+                "m³": 1, "dm³": 0.001, "L": 0.001, "dm³": 0.001,
+                "cm³": 1e-6, "mL": 1e-6, "mm³": 1e-9 
+            } 
+        },
+        "Time": { 
+            units: { 
+                "s": 1, "ms": 0.001, "µs": 1e-6, "ns": 1e-9,
+                "min": 60, "h": 3600, "d": 86400 
+            } 
+        },
+        "Speed": { 
+            units: { 
+                "m/s": 1, "km/h": 1000/3600, "km/s": 1000, "cm/s": 0.01 
+            } 
+        },
+        "Area": { 
+            units: { 
+                "m²": 1, "km²": 1000000, "dm²": 0.01, "cm²": 0.0001, 
+                "mm²": 0.000001, "ha": 10000 
+            } 
+        },
+        "Pressure": { 
+            units: { 
+                "Pa": 1, "kPa": 1000, "MPa": 1000000, "bar": 100000, 
+                "mbar": 100 
+            } 
+        },
+        "Energy": { 
+            units: { 
+                "J": 1, "kJ": 1000, "MJ": 1000000, "GJ": 1e9,
+                "Wh": 3600, "kWh": 3600000 
+            } 
+        },
+        "Data": { 
+            units: { 
+                "B": 1, "KB": 1024, "MB": 1024**2, "GB": 1024**3,
+                "TB": 1024**4, "bit": 0.125, "Kbit": 128, "Mbit": 131072 
+            } 
+        },
+        "Temperature": { 
+            special: true, 
+            units: { "K": "K", "°C": "C", "°F": "F" } 
+        }
     };
 
     const presetList = [
-        { label: "km → m", cat: "Length", from: "km", to: "m", val: 1 },
-        { label: "kg → g", cat: "Mass", from: "kg", to: "g", val: 1 },
-        { label: "°C → °F", cat: "Temperature", from: "°C", to: "°F", val: 20 },
-        { label: "GB → MB", cat: "Data", from: "GB", to: "MB", val: 1 }
+        { label: "km → m", cat: "Length", from: "km", to: "m", val: 5 },
+        { label: "kg → g", cat: "Mass", from: "kg", to: "g", val: 2.5 },
+        { label: "L → mL", cat: "Volume", from: "L", to: "mL", val: 1 },
+        { label: "m³ → cm³", cat: "Volume", from: "m³", to: "cm³", val: 1 },
+        { label: "°C → K", cat: "Temperature", from: "°C", to: "K", val: 20 },
+        { label: "km/h → m/s", cat: "Speed", from: "km/h", to: "m/s", val: 100 }
     ];
 
-    /* DOM Elements */
+    // Der Rest des Scripts bleibt gleich
     const categoryEl = document.getElementById('category');
     const fromEl = document.getElementById('fromUnit');
     const toEl = document.getElementById('toUnit');
@@ -340,38 +339,37 @@
     function init() {
         Object.keys(categories).forEach(k => {
             const opt = document.createElement('option');
-            opt.value = k; 
+            opt.value = k;
             opt.textContent = k;
             categoryEl.appendChild(opt);
         });
-        
-        categoryEl.value = Object.keys(categories)[0];
+       
+        categoryEl.value = "Length";
         populateUnits(categoryEl.value);
         buildPresets();
-        
-        // Initialer Verlauf (Maximal 8 Einträge im Speicher erlaubt)
-        pushHistory({ cat: "Length", from: "km", to: "m", input: 1, output: "1,000" });
-        pushHistory({ cat: "Temperature", from: "°C", to: "°F", input: 20, output: "68" });
-        
+       
+        pushHistory({ cat: "Length", from: "km", to: "m", input: 5, output: "5,000" });
+        pushHistory({ cat: "Volume", from: "L", to: "mL", input: 1, output: "1,000" });
+       
         resultValueEl.textContent = '—';
         resultDetailEl.textContent = 'Ready to convert';
     }
 
     function populateUnits(cat) {
-        fromEl.innerHTML = ''; 
+        fromEl.innerHTML = '';
         toEl.innerHTML = '';
         const currentCategory = categories[cat];
-        
+       
         Object.keys(currentCategory.units).forEach(u => {
-            const o1 = document.createElement('option'); 
-            o1.value = u; 
-            o1.textContent = u; 
+            const o1 = document.createElement('option');
+            o1.value = u;
+            o1.textContent = u;
             fromEl.appendChild(o1);
-            
-            const o2 = o1.cloneNode(true); 
+           
+            const o2 = o1.cloneNode(true);
             toEl.appendChild(o2);
         });
-        
+       
         fromEl.value = fromEl.options[0]?.value || '';
         toEl.value = toEl.options[1]?.value || fromEl.value;
     }
@@ -382,7 +380,7 @@
         if (unit === "°F") return (Number(v) - 32) * 5/9 + 273.15;
         return Number(v);
     }
-    
+   
     function kToTemp(k, unit) {
         if (unit === "K") return k;
         if (unit === "°C") return k - 273.15;
@@ -403,14 +401,14 @@
 
     function showResult(rawVal, val, from, to) {
         const prec = Number(precisionEl.value);
-        const formatted = Number(rawVal).toLocaleString('en-US', { maximumFractionDigits: prec });
-        
+        const formatted = Number(rawVal).toLocaleString('de-DE', { maximumFractionDigits: prec });
+       
         resultValueEl.style.opacity = 0;
         setTimeout(() => {
             resultValueEl.textContent = formatted;
             resultValueEl.style.opacity = 1;
         }, 120);
-        
+       
         resultDetailEl.textContent = `${val} ${from} → ${to}`;
         return formatted;
     }
@@ -420,32 +418,29 @@
         const from = fromEl.value;
         const to = toEl.value;
         const val = Number(valueEl.value);
-        
-        if (valueEl.value === "" || valueEl.value === "-" || isNaN(val)) {
+       
+        if (valueEl.value === "" || isNaN(val)) {
             resultValueEl.textContent = '—';
             resultDetailEl.textContent = 'Ready to convert';
             return;
         }
-        
+       
         const rawResult = convert(cat, from, to, val);
         const formattedStr = showResult(rawResult, val, from, to);
-        
+       
         if (!skipHistory && !isRestoring) {
             pushHistory({ cat, from, to, input: val, output: formattedStr });
         }
     }
 
     function pushHistory(item) {
-        if (historyData.length > 0 && 
+        if (historyData.length > 0 &&
             historyData[0].cat === item.cat &&
-            historyData[0].from === item.from && 
-            historyData[0].to === item.to && 
-            historyData[0].input === item.input) {
-            return; 
-        }
+            historyData[0].from === item.from &&
+            historyData[0].to === item.to &&
+            historyData[0].input === item.input) return;
 
         historyData.unshift(item);
-        // Erhöht auf 8 Einträge, damit man das Scrollen auch gut nutzen kann
         if (historyData.length > 8) historyData.pop();
         renderHistory();
     }
@@ -456,8 +451,6 @@
             const d = document.createElement('div');
             d.className = 'hist-item';
             d.textContent = `${h.input} ${h.from} → ${h.output} ${h.to}`;
-            d.title = `Restore: ${h.cat}`;
-            
             d.addEventListener('click', () => {
                 isRestoring = true;
                 categoryEl.value = h.cat;
@@ -478,7 +471,6 @@
             const btn = document.createElement('button');
             btn.className = 'preset-btn';
             btn.textContent = p.label;
-            
             btn.addEventListener('click', () => {
                 categoryEl.value = p.cat;
                 populateUnits(p.cat);
@@ -491,36 +483,24 @@
         });
     }
 
+    // Events
     swapBtn.addEventListener('click', () => {
-        const temp = fromEl.value; 
-        fromEl.value = toEl.value; 
+        const temp = fromEl.value;
+        fromEl.value = toEl.value;
         toEl.value = temp;
         doConvert(false);
     });
 
-    categoryEl.addEventListener('change', () => { 
-        populateUnits(categoryEl.value); 
-        doConvert(true); 
+    categoryEl.addEventListener('change', () => {
+        populateUnits(categoryEl.value);
+        doConvert(true);
     });
-    
+   
     precisionEl.addEventListener('change', () => doConvert(true));
     valueEl.addEventListener('input', () => doConvert(true));
-    
-    valueEl.addEventListener('blur', () => { 
-        if (valueEl.value !== "" && valueEl.value !== "-") {
-            doConvert(false); 
-        }
-    });
-
+    valueEl.addEventListener('blur', () => doConvert(false));
     fromEl.addEventListener('change', () => doConvert(false));
     toEl.addEventListener('change', () => doConvert(false));
-
-    valueEl.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            doConvert(false);
-            valueEl.blur();
-        }
-    });
 
     init();
 </script>
