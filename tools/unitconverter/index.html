@@ -40,8 +40,158 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             overflow: hidden;
         }
-        /* ... (Rest des CSS bleibt gleich wie vorher) ... */
-        /* Ich habe es aus Platzgründen gekürzt – kopiere den Rest aus der vorherigen Version */
+        .main {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .brand-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin: 0;
+        }
+        .brand-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
+        }
+        .input-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .input-group {
+            flex: 1;
+            display: flex;
+            gap: 12px;
+        }
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn:hover {
+            filter: brightness(1.2);
+            box-shadow: 0 0 15px var(--primary);
+        }
+        .btn.secondary {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            color: var(--secondary);
+            padding: 14px;
+        }
+        .btn.secondary:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+        }
+        .result-box {
+            margin-top: 10px;
+            padding: 24px;
+            background: linear-gradient(90deg, rgba(255,0,127,0.05), transparent);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text);
+            transition: opacity 0.2s ease;
+        }
+        .result-detail {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 6px;
+        }
+        .side {
+            background: rgba(0,0,0,0.2);
+            border-left: 1px solid var(--border);
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .history-title {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+        .history-list::-webkit-scrollbar { width: 5px; }
+        .history-list::-webkit-scrollbar-track { background: transparent; }
+        .history-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 5px; }
+        .history-list::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
+        .hist-item {
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            line-height: 1.4;
+        }
+        .hist-item:hover {
+            border-color: var(--secondary);
+            background: rgba(0,240,255,0.08);
+            transform: translateX(4px);
+        }
+        @media (max-width: 880px) {
+            .card { grid-template-columns: 1fr; }
+            .side { border-left: none; border-top: 1px solid var(--border); padding: 30px; }
+            .input-area { flex-direction: column; align-items: stretch; }
+            .input-group { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
@@ -60,7 +210,9 @@
                 <input id="value" type="number" step="any" value="" placeholder="Enter value..." />
                 <select id="fromUnit"></select>
             </div>
+           
             <button id="swapBtn" class="btn secondary" title="Swap Units">⇄</button>
+           
             <div class="input-group">
                 <select id="toUnit"></select>
             </div>
@@ -95,14 +247,15 @@
     async function loadUnits() {
         try {
             const response = await fetch('units.json');
+            if (!response.ok) throw new Error('units.json not found');
             unitsData = await response.json();
             init();
         } catch (err) {
-            console.error("Fehler beim Laden von units.json", err);
+            console.error("Fehler beim Laden der units.json:", err);
+            document.querySelector('.main').innerHTML += `<p style="color:red; text-align:center;">Fehler: units.json konnte nicht geladen werden.</p>`;
         }
     }
 
-    // Rest des Codes bleibt fast gleich – nur init() und populateUnits() angepasst
     const categoryEl = document.getElementById('category');
     const fromEl = document.getElementById('fromUnit');
     const toEl = document.getElementById('toUnit');
@@ -154,10 +307,125 @@
         toEl.value = toEl.options[1]?.value || fromEl.value;
     }
 
-    // ... (Rest der Funktionen wie convert, doConvert, etc. bleiben gleich wie in der letzten Version)
+    function tempToK(v, unit) {
+        if (unit === "K") return Number(v);
+        if (unit === "°C") return Number(v) + 273.15;
+        if (unit === "°F") return (Number(v) - 32) * 5/9 + 273.15;
+        return Number(v);
+    }
+   
+    function kToTemp(k, unit) {
+        if (unit === "K") return k;
+        if (unit === "°C") return k - 273.15;
+        if (unit === "°F") return (k - 273.15) * 9/5 + 32;
+        return k;
+    }
 
-    // Kopiere den Rest aus der vorherigen Unit Converter Version (convert, showResult, doConvert, etc.)
+    function convert(cat, from, to, val) {
+        const currentCategory = unitsData[cat];
+        if (currentCategory.special) {
+            const kelvin = tempToK(val, from);
+            return kToTemp(kelvin, to);
+        } else {
+            const fromFactor = currentCategory[from];
+            const toFactor = currentCategory[to];
+            return Number(val) * fromFactor / toFactor;
+        }
+    }
 
+    function showResult(rawVal, val, from, to) {
+        const prec = Number(precisionEl.value);
+        const formatted = Number(rawVal).toLocaleString('de-DE', { maximumFractionDigits: prec });
+       
+        resultValueEl.style.opacity = 0;
+        setTimeout(() => {
+            resultValueEl.textContent = formatted;
+            resultValueEl.style.opacity = 1;
+        }, 120);
+       
+        resultDetailEl.textContent = `${val} ${from} → ${to}`;
+        return formatted;
+    }
+
+    function doConvert(skipHistory = false) {
+        const cat = categoryEl.value;
+        const from = fromEl.value;
+        const to = toEl.value;
+        
+        let val = valueEl.value.trim() === "" ? 1 : Number(valueEl.value);
+       
+        if (isNaN(val)) {
+            resultValueEl.textContent = '—';
+            resultDetailEl.textContent = 'Ready to convert';
+            return;
+        }
+       
+        const rawResult = convert(cat, from, to, val);
+        const displayVal = (val === 1 && valueEl.value.trim() === "") ? "" : val;
+        const formattedStr = showResult(rawResult, displayVal, from, to);
+       
+        if (!skipHistory && !isRestoring) {
+            pushHistory({ cat, from, to, input: val, output: formattedStr });
+        }
+    }
+
+    function pushHistory(item) {
+        if (historyData.length > 0 &&
+            historyData[0].cat === item.cat &&
+            historyData[0].from === item.from &&
+            historyData[0].to === item.to &&
+            historyData[0].input === item.input) return;
+
+        historyData.unshift(item);
+        if (historyData.length > 12) historyData.pop();
+        renderHistory();
+    }
+
+    function renderHistory() {
+        historyEl.innerHTML = '';
+        historyData.forEach((h) => {
+            const d = document.createElement('div');
+            d.className = 'hist-item';
+            d.innerHTML = `
+                <strong>${h.input} ${h.from}</strong><br>
+                <span style="color:var(--secondary)">→ ${h.output} ${h.to}</span>
+            `;
+            d.title = `${h.cat} • Click to restore`;
+           
+            d.addEventListener('click', () => {
+                isRestoring = true;
+                categoryEl.value = h.cat;
+                populateUnits(h.cat);
+                fromEl.value = h.from;
+                toEl.value = h.to;
+                valueEl.value = h.input;
+                doConvert(true);
+                isRestoring = false;
+            });
+            historyEl.appendChild(d);
+        });
+    }
+
+    // Event Listeners
+    swapBtn.addEventListener('click', () => {
+        const temp = fromEl.value;
+        fromEl.value = toEl.value;
+        toEl.value = temp;
+        doConvert(false);
+    });
+
+    categoryEl.addEventListener('change', () => {
+        populateUnits(categoryEl.value);
+        doConvert(true);
+    });
+   
+    precisionEl.addEventListener('change', () => doConvert(true));
+    valueEl.addEventListener('input', () => doConvert(true));
+    valueEl.addEventListener('blur', () => doConvert(false));
+    fromEl.addEventListener('change', () => doConvert(false));
+    toEl.addEventListener('change', () => doConvert(false));
+
+    // Start
     loadUnits();
 </script>
 </body>
