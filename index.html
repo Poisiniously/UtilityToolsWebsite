@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Utility Tools</title>
-
 <style>
 :root {
   --bg: #0d0714;
@@ -13,14 +12,12 @@
   --text: #e0e0ff;
   --glass: rgba(255,255,255,0.05);
 }
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: Arial, sans-serif;
 }
-
 body {
   background:
     radial-gradient(at 0% 0%, #ff007f33, transparent 50%),
@@ -30,14 +27,12 @@ body {
   min-height: 100vh;
   padding: 30px;
 }
-
 /* TITLE */
 h1 {
   text-align: center;
   margin-bottom: 25px;
   color: var(--primary);
 }
-
 /* SEARCH & FILTER */
 .search-container {
   display: flex;
@@ -46,7 +41,6 @@ h1 {
   gap: 15px;
   margin-bottom: 15px;
 }
-
 .search-input {
   width: 300px;
   padding: 12px;
@@ -57,11 +51,9 @@ h1 {
   outline: none;
   transition: box-shadow 0.3s;
 }
-
 .search-input:focus {
   box-shadow: 0 0 10px var(--secondary);
 }
-
 .filter-btn {
   padding: 12px 20px;
   border-radius: 10px;
@@ -73,17 +65,14 @@ h1 {
   transition: all 0.3s;
   font-weight: bold;
 }
-
 .filter-btn:hover {
   background: rgba(255, 0, 127, 0.1);
 }
-
 .filter-btn.active {
   background: var(--primary);
   color: white;
   box-shadow: 0 0 15px #ff007f55;
 }
-
 /* CATEGORIES (TAGS) */
 .tags-container {
   display: flex;
@@ -92,7 +81,6 @@ h1 {
   margin-bottom: 30px;
   flex-wrap: wrap;
 }
-
 .tag-btn {
   padding: 8px 16px;
   border-radius: 20px;
@@ -103,12 +91,10 @@ h1 {
   font-size: 14px;
   transition: all 0.3s;
 }
-
 .tag-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: var(--secondary);
 }
-
 .tag-btn.active {
   background: var(--secondary);
   color: #000;
@@ -116,14 +102,12 @@ h1 {
   font-weight: bold;
   box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
 }
-
 /* GRID */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;
 }
-
 /* CARD */
 .card {
   background: var(--glass);
@@ -134,12 +118,10 @@ h1 {
   cursor: pointer;
   transition: 0.3s;
 }
-
 .card:hover {
   transform: translateY(-6px) scale(1.02);
   box-shadow: 0 0 20px #ff007f55;
 }
-
 /* PLACEHOLDER IMAGE */
 .card-image {
   height: 120px;
@@ -152,7 +134,6 @@ h1 {
   font-weight: bold;
   color: black;
 }
-
 /* CARD HEADER */
 .card-header {
   display: flex;
@@ -160,12 +141,10 @@ h1 {
   align-items: center;
   margin-bottom: 5px;
 }
-
 .card-title {
   font-size: 18px;
   font-weight: bold;
 }
-
 /* FAVORITE BUTTON */
 .fav-btn {
   font-size: 22px;
@@ -176,23 +155,19 @@ h1 {
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   line-height: 1;
 }
-
 .fav-btn:hover {
   transform: scale(1.2);
   color: rgba(255, 255, 255, 0.6);
 }
-
 .fav-btn.active {
   color: #ffd700;
   text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
 }
-
 /* TEXT */
 .card-desc {
   font-size: 14px;
   opacity: 0.7;
 }
-
 /* POPUP & CONTROLS */
 .popup {
   position: fixed;
@@ -206,7 +181,6 @@ h1 {
   align-items: center;
   z-index: 1000;
 }
-
 .popup-controls {
   position: absolute;
   top: 20px;
@@ -216,7 +190,6 @@ h1 {
   gap: 20px;
   z-index: 1010;
 }
-
 .control-btn {
   font-size: 24px;
   color: white;
@@ -229,20 +202,16 @@ h1 {
   align-items: center;
   justify-content: center;
 }
-
 .control-btn:hover {
   color: var(--secondary);
   transform: scale(1.1);
 }
-
 .close-btn {
   font-size: 40px;
 }
-
 .close-btn:hover {
   color: var(--primary);
 }
-
 .popup iframe {
   width: 80%;
   height: 80%;
@@ -250,15 +219,13 @@ h1 {
   border-radius: 12px;
   background: white;
   transition: width 0.3s, height 0.3s, border-radius 0.3s, opacity 0.3s;
-  opacity: 0; /* Standardmäßig unsichtbar, bis es geladen ist */
+  opacity: 0;
 }
-
 .popup.fullscreen-mode iframe {
   width: 100% !important;
   height: 100% !important;
   border-radius: 0px !important;
 }
-
 /* NEON LOADING SPINNER */
 .spinner {
   position: absolute;
@@ -273,12 +240,10 @@ h1 {
   transition: opacity 0.3s, visibility 0.3s;
   box-shadow: 0 0 15px var(--primary);
 }
-
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-
 /* NO RESULTS */
 .no-results {
   text-align: center;
@@ -290,9 +255,7 @@ h1 {
 }
 </style>
 </head>
-
 <body>
-
 <h1>Utility Tools</h1>
 
 <div class="search-container">
@@ -300,80 +263,9 @@ h1 {
   <button id="favFilterBtn" class="filter-btn" onclick="toggleFavFilter()">★ Favorites</button>
 </div>
 
-<div class="tags-container">
-  <button class="tag-btn active" onclick="setCategory('all', this)">All</button>
-  <button class="tag-btn" onclick="setCategory('math', this)">Math</button>
-  <button class="tag-btn" onclick="setCategory('text', this)">Text</button>
-  <button class="tag-btn" onclick="setCategory('utility', this)">Utility</button>
-</div>
+<div class="tags-container" id="tagsContainer"></div>
 
-<div id="grid" class="grid">
-
-  <div class="card" data-id="calc" data-name="calculator" data-category="math" onclick="openTool('tools/calculator/index.html')">
-    <div class="card-image">CALC</div>
-    <div class="card-header">
-      <div class="card-title">Calculator</div>
-      <button class="fav-btn" onclick="toggleFav(event, 'calc')">★</button>
-    </div>
-    <div class="card-desc">Simple math calculator</div>
-  </div>
-
-  <div class="card" data-id="text" data-name="text cleaner" data-category="text" onclick="openTool('tools/textcleaner/index.html')">
-    <div class="card-image">TEXT</div>
-    <div class="card-header">
-      <div class="card-title">Text Cleaner</div>
-      <button class="fav-btn" onclick="toggleFav(event, 'text')">★</button>
-    </div>
-    <div class="card-desc">Simple text formatting</div>
-  </div>
-
-  <div class="card" data-id="conv" data-name="converter file" data-category="utility" onclick="openTool('tools/file-converter/index.html')">
-    <div class="card-image">CONV</div>
-    <div class="card-header">
-      <div class="card-title">File Converter</div>
-      <button class="fav-btn" onclick="toggleFav(event, 'conv')">★</button>
-    </div>
-    <div class="card-desc">Convert files easily</div>
-  </div>
-
-  <div class="card" data-id="qr" data-name="qr code generator" data-category="utility" onclick="openTool('tools/qr-generator/index.html')">
-    <div class="card-image">QR-GEN</div>
-    <div class="card-header">
-      <div class="card-title">QR Generator</div>
-      <button class="fav-btn" onclick="toggleFav(event, 'qr')">★</button>
-    </div>
-    <div class="card-desc">Generate custom QR codes</div>
-  </div>
-
-  <div class="card" data-id="barcode" data-name="barcode generator" data-category="utility" onclick="openTool('tools/barcode-generator/index.html')">
-    <div class="card-image">BARCODE</div>
-    <div class="card-header">
-      <div class="card-title">Barcode Gen</div>
-      <button class="fav-btn" onclick="toggleFav(event, 'barcode')">★</button>
-    </div>
-    <div class="card-desc">Create standard barcodes</div>
-  </div>
-
-  <div class="card" data-id="timer" data-name="timer" data-category="utility" onclick="openTool('tools/timer/index.html')">
-    <div class="card-image">TIME</div>
-    <div class="card-header">
-      <div class="card-title">Timer</div>
-      <button class="fav-btn" onclick="toggleFav(event, 'timer')">★</button>
-    </div>
-    <div class="card-desc">Countdown & Stopwatch</div>
-  </div>
-
-  <div class="card" data-id="uc" data-name="Convert Units" data-category="math" onclick="openTool('tools/unitconverter/index.html')">
-    <div class="card-image">UNIT</div>
-    <div class="card-header">
-      <div class="card-title">Unit Converter</div>
-      <button class="fav-btn" onclick="toggleFav(event, 'uc')">★</button>
-    </div>
-    <div class="card-desc">Convert Units</div>
-  </div>
-  
-
-</div>
+<div id="grid" class="grid"></div>
 
 <div id="noResults" class="no-results">
   No tools found matching your filters.
@@ -390,169 +282,201 @@ h1 {
 </div>
 
 <script>
-  let favorites = JSON.parse(localStorage.getItem('utilityHubFavs')) || [];
-  let showFavoritesOnly = false;
-  let activeCategory = 'all';
-  let currentToolUrl = '';
+// ====================== DATA & STATE ======================
+let toolsData = [];
+let favorites = JSON.parse(localStorage.getItem('utilityHubFavs')) || [];
+let showFavoritesOnly = false;
+let activeCategory = 'all';
+let currentToolUrl = '';
 
-  function init() {
-    document.querySelectorAll('.card').forEach(card => {
-      const id = card.getAttribute('data-id');
-      if (favorites.includes(id)) {
-        card.querySelector('.fav-btn').classList.add('active');
-      }
+// ====================== LOAD TOOLS ======================
+async function loadTools() {
+  try {
+    const response = await fetch('tools.json');
+    if (!response.ok) throw new Error('JSON not found');
+    toolsData = await response.json();
+    renderTags();
+    renderCards();
+  } catch (err) {
+    console.error("Fehler beim Laden der tools.json:", err);
+    document.getElementById('grid').innerHTML = `
+      <p style="color:red; text-align:center; grid-column: 1/-1;">
+        Fehler: tools.json konnte nicht geladen werden.<br>
+        Stelle sicher, dass die Datei im gleichen Ordner liegt.
+      </p>`;
+  }
+}
+
+// ====================== RENDER ======================
+function renderTags() {
+  const container = document.getElementById('tagsContainer');
+  container.innerHTML = `<button class="tag-btn active" onclick="setCategory('all', this)">All</button>`;
+
+  const categories = [...new Set(toolsData.map(t => t.category))];
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'tag-btn';
+    btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+    btn.onclick = () => setCategory(cat, btn);
+    container.appendChild(btn);
+  });
+}
+
+function renderCards(filteredTools = toolsData) {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  filteredTools.forEach(tool => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.setAttribute('data-id', tool.id);
+    card.setAttribute('data-name', tool.name);
+    card.setAttribute('data-category', tool.category);
+    card.onclick = () => openTool(tool.url);
+
+    card.innerHTML = `
+      <div class="card-image">${tool.imageText}</div>
+      <div class="card-header">
+        <div class="card-title">${tool.title}</div>
+        <button class="fav-btn" onclick="toggleFav(event, '${tool.id}')">★</button>
+      </div>
+      <div class="card-desc">${tool.desc}</div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // Restore favorites
+  document.querySelectorAll('.fav-btn').forEach(btn => {
+    const id = btn.parentElement.parentElement.getAttribute('data-id');
+    if (favorites.includes(id)) btn.classList.add('active');
+  });
+}
+
+// ====================== FILTERS ======================
+function setCategory(category, btnElement) {
+  activeCategory = category;
+  document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
+  btnElement.classList.add('active');
+  filterCards();
+}
+
+function toggleFav(event, id) {
+  event.stopPropagation();
+  const btn = event.target;
+
+  if (favorites.includes(id)) {
+    favorites = favorites.filter(favId => favId !== id);
+    btn.classList.remove('active');
+  } else {
+    favorites.push(id);
+    btn.classList.add('active');
+  }
+
+  localStorage.setItem('utilityHubFavs', JSON.stringify(favorites));
+  filterCards();
+}
+
+function toggleFavFilter() {
+  showFavoritesOnly = !showFavoritesOnly;
+  document.getElementById('favFilterBtn').classList.toggle('active', showFavoritesOnly);
+  filterCards();
+}
+
+function filterCards() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+  const filtered = toolsData.filter(tool => {
+    const matchesSearch = tool.name.toLowerCase().includes(searchTerm) || 
+                         tool.title.toLowerCase().includes(searchTerm);
+    const matchesFav = !showFavoritesOnly || favorites.includes(tool.id);
+    const matchesCat = activeCategory === 'all' || activeCategory === tool.category;
+
+    return matchesSearch && matchesFav && matchesCat;
+  });
+
+  renderCards(filtered);
+  document.getElementById('noResults').style.display = filtered.length ? 'none' : 'block';
+}
+
+// ====================== POPUP ======================
+function openTool(url) {
+  currentToolUrl = url;
+  const popup = document.getElementById('popup');
+  const iframe = document.getElementById('toolFrame');
+  const spinner = document.getElementById('popupSpinner');
+
+  spinner.style.opacity = '1';
+  spinner.style.visibility = 'visible';
+  iframe.style.opacity = '0';
+
+  iframe.src = url;
+  popup.style.display = 'flex';
+}
+
+function onIframeLoaded() {
+  const iframe = document.getElementById('toolFrame');
+  const spinner = document.getElementById('popupSpinner');
+  if (iframe.src && currentToolUrl !== '') {
+    spinner.style.opacity = '0';
+    spinner.style.visibility = 'hidden';
+    iframe.style.opacity = '1';
+  }
+}
+
+function openInNewTab() {
+  if (currentToolUrl) {
+    window.open(currentToolUrl, '_blank');
+    closeTool();
+  }
+}
+
+function closeTool() {
+  const popup = document.getElementById('popup');
+  const iframe = document.getElementById('toolFrame');
+
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  popup.classList.remove('fullscreen-mode');
+  document.getElementById('fullscreenBtn').innerText = '🗖';
+
+  popup.style.display = 'none';
+  iframe.src = '';
+  currentToolUrl = '';
+}
+
+function toggleFullscreen() {
+  const popup = document.getElementById('popup');
+  const btn = document.getElementById('fullscreenBtn');
+
+  if (!document.fullscreenElement) {
+    popup.requestFullscreen().then(() => {
+      btn.innerText = '🗗';
+      popup.classList.add('fullscreen-mode');
+    }).catch(() => {
+      popup.classList.toggle('fullscreen-mode');
+      btn.innerText = popup.classList.contains('fullscreen-mode') ? '🗗' : '🗖';
     });
-
-    // Event Listener für das iFrame-Lade-Event registrieren
-    document.getElementById('toolFrame').addEventListener('load', onIframeLoaded);
+  } else {
+    document.exitFullscreen();
   }
+}
 
-  // --- Category System ---
-  function setCategory(category, btnElement) {
-    activeCategory = category;
-    document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
-    btnElement.classList.add('active');
-    filterCards();
-  }
-
-  // --- Favorites System ---
-  function toggleFav(event, id) {
-    event.stopPropagation();
-    const btn = event.target;
-    if (favorites.includes(id)) {
-      favorites = favorites.filter(favId => favId !== id);
-      btn.classList.remove('active');
-    } else {
-      favorites.push(id);
-      btn.classList.add('active');
-    }
-    localStorage.setItem('utilityHubFavs', JSON.stringify(favorites));
-    filterCards();
-  }
-
-  function toggleFavFilter() {
-    showFavoritesOnly = !showFavoritesOnly;
-    const btn = document.getElementById('favFilterBtn');
-    btn.classList.toggle('active', showFavoritesOnly);
-    filterCards();
-  }
-
-  function filterCards() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const cards = document.querySelectorAll('.card');
-    let hasVisibleCards = false;
-
-    cards.forEach(card => {
-      const toolName = card.getAttribute('data-name').toLowerCase();
-      const id = card.getAttribute('data-id');
-      const cardCategory = card.getAttribute('data-category');
-      
-      const matchesSearch = toolName.includes(searchTerm);
-      const matchesFav = !showFavoritesOnly || favorites.includes(id);
-      const matchesCat = activeCategory === 'all' || activeCategory === cardCategory;
-
-      if (matchesSearch && matchesFav && matchesCat) {
-        card.style.display = 'block';
-        hasVisibleCards = true;
-      } else {
-        card.style.display = 'none';
-      }
-    });
-
-    document.getElementById('noResults').style.display = hasVisibleCards ? 'none' : 'block';
-  }
-
-  document.getElementById('searchInput').addEventListener('input', filterCards);
-
-  // --- Popup & Loading Logic ---
-  function openTool(url) {
-    currentToolUrl = url;
-    const popup = document.getElementById('popup');
-    const iframe = document.getElementById('toolFrame');
-    const spinner = document.getElementById('popupSpinner');
-    
-    // Vorbereitung fürs Laden: Spinner zeigen, iFrame verstecken
-    spinner.style.opacity = '1';
-    spinner.style.visibility = 'visible';
-    iframe.style.opacity = '0';
-    
-    iframe.src = url;
-    popup.style.display = 'flex';
-  }
-
-  // Wird aufgerufen, sobald die iFrame-Seite fertig geladen ist
-  function onIframeLoaded() {
-    const iframe = document.getElementById('toolFrame');
-    const spinner = document.getElementById('popupSpinner');
-    
-    // Nur triggern, wenn auch wirklich eine URL geladen wurde (verhindert Trigger beim Leeren des iFrames)
-    if (iframe.src && !iframe.src.endsWith('index.html#') && currentToolUrl !== '') {
-      spinner.style.opacity = '0';
-      spinner.style.visibility = 'hidden';
-      iframe.style.opacity = '1'; // Weiches Einblenden des Tools
-    }
-  }
-
-  function openInNewTab() {
-    if (currentToolUrl) {
-      window.open(currentToolUrl, '_blank');
-      closeTool();
-    }
-  }
-
-  function closeTool() {
-    const popup = document.getElementById('popup');
-    const iframe = document.getElementById('toolFrame');
-    
-    if (document.fullscreenElement) {
-      document.exitFullscreen().catch(err => console.log(err));
-    }
-    
+// Event Listeners
+document.getElementById('searchInput').addEventListener('input', filterCards);
+document.getElementById('toolFrame').addEventListener('load', onIframeLoaded);
+document.getElementById('popup').addEventListener('click', function(e) {
+  if (e.target === this) closeTool();
+});
+document.addEventListener('fullscreenchange', () => {
+  const popup = document.getElementById('popup');
+  const btn = document.getElementById('fullscreenBtn');
+  if (!document.fullscreenElement) {
     popup.classList.remove('fullscreen-mode');
-    document.getElementById('fullscreenBtn').innerText = '🗖';
-    
-    popup.style.display = 'none';
-    iframe.src = '';
-    currentToolUrl = '';
+    btn.innerText = '🗖';
   }
+});
 
-  function toggleFullscreen() {
-    const popup = document.getElementById('popup');
-    const btn = document.getElementById('fullscreenBtn');
-
-    if (!document.fullscreenElement) {
-      popup.requestFullscreen()
-        .then(() => {
-          btn.innerText = '🗗';
-          popup.classList.add('fullscreen-mode');
-        })
-        .catch(err => {
-          console.log(`Fullscreen error: ${err.message}`);
-          popup.classList.toggle('fullscreen-mode');
-          btn.innerText = popup.classList.contains('fullscreen-mode') ? '🗗' : '🗖';
-        });
-    } else {
-      document.exitFullscreen();
-    }
-  }
-
-  document.addEventListener('fullscreenchange', () => {
-    const popup = document.getElementById('popup');
-    const btn = document.getElementById('fullscreenBtn');
-    if (!document.fullscreenElement) {
-      popup.classList.remove('fullscreen-mode');
-      btn.innerText = '🗖';
-    }
-  });
-
-  document.getElementById('popup').addEventListener('click', function(e) {
-    if (e.target === this && !document.fullscreenElement) {
-      closeTool();
-    }
-  });
-
-  init();
+// Start
+loadTools();
 </script>
-
 </body>
 </html>
