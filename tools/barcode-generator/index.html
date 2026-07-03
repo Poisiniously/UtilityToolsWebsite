@@ -1,280 +1,107 @@
-<!DOCTYPE html>
-<html lang="en">
+!DOCTYPE html>
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barcode Generator</title>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <title>Barcode Generator | Utility Hub</title>
     <style>
         :root {
-            --background: #0c0812;
-            --surface: rgba(26, 12, 38, 0.65);
+            --background: #0d0714;
+            --surface: rgba(26, 12, 38, .65);
             --primary: #ff007f;
             --secondary: #00f0ff;
             --text: #f4f4ff;
             --text-secondary: #a0a0c0;
-            --border: #0d0714;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Outfit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --border: rgba(255, 255, 255, .08);
+            --font: 'Outfit', 'Segoe UI', sans-serif;
         }
 
         body {
-            background: transparent;
+            margin: 0;
+            padding: 20px;
+            background: var(--background);
             color: var(--text);
+            font-family: var(--font);
             min-height: 100vh;
             display: flex;
-            align-items: center;
             justify-content: center;
-            padding: 20px;
-            overflow: hidden; 
+            align-items: center;
         }
 
-        .app {
+        .card {
             width: 100%;
             max-width: 600px;
             background: var(--surface);
             backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        }
-
-        h2 {
-            text-align: center;
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: var(--text-secondary);
-            margin-bottom: 25px;
-            font-size: 0.95rem;
-        }
-
-        .preview {
-            width: 100%;
-            min-height: 240px;
-            padding: 30px;
-            margin-bottom: 25px;
-            border: 2px dashed var(--border);
-            border-radius: 18px;
-            background: rgba(0, 0, 0, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            transition: border-color 0.3s ease, background 0.3s ease;
-        }
-
-        .preview:hover {
-            border-color: var(--primary);
-            background: rgba(255, 0, 127, 0.05);
-        }
-
-        .empty-state {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             text-align: center;
         }
 
-        #barcode-container {
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        .preview:hover #barcode-container {
-            transform: scale(1.02);
-            box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-
-        input[type="text"] {
+        .title { font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; color: var(--secondary); }
+        
+        input {
             width: 100%;
             padding: 16px;
-            background: rgba(0, 0, 0, 0.4);
-            color: var(--text);
+            background: rgba(0,0,0,0.3);
             border: 1px solid var(--border);
             border-radius: 12px;
-            font-size: 1.05rem;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            color: var(--text);
+            font-family: var(--font);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            font-size: 1.1rem;
+        }
+
+        input:focus {
             outline: none;
-        }
-
-        input[type="text"]:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
         }
 
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-top: 10px;
+        #barcodeContainer {
+            margin-top: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            display: inline-block;
         }
 
-        button {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: bold;
-            transition: all 0.2s ease;
-            border: none;
-        }
-
-        .btn-clear {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-
-        .btn-clear:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--text-secondary);
-        }
-
-        .btn-download {
-            background: var(--primary);
-            color: #ffffff;
-        }
-
-        .btn-download:hover:not(:disabled) {
-            background: #ff3399;
-            box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
-        }
-
-        .btn-download:disabled {
-            background: rgba(255, 0, 127, 0.2);
-            color: rgba(255, 255, 255, 0.4);
-            cursor: not-allowed;
-            box-shadow: none;
-        }
+        .hint { font-size: 0.9rem; color: var(--text-secondary); margin-top: 15px; }
     </style>
 </head>
 <body>
-    <div class="app">
-        <h2>Barcode Generator</h2>
-        <p class="subtitle">The barcode is generated live while typing.</p>
 
-        <div class="preview">
-            <div id="barcode-container">
-                <canvas id="barcode-canvas"></canvas>
-            </div>
-            <div id="empty-state" class="empty-state">
-                The barcode will appear here
-            </div>
-        </div>
-
-        <div class="input-group">
-            <label for="data-input">Barcode Data (Alphanumeric)</label>
-            <input type="text" id="data-input" placeholder="Enter text or numbers..." autocomplete="off" />
-        </div>
-
-        <div class="controls">
-            <button id="clear-btn" class="btn-clear">Clear</button>
-            <button id="download-btn" class="btn-download" disabled>Download PNG</button>
-        </div>
+<div class="card">
+    <div class="title">Barcode Generator</div>
+    <input type="text" id="barcodeInput" placeholder="Text oder Nummer eingeben..." value="12345678">
+    <div id="barcodeContainer">
+        <svg id="barcode"></svg>
     </div>
+    <div class="hint">Unterstützt Code128 Format</div>
+</div>
 
-    <script>
-        const dataInput = document.getElementById('data-input');
-        const downloadBtn = document.getElementById('download-btn');
-        const clearBtn = document.getElementById('clear-btn');
-        const emptyState = document.getElementById('empty-state');
-        const barcodeContainer = document.getElementById('barcode-container');
-        const barcodeCanvas = document.getElementById('barcode-canvas');
+<!-- Einbindung der JS-Bibliothek für Barcodes -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<script>
+    const input = document.getElementById('barcodeInput');
+    const barcode = document.getElementById('barcode');
 
-        let currentData = '';
-        let debounceTimer = null;
-
-        const renderBarcode = (text) => {
-            if (!text || text.trim() === '') {
-                emptyState.textContent = 'The barcode will appear here';
-                emptyState.style.display = 'block';
-                barcodeContainer.style.display = 'none';
-                downloadBtn.disabled = true;
-                return;
-            }
-
-            try {
-                // Generate CODE128 barcode
-                JsBarcode(barcodeCanvas, text, {
-                    format: "CODE128",
-                    lineColor: "#000000",
-                    background: "#ffffff",
-                    width: 2,
-                    height: 80,
-                    displayValue: true,
-                    margin: 15,
-                    fontSize: 18,
-                    fontOptions: "bold",
-                    textAlign: "center"
-                });
-
-                emptyState.style.display = 'none';
-                barcodeContainer.style.display = 'flex';
-                currentData = text;
-                downloadBtn.disabled = false;
-            } catch (error) {
-                emptyState.textContent = 'Invalid characters for this barcode format.';
-                emptyState.style.display = 'block';
-                barcodeContainer.style.display = 'none';
-                downloadBtn.disabled = true;
-            }
-        };
-
-        const downloadImage = () => {
-            if (!currentData) return;
-            
-            const link = document.createElement('a');
-            link.download = `barcode-${currentData}.png`;
-            link.href = barcodeCanvas.toDataURL('image/png', 1.0);
-            link.click();
-        };
-
-        const resetApp = () => {
-            dataInput.value = '';
-            renderBarcode('');
-            dataInput.focus();
-        };
-
-        // Real-time generation with debounce
-        dataInput.addEventListener('input', () => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                renderBarcode(dataInput.value.trim());
-            }, 250);
+    function generate() {
+        const val = input.value || " ";
+        JsBarcode("#barcode", val, {
+            format: "CODE128",
+            lineColor: "#0d0714",
+            width: 3,
+            height: 100,
+            displayValue: true
         });
+    }
 
-        // Clean EventListeners
-        downloadBtn.addEventListener('click', downloadImage);
-        clearBtn.addEventListener('click', resetApp);
-    </script>
+    input.addEventListener('input', generate);
+    generate();
+</script>
 </body>
 </html>
