@@ -250,7 +250,7 @@
 
         <div class="input-area">
             <div class="input-group">
-                <input id="value" type="number" step="any" value="1" placeholder="Enter value..." />
+                <input id="value" type="number" step="any" value="" placeholder="Enter value..." />
                 <select id="fromUnit"></select>
             </div>
             
@@ -323,6 +323,7 @@
     const historyEl = document.getElementById('history');
 
     let historyData = [];
+    let isRestoring = false; // Flag um Endlosschleifen beim Verlauf-Wiederherstellen zu verhindern
 
     function init() {
         Object.keys(categories).forEach(k => {
@@ -336,11 +337,13 @@
         populateUnits(categoryEl.value);
         buildPresets();
         
-        // Load initial dummy history
-        pushHistory({ cat: "Length", from: "km", to: "m", input: 1, output: "1000" });
+        // Initialer Verlauf ohne Duplikat-Fehler
+        pushHistory({ cat: "Length", from: "km", to: "m", input: 1, output: "1,000" });
         pushHistory({ cat: "Temperature", from: "°C", to: "°F", input: 20, output: "68" });
         
-        doConvert(true);
+        // Beim Start bleibt alles leer, keine automatische Berechnung erzwingen
+        resultValueEl.textContent = '—';
+        resultDetailEl.textContent = 'Ready to convert';
     }
 
     function populateUnits(cat) {
@@ -409,7 +412,7 @@
         const to = toEl.value;
         const val = Number(valueEl.value);
         
-        // Verhindert ein kurzes Umspringen auf "—" wenn ein Minuszeichen getippt wird
+        // Fängt leere Eingaben sowie das Tippen eines einzelnen Minuszeichens sauber ab
         if (valueEl.value === "" || valueEl.value === "-" || isNaN(val)) {
             resultValueEl.textContent = '—';
             resultDetailEl.textContent = 'Ready to convert';
@@ -419,15 +422,16 @@
         const rawResult = convert(cat, from, to, val);
         const formattedStr = showResult(rawResult, val, from, to);
         
-        if (!skipHistory) {
+        if (!skipHistory && !isRestoring) {
             pushHistory({ cat, from, to, input: val, output: formattedStr });
         }
     }
 
     /* History Management */
     function pushHistory(item) {
-        // Ignoriert Duplikate, falls exakt dieselbe Konvertierung direkt hintereinander stattfindet
+        // Robustere Duplikat-Prüfung verhindert doppelte Zeilen
         if (historyData.length > 0 && 
+            historyData[0].cat === item.cat &&
             historyData[0].from === item.from && 
             historyData[0].to === item.to && 
             historyData[0].input === item.input) {
@@ -448,12 +452,14 @@
             d.title = `Restore: ${h.cat}`;
             
             d.addEventListener('click', () => {
+                isRestoring = true; // Blockiert das Hinzufügen eines neuen Verlaufs-Eintrags während des Klicks
                 categoryEl.value = h.cat;
                 populateUnits(h.cat);
                 fromEl.value = h.from;
                 toEl.value = h.to;
                 valueEl.value = h.input;
                 doConvert(true);
+                isRestoring = false;
             });
             historyEl.appendChild(d);
         });
@@ -473,7 +479,7 @@
                 fromEl.value = p.from;
                 toEl.value = p.to;
                 valueEl.value = p.val;
-                doConvert();
+                doConvert(false); // Fügt Presets regulär dem Verlauf hinzu
             });
             presetsEl.appendChild(btn);
         });
@@ -484,7 +490,7 @@
         const temp = fromEl.value; 
         fromEl.value = toEl.value; 
         toEl.value = temp;
-        doConvert();
+        doConvert(false);
     });
 
     categoryEl.addEventListener('change', () => { 
@@ -494,14 +500,21 @@
     
     precisionEl.addEventListener('change', () => doConvert(true));
     valueEl.addEventListener('input', () => doConvert(true));
-    valueEl.addEventListener('blur', () => { if (valueEl.value !== "") doConvert(false); });
+    
+    // Nur in History pushen, wenn das Feld verlassen wird UND sich der Wert vom letzten Verlaufseintrag unterscheidet
+    valueEl.addEventListener('blur', () => { 
+        if (valueEl.value !== "" && valueEl.value !== "-") {
+            doConvert(false); 
+        }
+    });
+
     fromEl.addEventListener('change', () => doConvert(false));
     toEl.addEventListener('change', () => doConvert(false));
 
     valueEl.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             doConvert(false);
-            valueEl.blur();
+            valueEl.blur(); // Triggert blur, wird aber durch unseren Duplikat-Schutz abgefangen
         }
     });
 
