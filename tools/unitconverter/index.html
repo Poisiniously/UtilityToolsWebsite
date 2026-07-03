@@ -36,7 +36,7 @@
             border: 1px solid var(--border);
             border-radius: 24px;
             display: grid;
-            grid-template-columns: 1fr 320px;
+            grid-template-columns: 1fr 340px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             overflow: hidden;
         }
@@ -148,56 +148,43 @@
             padding: 40px 30px;
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 24px;
         }
-        .preset-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .preset-btn {
-            padding: 12px 16px;
-            border-radius: 10px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border);
-            cursor: pointer;
-            color: var(--text);
-            font-weight: 600;
-            text-align: left;
-            transition: all 0.2s ease;
-            font-family: var(--font);
-        }
-        .preset-btn:hover {
-            border-color: var(--primary);
-            background: rgba(255,0,127,0.05);
-            transform: translateX(4px);
+        .history-title {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            margin-bottom: 12px;
         }
         .history-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            max-height: 200px;
+            max-height: 380px;
             overflow-y: auto;
             padding-right: 6px;
         }
-        .history-list::-webkit-scrollbar { width: 4px; }
+        .history-list::-webkit-scrollbar { width: 5px; }
         .history-list::-webkit-scrollbar-track { background: transparent; }
-        .history-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
-        .history-list::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+        .history-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 5px; }
+        .history-list::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
         .hist-item {
-            padding: 12px;
-            border-radius: 10px;
-            background: transparent;
-            border: 1px dashed var(--border);
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.2s ease;
+            line-height: 1.4;
         }
         .hist-item:hover {
             border-color: var(--secondary);
-            color: var(--text);
-            background: rgba(0,240,255,0.05);
+            background: rgba(0,240,255,0.08);
+            transform: translateX(4px);
         }
         @media (max-width: 880px) {
             .card { grid-template-columns: 1fr; }
@@ -245,13 +232,11 @@
             </div>
         </div>
     </div>
+
+    <!-- Side Panel nur mit Verlauf -->
     <div class="side">
         <div>
-            <label>Quick Presets</label>
-            <div class="preset-grid" id="presets"></div>
-        </div>
-        <div>
-            <label>History</label>
+            <div class="history-title">History</div>
             <div class="history-list" id="history"></div>
         </div>
     </div>
@@ -317,17 +302,7 @@
         }
     };
 
-    const presetList = [
-        { label: "km → m", cat: "Length", from: "km", to: "m", val: 5 },
-        { label: "kg → g", cat: "Mass", from: "kg", to: "g", val: 2.5 },
-        { label: "L → mL", cat: "Volume", from: "L", to: "mL", val: 1 },
-        { label: "m³ → cm³", cat: "Volume", from: "m³", to: "cm³", val: 1 },
-        { label: "km³ → m³", cat: "Volume", from: "km³", to: "m³", val: 1 },
-        { label: "°C → K", cat: "Temperature", from: "°C", to: "K", val: 20 },
-        { label: "km/h → m/s", cat: "Speed", from: "km/h", to: "m/s", val: 100 }
-    ];
-
-    // Der Rest des Scripts (unverändert)
+    // DOM Elements
     const categoryEl = document.getElementById('category');
     const fromEl = document.getElementById('fromUnit');
     const toEl = document.getElementById('toUnit');
@@ -336,7 +311,6 @@
     const resultValueEl = document.getElementById('resultValue');
     const resultDetailEl = document.getElementById('resultDetail');
     const precisionEl = document.getElementById('precision');
-    const presetsEl = document.getElementById('presets');
     const historyEl = document.getElementById('history');
 
     let historyData = [];
@@ -352,10 +326,11 @@
        
         categoryEl.value = "Length";
         populateUnits(categoryEl.value);
-        buildPresets();
        
+        // Beispiel-Einträge im Verlauf
         pushHistory({ cat: "Length", from: "km", to: "m", input: 5, output: "5.000" });
         pushHistory({ cat: "Volume", from: "km³", to: "m³", input: 1, output: "1.000.000.000" });
+        pushHistory({ cat: "Mass", from: "kg", to: "g", input: 2.5, output: "2.500" });
        
         resultValueEl.textContent = '—';
         resultDetailEl.textContent = 'Ready to convert';
@@ -440,6 +415,7 @@
     }
 
     function pushHistory(item) {
+        // Doppelte Einträge vermeiden
         if (historyData.length > 0 &&
             historyData[0].cat === item.cat &&
             historyData[0].from === item.from &&
@@ -447,16 +423,21 @@
             historyData[0].input === item.input) return;
 
         historyData.unshift(item);
-        if (historyData.length > 8) historyData.pop();
+        if (historyData.length > 12) historyData.pop(); // Mehr Einträge erlaubt
         renderHistory();
     }
 
     function renderHistory() {
         historyEl.innerHTML = '';
-        historyData.forEach(h => {
+        historyData.forEach((h, index) => {
             const d = document.createElement('div');
             d.className = 'hist-item';
-            d.textContent = `${h.input} ${h.from} → ${h.output} ${h.to}`;
+            d.innerHTML = `
+                <strong>${h.input} ${h.from}</strong><br>
+                <span style="color:var(--secondary)">→ ${h.output} ${h.to}</span>
+            `;
+            d.title = `${h.cat} • Click to restore`;
+           
             d.addEventListener('click', () => {
                 isRestoring = true;
                 categoryEl.value = h.cat;
@@ -471,24 +452,7 @@
         });
     }
 
-    function buildPresets() {
-        presetsEl.innerHTML = '';
-        presetList.forEach(p => {
-            const btn = document.createElement('button');
-            btn.className = 'preset-btn';
-            btn.textContent = p.label;
-            btn.addEventListener('click', () => {
-                categoryEl.value = p.cat;
-                populateUnits(p.cat);
-                fromEl.value = p.from;
-                toEl.value = p.to;
-                valueEl.value = p.val;
-                doConvert(false);
-            });
-            presetsEl.appendChild(btn);
-        });
-    }
-
+    // Event Listeners
     swapBtn.addEventListener('click', () => {
         const temp = fromEl.value;
         fromEl.value = toEl.value;
