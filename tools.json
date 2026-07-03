@@ -1,0 +1,65 @@
+[
+  {
+    "id": "calc",
+    "name": "calculator",
+    "category": "math",
+    "title": "Calculator",
+    "desc": "Simple math calculator",
+    "imageText": "CALC",
+    "url": "tools/calculator/index.html"
+  },
+  {
+    "id": "text",
+    "name": "text cleaner",
+    "category": "text",
+    "title": "Text Cleaner",
+    "desc": "Simple text formatting",
+    "imageText": "TEXT",
+    "url": "tools/textcleaner/index.html"
+  },
+  {
+    "id": "conv",
+    "name": "converter file",
+    "category": "utility",
+    "title": "File Converter",
+    "desc": "Convert files easily",
+    "imageText": "CONV",
+    "url": "tools/file-converter/index.html"
+  },
+  {
+    "id": "qr",
+    "name": "qr code generator",
+    "category": "utility",
+    "title": "QR Generator",
+    "desc": "Generate custom QR codes",
+    "imageText": "QR-GEN",
+    "url": "tools/qr-generator/index.html"
+  },
+  {
+    "id": "barcode",
+    "name": "barcode generator",
+    "category": "utility",
+    "title": "Barcode Gen",
+    "desc": "Create standard barcodes",
+    "imageText": "BARCODE",
+    "url": "tools/barcode-generator/index.html"
+  },
+  {
+    "id": "timer",
+    "name": "timer",
+    "category": "utility",
+    "title": "Timer",
+    "desc": "Countdown & Stopwatch",
+    "imageText": "TIME",
+    "url": "tools/timer/index.html"
+  },
+  {
+    "id": "uc",
+    "name": "Convert Units",
+    "category": "math",
+    "title": "Unit Converter",
+    "desc": "Convert Units",
+    "imageText": "UNIT",
+    "url": "tools/unitconverter/index.html"
+  }
+]
