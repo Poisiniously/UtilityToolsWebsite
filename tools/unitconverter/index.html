@@ -28,67 +28,209 @@
             align-items: center;
         }
 
+        /* Custom Dark Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--background); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
         .card {
             width: 100%;
-            max-width: 800px;
+            max-width: 940px;
             background: var(--surface);
             backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             border-radius: 24px;
-            padding: 40px;
             display: grid;
-            grid-template-columns: 1fr 280px;
-            gap: 30px;
+            grid-template-columns: 1fr 320px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
         }
 
-        /* Reusable UI Components */
-        .title { font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; color: var(--secondary); }
-        
+        .main {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .brand-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin: 0;
+        }
+
+        .brand-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
         input, select {
             width: 100%;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
+            padding: 14px 16px;
+            background: rgba(0,0,0,0.4);
             border: 1px solid var(--border);
             border-radius: 12px;
             color: var(--text);
             font-family: var(--font);
-            margin-bottom: 15px;
+            font-size: 1rem;
             box-sizing: border-box;
+            transition: all 0.3s ease;
         }
 
         input:focus, select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+            box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
+        }
+
+        .input-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .input-group {
+            flex: 1;
+            display: flex;
+            gap: 12px;
         }
 
         .btn {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 14px 20px;
             border-radius: 12px;
             cursor: pointer;
             font-weight: bold;
-            transition: 0.3s;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .btn:hover { filter: brightness(1.2); box-shadow: 0 0 15px var(--primary); }
+        .btn:hover {
+            filter: brightness(1.2);
+            box-shadow: 0 0 15px var(--primary);
+        }
 
-        .side { border-left: 1px solid var(--border); padding-left: 30px; }
-        
+        .btn.secondary {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            color: var(--secondary);
+            padding: 14px;
+        }
+
+        .btn.secondary:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+        }
+
         .result-box {
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(0,0,0,0.2);
+            margin-top: 10px;
+            padding: 24px;
+            background: linear-gradient(90deg, rgba(255,0,127,0.05), transparent);
+            border: 1px solid var(--border);
             border-radius: 16px;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        @media (max-width: 600px) {
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text);
+            transition: opacity 0.2s ease;
+        }
+
+        .result-detail {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 6px;
+        }
+
+        /* Sidebar */
+        .side {
+            background: rgba(0,0,0,0.2);
+            border-left: 1px solid var(--border);
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .preset-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .preset-btn {
+            padding: 12px 16px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            color: var(--text);
+            font-weight: 600;
+            text-align: left;
+            transition: all 0.2s ease;
+            font-family: var(--font);
+        }
+
+        .preset-btn:hover {
+            border-color: var(--primary);
+            background: rgba(255,0,127,0.05);
+            transform: translateX(4px);
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .hist-item {
+            padding: 12px;
+            border-radius: 10px;
+            background: transparent;
+            border: 1px dashed var(--border);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .hist-item:hover {
+            border-color: var(--secondary);
+            color: var(--text);
+            background: rgba(0,240,255,0.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 880px) {
             .card { grid-template-columns: 1fr; }
-            .side { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 20px; }
+            .side { border-left: none; border-top: 1px solid var(--border); padding: 30px; }
+            .input-area { flex-direction: column; align-items: stretch; }
+            .input-group { flex-direction: column; }
         }
     </style>
 </head>
@@ -96,341 +238,266 @@
 
 <div class="card">
     <div class="main">
-        <div class="title">Unit Converter</div>
-        <label>Category</label>
-        <select id="category"></select>
-        
-        <div style="display: flex; gap: 10px;">
-            <input type="number" id="value" value="1">
-            <select id="fromUnit"></select>
+        <div>
+            <h1 class="brand-title">Unit Converter</h1>
+            <div class="brand-subtitle">Premium conversion tool — Utility Hub</div>
         </div>
-        
-        <div style="text-align: center;">→</div>
-        
-        <select id="toUnit"></select>
+
+        <div>
+            <label for="category">Category</label>
+            <select id="category"></select>
+        </div>
+
+        <div class="input-area">
+            <div class="input-group">
+                <input id="value" type="number" step="any" value="1" placeholder="Enter value..." />
+                <select id="fromUnit"></select>
+            </div>
+            
+            <button id="swapBtn" class="btn secondary" title="Swap Units">⇄</button>
+            
+            <div class="input-group">
+                <select id="toUnit"></select>
+            </div>
+        </div>
 
         <div class="result-box">
-            <div id="resultValue" style="font-size: 2rem; font-weight: bold;">—</div>
-            <div id="resultDetail" style="color: var(--text-secondary);">Select units</div>
+            <div>
+                <div class="result-value" id="resultValue">—</div>
+                <div class="result-detail" id="resultDetail">Ready to convert</div>
+            </div>
+            <div style="text-align: right; min-width: 120px;">
+                <label for="precision">Precision</label>
+                <select id="precision" style="padding: 10px;">
+                    <option value="4" selected>4 Decimals</option>
+                    <option value="2">2 Decimals</option>
+                    <option value="0">Integer</option>
+                </select>
+            </div>
         </div>
     </div>
 
     <div class="side">
-        <div class="title" style="font-size: 1rem;">History</div>
-        <div id="history"></div>
+        <div>
+            <label>Quick Presets</label>
+            <div class="preset-grid" id="presets"></div>
+        </div>
+
+        <div>
+            <label>History</label>
+            <div class="history-list" id="history"></div>
+        </div>
     </div>
 </div>
 
 <script>
+    /* -------------------------
+       Conversion Logic & Data
+       ------------------------- */
     const categories = {
-        "Length": { units: { "m": 1, "km": 1000, "cm": 0.01 } },
-        "Mass": { units: { "kg": 1, "g": 0.001 } }
+        "Length": { special: false, units: { "m": 1, "km": 1000, "cm": 0.01, "mm": 0.001, "mi": 1609.344, "ft": 0.3048, "in": 0.0254 } },
+        "Mass": { special: false, units: { "kg": 1, "g": 0.001, "mg": 1e-6, "lb": 0.45359237, "oz": 0.028349523125 } },
+        "Volume": { special: false, units: { "L": 1, "mL": 0.001, "m³": 1000, "cup": 0.24, "gal": 3.785411784 } },
+        "Time": { special: false, units: { "s": 1, "min": 60, "h": 3600, "d": 86400 } },
+        "Data": { special: false, units: { "B": 1, "KB": 1024, "MB": 1024**2, "GB": 1024**3 } },
+        "Temperature": { special: true, units: { "K": "K", "°C": "C", "°F": "F" } }
     };
 
+    const presetList = [
+        { label: "km → m", cat: "Length", from: "km", to: "m", val: 1 },
+        { label: "kg → g", cat: "Mass", from: "kg", to: "g", val: 1 },
+        { label: "°C → °F", cat: "Temperature", from: "°C", to: "°F", val: 20 },
+        { label: "GB → MB", cat: "Data", from: "GB", to: "MB", val: 1 }
+    ];
+
+    /* DOM Elements */
     const categoryEl = document.getElementById('category');
     const fromEl = document.getElementById('fromUnit');
     const toEl = document.getElementById('toUnit');
     const valueEl = document.getElementById('value');
+    const swapBtn = document.getElementById('swapBtn');
     const resultValueEl = document.getElementById('resultValue');
+    const resultDetailEl = document.getElementById('resultDetail');
+    const precisionEl = document.getElementById('precision');
+    const presetsEl = document.getElementById('presets');
+    const historyEl = document.getElementById('history');
+
+    let historyData = [];
 
     function init() {
-        Object.keys(categories).forEach(cat => {
+        Object.keys(categories).forEach(k => {
             const opt = document.createElement('option');
-            opt.value = cat; opt.textContent = cat;
+            opt.value = k; 
+            opt.textContent = k;
             categoryEl.appendChild(opt);
         });
-        updateUnits();
+        
+        categoryEl.value = Object.keys(categories)[0];
+        populateUnits(categoryEl.value);
+        buildPresets();
+        
+        // Load initial dummy history
+        pushHistory({ cat: "Length", from: "km", to: "m", input: 1, output: "1000" });
+        pushHistory({ cat: "Temperature", from: "°C", to: "°F", input: 20, output: "68" });
+        
+        doConvert(true);
     }
 
-    function updateUnits() {
-        const units = Object.keys(categories[categoryEl.value].units);
-        fromEl.innerHTML = toEl.innerHTML = units.map(u => `<option value="${u}">${u}</option>`).join('');
-        convert();
+    function populateUnits(cat) {
+        fromEl.innerHTML = ''; 
+        toEl.innerHTML = '';
+        const currentCategory = categories[cat];
+        
+        Object.keys(currentCategory.units).forEach(u => {
+            const o1 = document.createElement('option'); 
+            o1.value = u; 
+            o1.textContent = u; 
+            fromEl.appendChild(o1);
+            
+            const o2 = o1.cloneNode(true); 
+            toEl.appendChild(o2);
+        });
+        
+        fromEl.value = fromEl.options[0]?.value || '';
+        toEl.value = toEl.options[1]?.value || fromEl.value;
     }
 
-    function convert() {
-        const val = parseFloat(valueEl.value);
-        const from = categories[categoryEl.value].units[fromEl.value];
-        const to = categories[categoryEl.value].units[toEl.value];
-        const res = (val * from) / to;
-        resultValueEl.textContent = isNaN(res) ? "—" : res.toFixed(4);
+    /* Temperature helpers */
+    function tempToK(v, unit) {
+        if (unit === "K") return Number(v);
+        if (unit === "°C") return Number(v) + 273.15;
+        if (unit === "°F") return (Number(v) - 32) * 5/9 + 273.15;
+        return Number(v);
+    }
+    
+    function kToTemp(k, unit) {
+        if (unit === "K") return k;
+        if (unit === "°C") return k - 273.15;
+        if (unit === "°F") return (k - 273.15) * 9/5 + 32;
+        return k;
     }
 
-    [categoryEl, fromEl, toEl, valueEl].forEach(el => el.addEventListener('input', convert));
+    /* Core Conversion */
+    function convert(cat, from, to, val) {
+        if (categories[cat].special) {
+            const kelvin = tempToK(val, from);
+            return kToTemp(kelvin, to);
+        } else {
+            const fromFactor = categories[cat].units[from];
+            const toFactor = categories[cat].units[to];
+            return Number(val) * fromFactor / toFactor;
+        }
+    }
+
+    function showResult(rawVal, val, from, to) {
+        const prec = Number(precisionEl.value);
+        const formatted = Number(rawVal).toLocaleString('en-US', { maximumFractionDigits: prec });
+        
+        resultValueEl.style.opacity = 0;
+        setTimeout(() => {
+            resultValueEl.textContent = formatted;
+            resultValueEl.style.opacity = 1;
+        }, 120);
+        
+        resultDetailEl.textContent = `${val} ${from} → ${to}`;
+        return formatted;
+    }
+
+    function doConvert(skipHistory = false) {
+        const cat = categoryEl.value;
+        const from = fromEl.value;
+        const to = toEl.value;
+        const val = Number(valueEl.value);
+        
+        if (valueEl.value === "" || isNaN(val)) {
+            resultValueEl.textContent = '—';
+            resultDetailEl.textContent = 'Ready to convert';
+            return;
+        }
+        
+        const rawResult = convert(cat, from, to, val);
+        const formattedStr = showResult(rawResult, val, from, to);
+        
+        if (!skipHistory) {
+            pushHistory({ cat, from, to, input: val, output: formattedStr });
+        }
+    }
+
+    /* History Management */
+    function pushHistory(item) {
+        historyData.unshift(item);
+        if (historyData.length > 5) historyData.pop();
+        renderHistory();
+    }
+
+    function renderHistory() {
+        historyEl.innerHTML = '';
+        historyData.forEach(h => {
+            const d = document.createElement('div');
+            d.className = 'hist-item';
+            d.textContent = `${h.input} ${h.from} → ${h.output} ${h.to}`;
+            d.title = `Restore: ${h.cat}`;
+            
+            d.addEventListener('click', () => {
+                categoryEl.value = h.cat;
+                populateUnits(h.cat);
+                fromEl.value = h.from;
+                toEl.value = h.to;
+                valueEl.value = h.input;
+                doConvert(true);
+            });
+            historyEl.appendChild(d);
+        });
+    }
+
+    /* Presets Builder */
+    function buildPresets() {
+        presetsEl.innerHTML = '';
+        presetList.forEach(p => {
+            const btn = document.createElement('button');
+            btn.className = 'preset-btn';
+            btn.textContent = p.label;
+            
+            btn.addEventListener('click', () => {
+                categoryEl.value = p.cat;
+                populateUnits(p.cat);
+                fromEl.value = p.from;
+                toEl.value = p.to;
+                valueEl.value = p.val;
+                doConvert();
+            });
+            presetsEl.appendChild(btn);
+        });
+    }
+
+    /* Event Listeners */
+    swapBtn.addEventListener('click', () => {
+        const temp = fromEl.value; 
+        fromEl.value = toEl.value; 
+        toEl.value = temp;
+        doConvert();
+    });
+
+    categoryEl.addEventListener('change', () => { 
+        populateUnits(categoryEl.value); 
+        doConvert(true); 
+    });
+    
+    precisionEl.addEventListener('change', () => doConvert(true));
+    valueEl.addEventListener('input', () => doConvert(true));
+    valueEl.addEventListener('blur', () => { if (valueEl.value !== "") doConvert(false); });
+    fromEl.addEventListener('change', () => doConvert(false));
+    toEl.addEventListener('change', () => doConvert(false));
+
+    valueEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            doConvert(false);
+            valueEl.blur();
+        }
+    });
+
+    /* Start App */
     init();
-</script>
-</body>
-</html>
-
-
-</style>
-</head>
-<body>
-<div class="wrap">
-  <div class="card" role="application" aria-label="Einfacher Unit Converter">
-    <div class="main">
-      <div class="brand">
-        <div class="logo">UC</div>
-        <div>
-          <div class="title">Unit Converter</div>
-          <div class="subtitle">Extrem einfach zu bedienen — Premium Dark Design</div>
-        </div>
-      </div>
-
-      <div>
-        <label class="muted" style="display:block; margin-bottom:8px;" for="category">Kategorie</label>
-        <select id="category" class="unit-select" style="width:100%;" aria-label="Kategorie auswählen"></select>
-      </div>
-
-      <div class="input-area">
-        <div class="value-input">
-          <div class="input-wrapper">
-            <input id="value" type="number" step="any" value="1" aria-label="Wert eingeben" />
-            <button id="clearInput" class="clear-icon" aria-label="Eingabe löschen" title="Löschen">✕</button>
-          </div>
-          <select id="fromUnit" class="unit-select" aria-label="Von Einheit"></select>
-        </div>
-        <div style="display:flex; justify-content:center;">
-          <button id="swap" class="btn secondary" style="padding: 16px 20px;" title="Tauschen" aria-label="Tauschen">⇄</button>
-        </div>
-        <div>
-          <select id="toUnit" class="unit-select" aria-label="Nach Einheit"></select>
-        </div>
-      </div>
-
-      <div class="result" id="resultCard" aria-live="polite">
-        <div>
-          <div class="big" id="resultValue">—</div>
-          <div class="small" id="resultDetail">—</div>
-        </div>
-        <div style="text-align:right">
-          <div class="muted" style="margin-bottom:6px;">Genauigkeit</div>
-          <select id="precision" class="unit-select" style="padding: 8px 12px; width:110px; font-size:13px;" aria-label="Genauigkeit">
-            <option value="4" selected>4 Dez.</option>
-            <option value="2">2 Dez.</option>
-            <option value="0">Ganzzahl</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="side" aria-hidden="false">
-      <div>
-        <div class="section-title">Schnellvorlagen</div>
-        <div class="preset-grid" id="presets">
-          </div>
-      </div>
-
-      <div>
-        <div class="section-title">Verlauf</div>
-        <div class="history" id="history" aria-label="Verlauf">
-          </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-/* -------------------------
-   Vereinfachte Unit-Logik
-   ------------------------- */
-
-const categories = {
-  "Länge": { base:"m", units: { "m":1, "km":1000, "cm":0.01, "mm":0.001, "mi":1609.344, "ft":0.3048, "in":0.0254 } },
-  "Masse": { base:"kg", units: { "kg":1, "g":0.001, "mg":1e-6, "lb":0.45359237, "oz":0.028349523125 } },
-  "Volumen": { base:"L", units: { "L":1, "mL":0.001, "m³":1000, "cup":0.24, "gal":3.785411784 } },
-  "Zeit": { base:"s", units: { "s":1, "min":60, "h":3600, "d":86400 } },
-  "Daten": { base:"B", units: { "B":1, "KB":1024, "MB":1024**2, "GB":1024**3 } },
-  "Temperatur": { special:true, units: { "K":"K", "°C":"C", "°F":"F" } }
-};
-
-/* DOM */
-const categoryEl = document.getElementById('category');
-const fromEl = document.getElementById('fromUnit');
-const toEl = document.getElementById('toUnit');
-const valueEl = document.getElementById('value');
-const clearInputBtn = document.getElementById('clearInput');
-const swapBtn = document.getElementById('swap');
-const resultValueEl = document.getElementById('resultValue');
-const resultDetailEl = document.getElementById('resultDetail');
-const precisionEl = document.getElementById('precision');
-const presetsEl = document.getElementById('presets');
-const historyEl = document.getElementById('history');
-
-/* Populate category and units */
-function init(){
-  categoryEl.innerHTML = '';
-  Object.keys(categories).forEach((k, i) => {
-    const o = document.createElement('option');
-    o.value = k; o.textContent = k;
-    categoryEl.appendChild(o);
-  });
-  categoryEl.value = Object.keys(categories)[0];
-  populateUnits(categoryEl.value);
-  buildPresets();
-  doConvert(true);
-}
-function populateUnits(cat){
-  fromEl.innerHTML = ''; toEl.innerHTML = '';
-  const c = categories[cat];
-  Object.keys(c.units).forEach(u=>{
-    const o1 = document.createElement('option'); o1.value = u; o1.textContent = u; fromEl.appendChild(o1);
-    const o2 = o1.cloneNode(true); toEl.appendChild(o2);
-  });
-  fromEl.value = fromEl.options[0]?.value || '';
-  toEl.value = toEl.options[1]?.value || fromEl.value;
-}
-
-/* Temperature helpers */
-function tempToK(v, unit){
-  if(unit === "K") return Number(v);
-  if(unit === "°C") return Number(v) + 273.15;
-  if(unit === "°F") return (Number(v) - 32) * 5/9 + 273.15;
-  return Number(v);
-}
-function kToTemp(k, unit){
-  if(unit === "K") return k;
-  if(unit === "°C") return k - 273.15;
-  if(unit === "°F") return (k - 273.15) * 9/5 + 32;
-  return k;
-}
-
-/* Convert */
-function convert(cat, from, to, val){
-  if(categories[cat].special){
-    const k = tempToK(val, from);
-    return kToTemp(k, to);
-  } else {
-    const c = categories[cat];
-    const fromF = c.units[from];
-    const toF = c.units[to];
-    return Number(val) * fromF / toF;
-  }
-}
-
-/* Simple animate number (fade) */
-function showResult(raw){
-  const prec = Number(precisionEl.value);
-  const formatted = Number(raw).toLocaleString('de-DE', {maximumFractionDigits:prec});
-  resultValueEl.style.opacity = 0;
-  setTimeout(()=> {
-    resultValueEl.textContent = formatted;
-    resultValueEl.style.opacity = 1;
-  }, 120);
-}
-
-/* History */
-let history = [];
-function pushHistory(item){
-  history.unshift(item);
-  if(history.length > 5) history.pop(); 
-  renderHistory();
-}
-function renderHistory(){
-  historyEl.innerHTML = '';
-  history.forEach(h=>{
-    const d = document.createElement('div');
-    d.className = 'hist-item';
-    d.textContent = `${h.input} ${h.from} → ${h.output} ${h.to}`;
-    d.title = `${h.input} ${h.from} → ${h.output} ${h.to} (${h.cat})`;
-    d.addEventListener('click', ()=> {
-      categoryEl.value = h.cat;
-      populateUnits(h.cat);
-      fromEl.value = h.from;
-      toEl.value = h.to;
-      valueEl.value = h.input;
-      doConvert(true);
-    });
-    historyEl.appendChild(d);
-  });
-}
-
-/* Presets */
-const presetList = [
-  {label:"km → m", cat:"Länge", from:"km", to:"m", val:1},
-  {label:"kg → g", cat:"Masse", from:"kg", to:"g", val:1},
-  {label:"°C → °F", cat:"Temperatur", from:"°C", to:"°F", val:20},
-  {label:"GB → MB", cat:"Daten", from:"GB", to:"MB", val:1}
-];
-function buildPresets(){
-  presetsEl.innerHTML = '';
-  presetList.forEach(p=>{
-    const b = document.createElement('div');
-    b.className = 'preset';
-    b.textContent = p.label;
-    b.addEventListener('click', ()=>{
-      categoryEl.value = p.cat;
-      populateUnits(p.cat);
-      fromEl.value = p.from;
-      toEl.value = p.to;
-      valueEl.value = p.val;
-      doConvert(); 
-    });
-    presetsEl.appendChild(b);
-  });
-}
-
-/* Main convert flow */
-function doConvert(skipHistory){
-  const cat = categoryEl.value;
-  const from = fromEl.value;
-  const to = toEl.value;
-  const val = Number(valueEl.value);
-  
-  if(valueEl.value === "" || isNaN(val)){ 
-      resultValueEl.textContent = '—'; 
-      resultDetailEl.textContent = 'Bereit zur Eingabe'; 
-      return; 
-  }
-  
-  const raw = convert(cat, from, to, val);
-  showResult(raw);
-  resultDetailEl.textContent = `${val} ${from} → ${to}`;
-  
-  if(!skipHistory){
-    pushHistory({cat, from, to, input:val, output: Number(raw).toLocaleString('de-DE', {maximumFractionDigits:Number(precisionEl.value)})});
-  }
-}
-
-/* Events */
-swapBtn.addEventListener('click', ()=>{
-  const a = fromEl.value; fromEl.value = toEl.value; toEl.value = a;
-  doConvert();
-});
-
-clearInputBtn.addEventListener('click', ()=>{
-  valueEl.value = '';
-  doConvert(true);
-  valueEl.focus();
-});
-
-categoryEl.addEventListener('change', ()=> { populateUnits(categoryEl.value); doConvert(true); });
-precisionEl.addEventListener('change', ()=> doConvert(true));
-
-// Konvertiere während des Tippens (überspringt den Verlauf, um ihn nicht zu spammen)
-valueEl.addEventListener('input', ()=> doConvert(true));
-
-// Speichere im Verlauf, wenn das Feld verlassen wird
-valueEl.addEventListener('blur', ()=> { if(valueEl.value !== "") doConvert(false) });
-
-fromEl.addEventListener('change', ()=> doConvert());
-toEl.addEventListener('change', ()=> doConvert());
-
-/* Keyboard: Enter to log history */
-valueEl.addEventListener('keydown', (e)=> { 
-    if(e.key === 'Enter') {
-        doConvert(false);
-        valueEl.blur(); // Nimmt den Fokus weg und visualisiert die Bestätigung
-    }
-});
-
-/* Initialize UI */
-init();
-
-/* Pre-fill history items */
-pushHistory({cat:"Länge", from:"km", to:"m", input:1, output:"1000"});
-pushHistory({cat:"Temperatur", from:"°C", to:"°F", input:20, output:"68"});
-pushHistory({cat:"Daten", from:"GB", to:"MB", input:1, output:"1024"});
 </script>
 </body>
 </html>
