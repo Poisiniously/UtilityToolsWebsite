@@ -274,8 +274,8 @@
         "Chemistry": {
             units: {
                 "mol": 1, "mmol": 0.001, "µmol": 1e-6, "nmol": 1e-9,
-                "M": 1, "mM": 0.001, "µM": 1e-6, "nM": 1e-9,   // Konzentration (mol/L)
-                "L/mol": 1, "mL/mol": 0.001                     // Molarvolumen
+                "M": 1, "mM": 0.001, "µM": 1e-6, "nM": 1e-9,
+                "L/mol": 1, "mL/mol": 0.001
             }
         },
         "Mass": { 
@@ -316,7 +316,6 @@
         }
     };
 
-    // DOM Elements
     const categoryEl = document.getElementById('category');
     const fromEl = document.getElementById('fromUnit');
     const toEl = document.getElementById('toUnit');
@@ -341,9 +340,7 @@
         categoryEl.value = "Length";
         populateUnits(categoryEl.value);
        
-        // Beispiel-Einträge
         pushHistory({ cat: "Length", from: "ly", to: "pc", input: 1, output: "0,3066" });
-        pushHistory({ cat: "Chemistry", from: "mol", to: "mmol", input: 0.5, output: "500" });
         pushHistory({ cat: "Chemistry", from: "M", to: "mM", input: 1, output: "1.000" });
        
         resultValueEl.textContent = '—';
@@ -412,16 +409,17 @@
         const cat = categoryEl.value;
         const from = fromEl.value;
         const to = toEl.value;
-        const val = Number(valueEl.value);
+        
+        let val = valueEl.value.trim() === "" ? 1 : Number(valueEl.value);
        
-        if (valueEl.value === "" || isNaN(val)) {
+        if (isNaN(val)) {
             resultValueEl.textContent = '—';
             resultDetailEl.textContent = 'Ready to convert';
             return;
         }
        
         const rawResult = convert(cat, from, to, val);
-        const formattedStr = showResult(rawResult, val, from, to);
+        const formattedStr = showResult(rawResult, val === 1 && valueEl.value === "" ? "" : val, from, to);
        
         if (!skipHistory && !isRestoring) {
             pushHistory({ cat, from, to, input: val, output: formattedStr });
