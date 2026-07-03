@@ -1,49 +1,48 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barcode Generator</title>
-    <script src=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <style>
         :root {
-            --bg-main: #0c0812;
-            --bg-panel: #180e25;
-            --border-color: #26163a;
-            --text-main: #f3effa;
-            --text-muted: #6e568b;
-            --accent-pink: #d61c59;
-            --accent-hover: #fa2a73;
-            --btn-dark: #1f1230;
-            --btn-dark-border: #361f54;
+            --background: #0d0714;
+            --surface: rgba(26, 12, 38, 0.65);
+            --primary: #ff007f;
+            --secondary: #00f0ff;
+            --text: #f4f4ff;
+            --text-secondary: #a0a0c0;
+            --border: rgba(255, 255, 255, 0.08);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Outfit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: var(--bg-main);
-            color: var(--text-main);
+            background: transparent;
+            color: var(--text);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            overflow: hidden; /* Verhindert das Scrollen der Seite */
+            overflow: hidden; 
         }
 
         .app {
             width: 100%;
             max-width: 600px;
-            background: var(--bg-panel);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
             padding: 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
         h2 {
@@ -54,39 +53,53 @@
 
         .subtitle {
             text-align: center;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             margin-bottom: 25px;
             font-size: 0.95rem;
         }
 
         .preview {
             width: 100%;
-            min-height: 320px;
+            min-height: 240px;
             padding: 30px;
             margin-bottom: 25px;
-            border: 2px dashed var(--btn-dark-border);
-            border-radius: 8px;
-            background: #08050c;
+            border: 2px dashed var(--border);
+            border-radius: 18px;
+            background: rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            transition: .25s;
+            transition: border-color 0.3s ease, background 0.3s ease;
         }
 
         .preview:hover {
-            border-color: var(--accent-pink);
-            background: #120a1c;
+            border-color: var(--primary);
+            background: rgba(255, 0, 127, 0.05);
         }
 
         .empty-state {
-            color: var(--text-muted);
+            color: var(--text-secondary);
             font-size: 0.95rem;
             text-align: center;
         }
 
-        .preview:hover #qrcode {
+        #barcode-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .preview:hover #barcode-container {
             transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
         }
 
         .input-group {
@@ -96,27 +109,26 @@
         label {
             display: block;
             margin-bottom: 8px;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             font-size: 0.9rem;
             font-weight: bold;
         }
 
-        textarea {
+        input[type="text"] {
             width: 100%;
-            height: 120px;
-            padding: 14px;
-            background: #08050c;
-            color: var(--text-main);
-            border: 1px solid var(--btn-dark-border);
-            border-radius: 8px;
-            font-size: .95rem;
-            resize: none;
-            transition: .25s;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 1.05rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            outline: none;
         }
 
-        textarea:focus {
-            outline: none;
-            border-color: var(--accent-pink);
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
         }
 
         .controls {
@@ -127,39 +139,39 @@
 
         button {
             width: 100%;
-            padding: 12px;
-            border-radius: 6px;
+            padding: 14px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: .95rem;
+            font-size: 0.95rem;
             font-weight: bold;
-            transition: .2s;
+            transition: all 0.2s ease;
             border: none;
         }
 
         .btn-clear {
-            background: var(--btn-dark);
-            color: var(--text-main);
-            border: 1px solid var(--btn-dark-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border: 1px solid var(--border);
         }
 
         .btn-clear:hover {
-            background: var(--border-color);
-            border-color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--text-secondary);
         }
 
         .btn-download {
-            background: var(--accent-pink);
-            color: white;
+            background: var(--primary);
+            color: #ffffff;
         }
 
         .btn-download:hover:not(:disabled) {
-            background: var(--accent-hover);
-            box-shadow: 0 0 12px rgba(214,28,89,.4);
+            background: #ff3399;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
         }
 
         .btn-download:disabled {
-            background: #2a1123;
-            color: #553444;
+            background: rgba(255, 0, 127, 0.2);
+            color: rgba(255, 255, 255, 0.4);
             cursor: not-allowed;
             box-shadow: none;
         }
@@ -168,29 +180,101 @@
 <body>
     <div class="app">
         <h2>Barcode Generator</h2>
-        <p class="subtitle">Der Barcode wird live beim Tippen generiert.</p>
+        <p class="subtitle">The barcode is generated live while typing.</p>
 
         <div class="preview">
-            <div id="qrcode-container">
-                <div id="qrcode"></div>
+            <div id="barcode-container">
+                <canvas id="barcode-canvas"></canvas>
             </div>
-            <div id="empty" class="empty-state">
-                Der Barcode erscheint hier
+            <div id="empty-state" class="empty-state">
+                The barcode will appear here
             </div>
         </div>
 
         <div class="input-group">
-            <label for="text">Text oder URL</label>
-            <textarea id="text" placeholder="Gib hier den Text oder die URL ein, die in den QR-Code soll..."></textarea>
+            <label for="data-input">Barcode Data (Alphanumeric)</label>
+            <input type="text" id="data-input" placeholder="Enter text or numbers..." autocomplete="off" />
         </div>
 
         <div class="controls">
-            <button onclick="clearInput()" class="btn-clear">Löschen</button>
-            <button onclick="downloadQR()" class="btn-download" id="downloadBtn" disabled>Download as png</button>
+            <button id="clear-btn" class="btn-clear">Clear</button>
+            <button id="download-btn" class="btn-download" disabled>Download PNG</button>
         </div>
     </div>
 
     <script>
+        const dataInput = document.getElementById('data-input');
+        const downloadBtn = document.getElementById('download-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const emptyState = document.getElementById('empty-state');
+        const barcodeContainer = document.getElementById('barcode-container');
+        const barcodeCanvas = document.getElementById('barcode-canvas');
+
+        let currentData = '';
+        let debounceTimer = null;
+
+        const renderBarcode = (text) => {
+            if (!text || text.trim() === '') {
+                emptyState.textContent = 'The barcode will appear here';
+                emptyState.style.display = 'block';
+                barcodeContainer.style.display = 'none';
+                downloadBtn.disabled = true;
+                return;
+            }
+
+            try {
+                // Generate CODE128 barcode
+                JsBarcode(barcodeCanvas, text, {
+                    format: "CODE128",
+                    lineColor: "#000000",
+                    background: "#ffffff",
+                    width: 2,
+                    height: 80,
+                    displayValue: true,
+                    margin: 15,
+                    fontSize: 18,
+                    fontOptions: "bold",
+                    textAlign: "center"
+                });
+
+                emptyState.style.display = 'none';
+                barcodeContainer.style.display = 'flex';
+                currentData = text;
+                downloadBtn.disabled = false;
+            } catch (error) {
+                emptyState.textContent = 'Invalid characters for this barcode format.';
+                emptyState.style.display = 'block';
+                barcodeContainer.style.display = 'none';
+                downloadBtn.disabled = true;
+            }
+        };
+
+        const downloadImage = () => {
+            if (!currentData) return;
+            
+            const link = document.createElement('a');
+            link.download = `barcode-${currentData}.png`;
+            link.href = barcodeCanvas.toDataURL('image/png', 1.0);
+            link.click();
+        };
+
+        const resetApp = () => {
+            dataInput.value = '';
+            renderBarcode('');
+            dataInput.focus();
+        };
+
+        // Real-time generation with debounce
+        dataInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                renderBarcode(dataInput.value.trim());
+            }, 250);
+        });
+
+        // Clean EventListeners
+        downloadBtn.addEventListener('click', downloadImage);
+        clearBtn.addEventListener('click', resetApp);
     </script>
 </body>
 </html>
