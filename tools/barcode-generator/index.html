@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Generator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <title>Barcode Generator</title>
+    <script src=""></script>
     <style>
         :root {
             --bg-main: #0c0812;
@@ -83,15 +83,6 @@
             color: var(--text-muted);
             font-size: 0.95rem;
             text-align: center;
-        }
-
-        #qrcode {
-            background: white;
-            padding: 18px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s ease;
-            display: inline-block;
         }
 
         .preview:hover #qrcode {
@@ -176,15 +167,15 @@
 </head>
 <body>
     <div class="app">
-        <h2>QR Code Generator</h2>
-        <p class="subtitle">Der QR-Code wird live beim Tippen generiert.</p>
+        <h2>Barcode Generator</h2>
+        <p class="subtitle">Der Barcode wird live beim Tippen generiert.</p>
 
         <div class="preview">
             <div id="qrcode-container">
                 <div id="qrcode"></div>
             </div>
             <div id="empty" class="empty-state">
-                Der QR-Code erscheint hier
+                Der Barcode erscheint hier
             </div>
         </div>
 
@@ -195,78 +186,11 @@
 
         <div class="controls">
             <button onclick="clearInput()" class="btn-clear">Löschen</button>
-            <button onclick="downloadQR()" class="btn-download" id="downloadBtn" disabled>Als PNG herunterladen</button>
+            <button onclick="downloadQR()" class="btn-download" id="downloadBtn" disabled>Download as png</button>
         </div>
     </div>
 
     <script>
-        let qrcodeInstance = null;
-        let currentText = '';
-        
-        const textarea = document.getElementById('text');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const emptyState = document.getElementById('empty');
-        const qrcodeContainer = document.getElementById('qrcode-container');
-        
-        function generateQR(text) {
-            if (!text || text.trim() === '') {
-                emptyState.style.display = 'block';
-                qrcodeContainer.style.display = 'none';
-                downloadBtn.disabled = true;
-                return;
-            }
-            
-            emptyState.style.display = 'none';
-            qrcodeContainer.style.display = 'block';
-            
-            const qrDiv = document.getElementById('qrcode');
-            qrDiv.innerHTML = '';
-            
-            qrcodeInstance = new QRCode(qrDiv, {
-                text: text,
-                width: 240,
-                height: 240,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-            
-            currentText = text;
-            downloadBtn.disabled = false;
-        }
-        
-        // Live Update mit Debounce
-        let timeout = null;
-        textarea.addEventListener('input', () => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                generateQR(textarea.value.trim());
-            }, 250);
-        });
-        
-        function downloadQR() {
-            if (!currentText) return;
-            
-            const canvas = document.querySelector('#qrcode canvas');
-            if (!canvas) return;
-            
-            const link = document.createElement('a');
-            link.download = 'qrcode.png';
-            link.href = canvas.toDataURL('image/png', 1.0);
-            link.click();
-        }
-        
-        function clearInput() {
-            textarea.value = '';
-            generateQR('');
-            textarea.focus();
-        }
-        
-        // Initialzustand
-        window.onload = () => {
-            emptyState.style.display = 'block';
-            qrcodeContainer.style.display = 'none';
-        };
     </script>
 </body>
 </html>
