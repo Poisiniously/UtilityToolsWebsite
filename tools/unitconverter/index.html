@@ -267,8 +267,13 @@
         },
         "Volume": { 
             units: { 
-                "m³": 1, "dm³": 0.001, "L": 0.001, "dm³": 0.001,
-                "cm³": 1e-6, "mL": 1e-6, "mm³": 1e-9 
+                "m³": 1, 
+                "km³": 1000000000,
+                "dm³": 0.001, 
+                "L": 0.001,
+                "cm³": 0.000001, 
+                "mL": 0.000001, 
+                "mm³": 0.000000001 
             } 
         },
         "Time": { 
@@ -317,11 +322,12 @@
         { label: "kg → g", cat: "Mass", from: "kg", to: "g", val: 2.5 },
         { label: "L → mL", cat: "Volume", from: "L", to: "mL", val: 1 },
         { label: "m³ → cm³", cat: "Volume", from: "m³", to: "cm³", val: 1 },
+        { label: "km³ → m³", cat: "Volume", from: "km³", to: "m³", val: 1 },
         { label: "°C → K", cat: "Temperature", from: "°C", to: "K", val: 20 },
         { label: "km/h → m/s", cat: "Speed", from: "km/h", to: "m/s", val: 100 }
     ];
 
-    // Der Rest des Scripts bleibt gleich
+    // Der Rest des Scripts (unverändert)
     const categoryEl = document.getElementById('category');
     const fromEl = document.getElementById('fromUnit');
     const toEl = document.getElementById('toUnit');
@@ -348,8 +354,8 @@
         populateUnits(categoryEl.value);
         buildPresets();
        
-        pushHistory({ cat: "Length", from: "km", to: "m", input: 5, output: "5,000" });
-        pushHistory({ cat: "Volume", from: "L", to: "mL", input: 1, output: "1,000" });
+        pushHistory({ cat: "Length", from: "km", to: "m", input: 5, output: "5.000" });
+        pushHistory({ cat: "Volume", from: "km³", to: "m³", input: 1, output: "1.000.000.000" });
        
         resultValueEl.textContent = '—';
         resultDetailEl.textContent = 'Ready to convert';
@@ -483,7 +489,6 @@
         });
     }
 
-    // Events
     swapBtn.addEventListener('click', () => {
         const temp = fromEl.value;
         fromEl.value = toEl.value;
