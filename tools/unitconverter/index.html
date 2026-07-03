@@ -409,7 +409,8 @@
         const to = toEl.value;
         const val = Number(valueEl.value);
         
-        if (valueEl.value === "" || isNaN(val)) {
+        // Verhindert ein kurzes Umspringen auf "—" wenn ein Minuszeichen getippt wird
+        if (valueEl.value === "" || valueEl.value === "-" || isNaN(val)) {
             resultValueEl.textContent = '—';
             resultDetailEl.textContent = 'Ready to convert';
             return;
@@ -425,6 +426,14 @@
 
     /* History Management */
     function pushHistory(item) {
+        // Ignoriert Duplikate, falls exakt dieselbe Konvertierung direkt hintereinander stattfindet
+        if (historyData.length > 0 && 
+            historyData[0].from === item.from && 
+            historyData[0].to === item.to && 
+            historyData[0].input === item.input) {
+            return; 
+        }
+
         historyData.unshift(item);
         if (historyData.length > 5) historyData.pop();
         renderHistory();
