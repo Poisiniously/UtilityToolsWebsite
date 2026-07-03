@@ -62,4 +62,14 @@
     "imageText": "UNIT",
     "url": "tools/unitconverter/index.html"
   }
+
+   {
+    "id": "dr",
+    "name": "Dino Runner",
+    "category": "game",
+    "title": "Dino Runner",
+    "desc": "RAAAAR",
+    "imageText": "DINO",
+    "url": "tools/dino/index.html"
+  }
 ]
