@@ -22,15 +22,17 @@
             background: var(--background);
             color: var(--text);
             font-family: var(--font);
-            min-height: 100vh;
+            height: 100vh; /* Fest auf Bildschirmhöhe */
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden; /* Verhindert das Scrollen des gesamten Fensters */
         }
 
         .card {
             width: 100%;
             max-width: 940px;
+            max-height: 90vh; /* Verhindert, dass die Karte zu hoch wird */
             background: var(--surface);
             backdrop-filter: blur(20px);
             border: 1px solid var(--border);
@@ -38,7 +40,7 @@
             display: grid;
             grid-template-columns: 1fr 320px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            overflow: hidden;
+            overflow: hidden; /* Innerhalb der Karte darf nichts rausragen */
         }
 
         .main {
