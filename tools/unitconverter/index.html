@@ -233,7 +233,6 @@
         </div>
     </div>
 
-    <!-- Side Panel nur mit Verlauf -->
     <div class="side">
         <div>
             <div class="history-title">History</div>
@@ -245,10 +244,19 @@
 <script>
     const categories = {
         "Length": { 
-            units: { "m": 1, "km": 1000, "dm": 0.1, "cm": 0.01, "mm": 0.001, "µm": 1e-6, "nm": 1e-9 } 
+            units: { 
+                "m": 1, "km": 1000, "dm": 0.1, "cm": 0.01, "mm": 0.001, "µm": 1e-6, "nm": 1e-9,
+                "ly": 9.46073e15, "kly": 9.46073e18, "Mly": 9.46073e21,
+                "pc": 3.08568e16, "kpc": 3.08568e19, "Mpc": 3.08568e22,
+                "AU": 1.495978707e11 
+            } 
         },
-        "Mass": { 
-            units: { "kg": 1, "g": 0.001, "mg": 1e-6, "µg": 1e-9, "t": 1000 } 
+        "Area": { 
+            units: { 
+                "m²": 1, "km²": 1000000, "dm²": 0.01, "cm²": 0.0001, 
+                "mm²": 0.000001, "ha": 10000,
+                "ly²": 8.95e31, "pc²": 9.52e32 
+            } 
         },
         "Volume": { 
             units: { 
@@ -258,8 +266,13 @@
                 "L": 0.001,
                 "cm³": 0.000001, 
                 "mL": 0.000001, 
-                "mm³": 0.000000001 
+                "mm³": 0.000000001,
+                "ly³": 8.47e47, 
+                "pc³": 2.94e49 
             } 
+        },
+        "Mass": { 
+            units: { "kg": 1, "g": 0.001, "mg": 1e-6, "µg": 1e-9, "t": 1000 } 
         },
         "Time": { 
             units: { 
@@ -270,12 +283,6 @@
         "Speed": { 
             units: { 
                 "m/s": 1, "km/h": 1000/3600, "km/s": 1000, "cm/s": 0.01 
-            } 
-        },
-        "Area": { 
-            units: { 
-                "m²": 1, "km²": 1000000, "dm²": 0.01, "cm²": 0.0001, 
-                "mm²": 0.000001, "ha": 10000 
             } 
         },
         "Pressure": { 
@@ -327,10 +334,10 @@
         categoryEl.value = "Length";
         populateUnits(categoryEl.value);
        
-        // Beispiel-Einträge im Verlauf
+        // Beispiel-Einträge
+        pushHistory({ cat: "Length", from: "ly", to: "pc", input: 1, output: "0,3066" });
         pushHistory({ cat: "Length", from: "km", to: "m", input: 5, output: "5.000" });
         pushHistory({ cat: "Volume", from: "km³", to: "m³", input: 1, output: "1.000.000.000" });
-        pushHistory({ cat: "Mass", from: "kg", to: "g", input: 2.5, output: "2.500" });
        
         resultValueEl.textContent = '—';
         resultDetailEl.textContent = 'Ready to convert';
@@ -415,7 +422,6 @@
     }
 
     function pushHistory(item) {
-        // Doppelte Einträge vermeiden
         if (historyData.length > 0 &&
             historyData[0].cat === item.cat &&
             historyData[0].from === item.from &&
@@ -423,13 +429,13 @@
             historyData[0].input === item.input) return;
 
         historyData.unshift(item);
-        if (historyData.length > 12) historyData.pop(); // Mehr Einträge erlaubt
+        if (historyData.length > 12) historyData.pop();
         renderHistory();
     }
 
     function renderHistory() {
         historyEl.innerHTML = '';
-        historyData.forEach((h, index) => {
+        historyData.forEach((h) => {
             const d = document.createElement('div');
             d.className = 'hist-item';
             d.innerHTML = `
