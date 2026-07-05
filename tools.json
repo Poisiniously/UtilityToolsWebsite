@@ -61,9 +61,8 @@
     "desc": "Convert Units",
     "imageText": "UNIT",
     "url": "tools/unitconverter/index.html"
-  }
-
-   {
+  },
+  {
     "id": "dr",
     "name": "Dino Runner",
     "category": "game",
