@@ -1,193 +1,345 @@
 <!DOCTYPE html>
-
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>Dino Runner</title>
-<style>
-body {
-  margin:0;
-  overflow:hidden;
-  background:#f7f7f7;
-  font-family:sans-serif;
-}
-canvas {
-  display:block;
-}
-#ui {
-  position:absolute;
-  top:10px;
-  left:10px;
-  color:#333;
-}
-#gameover {
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  font-size:30px;
-  display:none;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Immersive Dark Runner - Relaxed Start</title>
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at center, #111115 0%, #040406 100%);
+            --panel-bg: rgba(255, 255, 255, 0.01);
+            --border-color: rgba(255, 255, 255, 0.04);
+            --text-primary: #f8fafc;
+            --text-secondary: #64748b;
+            --accent-glow: rgba(167, 139, 250, 0.15);
+            --accent-color: #a78bfa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 40px;
+        }
+
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 200;
+            letter-spacing: -1px;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .header-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 300;
+            text-align: center;
+        }
+
+        .workspace {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 40px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), inset 0 0 40px rgba(167, 139, 250, 0.02);
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            padding: 40px;
+        }
+
+        .canvas-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 20px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .score-display {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 1.5rem;
+            font-weight: 200;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 2px;
+            color: var(--text-primary);
+        }
+
+        .high-score {
+            color: var(--text-secondary);
+            margin-right: 15px;
+        }
+
+        .message {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 25px;
+            border-radius: 50px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            transition: opacity 0.3s ease;
+        }
+
+        .hidden {
+            opacity: 0;
+        }
+    </style>
 </head>
 <body>
 
-<div id="ui">
-Score: <span id="score">0</span><br>
-Highscore: <span id="high">0</span>
-</div>
+    <h1 class="header-title">Neon Dash</h1>
+    <p class="header-subtitle">Kurz tippen = kleiner Sprung | Gedrückt halten = hoher Sprung</p>
 
-<div id="gameover">GAME OVER<br><small>Drücke R zum Neustarten</small></div>
+    <div class="workspace">
+        <div class="canvas-container">
+            <canvas id="gameCanvas" width="800" height="300"></canvas>
+            
+            <div class="ui-layer">
+                <div class="score-display">
+                    <span class="high-score" id="highScoreEl">HI 00000</span>
+                    <span id="scoreEl">00000</span>
+                </div>
+                <div class="message" id="messageEl">Leertaste drücken zum Starten</div>
+            </div>
+        </div>
+    </div>
 
-<canvas id="game"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('scoreEl');
+        const highScoreEl = document.getElementById('highScoreEl');
+        const messageEl = document.getElementById('messageEl');
 
-<script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+        let isPlaying = false;
+        let isGameOver = false;
+        let score = 0;
+        let highScore = localStorage.getItem('neonDashHighScore') || 0;
+        
+        // DEUTLICH langsamere Startgeschwindigkeit
+        let gameSpeed = 3.5; 
+        let spawnTimer = 0;
+        let animationId;
 
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+        highScoreEl.textContent = `HI ${String(Math.floor(highScore)).padStart(5, '0')}`;
 
-// GAME STATE
-let groundY = canvas.height - 100;
-let gravity = 0.6;
-let velocity = 0;
-let jumpForce = -12;
+        const gravity = 0.55; 
+        const groundY = canvas.height - 40; 
 
-let dino = {
-  x:100,
-  y:groundY,
-  w:40,
-  h:40
-};
+        const player = {
+            x: 60,
+            y: groundY - 30,
+            width: 30,
+            height: 30,
+            dy: 0,
+            jumpForce: -11.5,
+            isGrounded: true,
+            color: '#a78bfa', 
+            glow: 'rgba(167, 139, 250, 0.6)'
+        };
 
-let obstacles = [];
-let speed = 6;
-let score = 0;
-let high = localStorage.high || 0;
-document.getElementById("high").innerText = high;
+        let obstacles = [];
+        const obstacleColor = '#f87171'; 
+        const obstacleGlow = 'rgba(239, 68, 68, 0.5)';
+        
+        let keys = {};
 
-let running = true;
+        window.addEventListener('keydown', (e) => {
+            if(e.code === 'Space') e.preventDefault(); 
+            keys[e.code] = true;
 
-// INPUT
-document.addEventListener("keydown", e=>{
-  if((e.key===" " || e.key==="ArrowUp") && dino.y >= groundY){
-    velocity = jumpForce;
-  }
-  if(e.key==="r" && !running){
-    restart();
-  }
-});
+            if ((e.code === 'Space' || e.code === 'ArrowUp')) {
+                if (!isPlaying && !isGameOver) {
+                    startGame();
+                } else if (isGameOver) {
+                    resetGame();
+                } else if (player.isGrounded) {
+                    player.dy = player.jumpForce;
+                    player.isGrounded = false;
+                }
+            }
+        });
 
-// SPAWN
-function spawnObstacle(){
-  obstacles.push({
-    x: canvas.width,
-    y: groundY,
-    w: 20 + Math.random()*20,
-    h: 40 + Math.random()*20
-  });
-}
+        window.addEventListener('keyup', (e) => {
+            keys[e.code] = false;
+            
+            // Variable Sprunghöhe beibehalten
+            if ((e.code === 'Space' || e.code === 'ArrowUp') && player.dy < -4) {
+                player.dy = -4; 
+            }
+        });
 
-// LOOP
-function update(){
-  if(!running) return;
+        function startGame() {
+            isPlaying = true;
+            messageEl.classList.add('hidden');
+            gameLoop();
+        }
 
-  // PHYSICS
-  velocity += gravity;
-  dino.y += velocity;
+        function resetGame() {
+            obstacles = [];
+            score = 0;
+            gameSpeed = 3.5; // Startgeschwindigkeit bei Reset wieder runtersetzen
+            spawnTimer = 0;
+            player.y = groundY - player.height;
+            player.dy = 0;
+            isGameOver = false;
+            isPlaying = true;
+            messageEl.classList.add('hidden');
+            scoreEl.textContent = '00000';
+            gameLoop();
+        }
 
-  if(dino.y > groundY){
-    dino.y = groundY;
-    velocity = 0;
-  }
+        function spawnObstacle() {
+            let w = Math.random() * 15 + 15;
+            let h = Math.random() * 25 + 20;
+            
+            obstacles.push({
+                x: canvas.width,
+                y: groundY - h,
+                width: w,
+                height: h
+            });
+        }
 
-  // SPAWN
-  if(Math.random() < 0.02){
-    spawnObstacle();
-  }
+        function gameLoop() {
+            if (isGameOver) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // OBSTACLES
-  obstacles.forEach((o,i)=>{
-    o.x -= speed;
+            // --- WELT UPDATES ---
+            score += 0.05;
+            scoreEl.textContent = String(Math.floor(score)).padStart(5, '0');
+            
+            // Die Beschleunigung ist jetzt etwas sanfter (0.0008 statt 0.001)
+            if (gameSpeed < 10) {
+                gameSpeed += 0.0008; 
+            }
 
-    // COLLISION
-    if(
-      dino.x < o.x + o.w &&
-      dino.x + dino.w > o.x &&
-      dino.y < o.y + o.h &&
-      dino.y + dino.h > o.y
-    ){
-      gameOver();
-    }
+            // --- SPIELER PHYSIK ---
+            if (keys['ArrowDown'] && !player.isGrounded) {
+                player.dy += gravity * 2.5; 
+            } else {
+                player.dy += gravity; 
+            }
 
-    // REMOVE
-    if(o.x + o.w < 0){
-      obstacles.splice(i,1);
-    }
-  });
+            player.y += player.dy;
 
-  // SCORE
-  score++;
-  document.getElementById("score").innerText = score;
+            if (player.y + player.height >= groundY) {
+                player.y = groundY - player.height;
+                player.dy = 0;
+                player.isGrounded = true;
+            }
 
-  // DIFFICULTY
-  speed += 0.002;
-}
+            // --- HINDERNISSE ---
+            spawnTimer--;
+            if (spawnTimer <= 0) {
+                spawnObstacle();
+                let minDelay = 70 + (10 - gameSpeed) * 3; 
+                let maxDelay = minDelay + 60; 
+                spawnTimer = Math.floor(Math.random() * (maxDelay - minDelay) + minDelay);
+            }
 
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+            for (let i = 0; i < obstacles.length; i++) {
+                let obs = obstacles[i];
+                obs.x -= gameSpeed;
 
-  // GROUND
-  ctx.fillStyle = "#333";
-  ctx.fillRect(0, groundY + dino.h, canvas.width, 5);
+                ctx.fillStyle = obstacleColor;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = obstacleGlow;
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
 
-  // DINO
-  ctx.fillStyle = "#222";
-  ctx.fillRect(dino.x, dino.y, dino.w, dino.h);
+                let hitPadding = 5; 
+                if (
+                    player.x + hitPadding < obs.x + obs.width &&
+                    player.x + player.width - hitPadding > obs.x &&
+                    player.y + hitPadding < obs.y + obs.height &&
+                    player.y + player.height - hitPadding > obs.y
+                ) {
+                    isGameOver = true;
+                    isPlaying = false;
+                    
+                    if (score > highScore) {
+                        highScore = score;
+                        localStorage.setItem('neonDashHighScore', highScore);
+                        highScoreEl.textContent = `HI ${String(Math.floor(highScore)).padStart(5, '0')}`;
+                    }
 
-  // OBSTACLES
-  ctx.fillStyle = "#228B22";
-  obstacles.forEach(o=>{
-    ctx.fillRect(o.x, o.y, o.w, o.h);
-  });
-}
+                    messageEl.textContent = "Game Over. Leertaste für Neustart.";
+                    messageEl.classList.remove('hidden');
+                }
+            }
 
-function gameOver(){
-  running = false;
-  document.getElementById("gameover").style.display = "block";
+            obstacles = obstacles.filter(obs => obs.x + obs.width > 0);
 
-  if(score > high){
-    localStorage.high = score;
-  }
-}
+            // --- RENDERN ---
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillRect(0, groundY, canvas.width, 2);
 
-function restart(){
-  obstacles = [];
-  speed = 6;
-  score = 0;
-  velocity = 0;
-  dino.y = groundY;
-  running = true;
-  document.getElementById("gameover").style.display = "none";
-}
+            ctx.fillStyle = player.color;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = player.glow;
+            
+            if (keys['ArrowDown'] && player.isGrounded) {
+                ctx.fillRect(player.x, groundY - player.height / 2, player.width, player.height / 2);
+            } else {
+                ctx.fillRect(player.x, player.y, player.width, player.height);
+            }
 
-// MAIN LOOP
-function loop(){
-  update();
-  draw();
-  requestAnimationFrame(loop);
-}
+            if (!isGameOver) {
+                animationId = requestAnimationFrame(gameLoop);
+            }
+        }
 
-loop();
-
-// RESIZE
-window.addEventListener("resize", ()=>{
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
-  groundY = canvas.height - 100;
-});
-</script>
-
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.fillRect(0, groundY, canvas.width, 2);
+        
+        ctx.fillStyle = player.color;
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = player.glow;
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+    </script>
 </body>
 </html>
