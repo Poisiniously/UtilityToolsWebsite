@@ -15,29 +15,46 @@
             --border: rgba(255, 255, 255, .08);
             --font: 'Outfit', 'Segoe UI', sans-serif;
         }
+        
+        /* Lokale Webkit Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--background);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
         body {
             margin: 0;
-            padding: 20px;
+            padding: 40px 20px;
             background: var(--background);
             color: var(--text);
             font-family: var(--font);
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            box-sizing: border-box;
         }
         .card {
             width: 100%;
             max-width: 940px;
-            max-height: 90vh;
             background: var(--surface);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             border-radius: 24px;
             display: grid;
             grid-template-columns: 1fr 340px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             overflow: hidden;
         }
         .main {
@@ -130,12 +147,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 20px;
         }
         .result-value {
             font-size: 2.5rem;
             font-weight: 800;
             color: var(--text);
             transition: opacity 0.2s ease;
+            word-break: break-all;
         }
         .result-detail {
             color: var(--text-secondary);
@@ -210,9 +229,9 @@
                 <input id="value" type="number" step="any" value="" placeholder="Enter value..." />
                 <select id="fromUnit"></select>
             </div>
-           
+            
             <button id="swapBtn" class="btn secondary" title="Swap Units">⇄</button>
-           
+            
             <div class="input-group">
                 <select id="toUnit"></select>
             </div>
@@ -276,19 +295,20 @@
     let isRestoring = false;
 
     function init() {
+        categoryEl.innerHTML = '';
         Object.keys(unitsData).forEach(k => {
             const opt = document.createElement('option');
             opt.value = k;
             opt.textContent = k;
             categoryEl.appendChild(opt);
         });
-       
-        categoryEl.value = "Length";
-        populateUnits("Length");
-       
-        pushHistory({ cat: "Length", from: "ly", to: "pc", input: 1, output: "0,3066" });
-        pushHistory({ cat: "Chemistry", from: "M", to: "mM", input: 1, output: "1.000" });
-       
+        
+        if(Object.keys(unitsData).length > 0) {
+            const firstCat = Object.keys(unitsData)[0];
+            categoryEl.value = firstCat;
+            populateUnits(firstCat);
+        }
+        
         resultValueEl.textContent = '—';
         resultDetailEl.textContent = 'Ready to convert';
     }
@@ -297,18 +317,19 @@
         fromEl.innerHTML = '';
         toEl.innerHTML = '';
         const currentCategory = unitsData[cat];
-       
+        if(!currentCategory) return;
+        
         Object.keys(currentCategory).forEach(u => {
             if (u === "special") return;
             const o1 = document.createElement('option');
             o1.value = u;
             o1.textContent = u;
             fromEl.appendChild(o1);
-           
+            
             const o2 = o1.cloneNode(true);
             toEl.appendChild(o2);
         });
-       
+        
         fromEl.value = fromEl.options[0]?.value || '';
         toEl.value = toEl.options[1]?.value || fromEl.value;
     }
@@ -319,7 +340,7 @@
         if (unit === "°F") return (Number(v) - 32) * 5/9 + 273.15;
         return Number(v);
     }
-   
+    
     function kToTemp(k, unit) {
         if (unit === "K") return k;
         if (unit === "°C") return k - 273.15;
@@ -329,6 +350,8 @@
 
     function convert(cat, from, to, val) {
         const currentCategory = unitsData[cat];
+        if(!currentCategory) return 0;
+        
         if (currentCategory.special) {
             const kelvin = tempToK(val, from);
             return kToTemp(kelvin, to);
@@ -342,13 +365,13 @@
     function showResult(rawVal, val, from, to) {
         const prec = Number(precisionEl.value);
         const formatted = Number(rawVal).toLocaleString('de-DE', { maximumFractionDigits: prec });
-       
+        
         resultValueEl.style.opacity = 0;
         setTimeout(() => {
             resultValueEl.textContent = formatted;
             resultValueEl.style.opacity = 1;
         }, 120);
-       
+        
         resultDetailEl.textContent = `${val} ${from} → ${to}`;
         return formatted;
     }
@@ -358,20 +381,22 @@
         const from = fromEl.value;
         const to = toEl.value;
         
+        if(!cat || !from || !to) return;
+        
         let val = valueEl.value.trim() === "" ? 1 : Number(valueEl.value);
-       
+        
         if (isNaN(val)) {
             resultValueEl.textContent = '—';
             resultDetailEl.textContent = 'Ready to convert';
             return;
         }
-       
+        
         const rawResult = convert(cat, from, to, val);
-        const displayVal = (val === 1 && valueEl.value.trim() === "") ? "" : val;
+        const displayVal = (val === 1 && valueEl.value.trim() === "") ? 1 : val;
         const formattedStr = showResult(rawResult, displayVal, from, to);
-       
-        if (!skipHistory && !isRestoring) {
-            pushHistory({ cat, from, to, input: val, output: formattedStr });
+        
+        if (!skipHistory && !isRestoring && valueEl.value.trim() !== "") {
+            pushHistory({ cat, from, to, input: displayVal, output: formattedStr });
         }
     }
 
@@ -397,7 +422,7 @@
                 <span style="color:var(--secondary)">→ ${h.output} ${h.to}</span>
             `;
             d.title = `${h.cat} • Click to restore`;
-           
+            
             d.addEventListener('click', () => {
                 isRestoring = true;
                 categoryEl.value = h.cat;
@@ -424,7 +449,7 @@
         populateUnits(categoryEl.value);
         doConvert(true);
     });
-   
+    
     precisionEl.addEventListener('change', () => doConvert(true));
     valueEl.addEventListener('input', () => doConvert(true));
     valueEl.addEventListener('blur', () => doConvert(false));
