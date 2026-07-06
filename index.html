@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Utility Tools - Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --background: #0d0714;
@@ -16,6 +17,22 @@
   --glass-blur: blur(16px);
 }
 
+/* Global Custom Dark Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -23,14 +40,25 @@
   font-family: 'Outfit', 'Segoe UI', sans-serif;
 }
 
+/* Force dark mode behavior for native browser elements */
+html {
+  color-scheme: dark;
+}
+
 body {
   background: 
-    radial-gradient(at 0% 0%, rgba(255, 0, 127, 0.15), transparent 50%),
-    radial-gradient(at 100% 0%, rgba(0, 240, 255, 0.1), transparent 40%),
+    radial-gradient(at 0% 0%, rgba(255, 0, 127, 0.12), transparent 50%),
+    radial-gradient(at 100% 0%, rgba(0, 240, 255, 0.08), transparent 40%),
     var(--background);
   color: var(--text);
   min-height: 100vh;
   padding: 40px 20px;
+  overflow-x: hidden;
+}
+
+/* Scroll-Lock class for active Popups */
+body.modal-open {
+  overflow: hidden;
 }
 
 h1 {
@@ -54,7 +82,8 @@ h1 {
 }
 
 .search-input {
-  width: 320px;
+  width: 100%;
+  max-width: 320px;
   padding: 14px 20px;
   border-radius: 12px;
   border: 1px solid var(--border);
@@ -62,7 +91,13 @@ h1 {
   color: var(--text);
   outline: none;
   backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
 }
 
 .search-input:focus {
@@ -79,8 +114,11 @@ h1 {
   cursor: pointer;
   outline: none;
   backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 600;
+  font-size: 1rem;
+  white-space: nowrap;
 }
 
 .filter-btn:hover {
@@ -111,9 +149,10 @@ h1 {
   background: var(--surface);
   color: var(--text-secondary);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0.9rem;
   font-weight: 500;
   backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   transition: all 0.2s ease;
 }
 
@@ -132,7 +171,7 @@ h1 {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 25px;
   max-width: 1200px;
   margin: 0 auto;
@@ -143,31 +182,52 @@ h1 {
   border-radius: 18px;
   padding: 20px;
   backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--border);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow: hidden;
 }
 
 .card:hover {
   transform: translateY(-5px);
-  border-color: rgba(255, 0, 127, 0.3);
-  box-shadow: 0 10px 30px rgba(255, 0, 127, 0.1);
+  border-color: rgba(255, 0, 127, 0.4);
+  box-shadow: 0 10px 30px rgba(255, 0, 127, 0.15);
+}
+
+/* Subtle light sweep effect on hover */
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+  transform: skewX(-20deg);
+  transition: all 0.5s ease;
+}
+
+.card:hover::after {
+  left: 200%;
 }
 
 .card-image {
-  height: 130px;
+  height: 140px;
   border-radius: 12px;
-  margin-bottom: 15px;
+  margin-bottom: 16px;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   color: #0d0714;
-  font-size: 1.1rem;
-  letter-spacing: 0.5px;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
 }
 
 .card-header {
@@ -178,18 +238,19 @@ h1 {
 }
 
 .card-title {
-  font-size: 18px;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--text);
 }
 
 .fav-btn {
-  font-size: 20px;
+  font-size: 1.3rem;
   color: rgba(255, 255, 255, 0.15);
   background: none;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
+  z-index: 2; /* Keep above light sweep */
 }
 
 .fav-btn:hover {
@@ -203,11 +264,12 @@ h1 {
 }
 
 .card-desc {
-  font-size: 14px;
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
+/* Popup / Modal */
 .popup {
   position: fixed;
   top: 0;
@@ -215,8 +277,9 @@ h1 {
   width: 100%;
   height: 100%;
   display: none;
-  background: rgba(13, 7, 20, 0.85);
-  backdrop-filter: blur(8px);
+  background: rgba(5, 5, 10, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   justify-content: center;
   align-items: center;
   z-index: 1000;
@@ -248,29 +311,35 @@ h1 {
 .control-btn:hover {
   color: var(--secondary);
   transform: scale(1.1);
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
 }
 
 .close-btn {
   font-size: 36px;
+  line-height: 1;
 }
 
 .close-btn:hover {
   color: var(--primary);
+  text-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
 }
 
 .popup iframe {
-  width: 85%;
+  width: 90%;
   height: 85%;
+  max-width: 1400px;
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 24px;
   background: var(--background);
   transition: all 0.3s ease;
   opacity: 0;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
 .popup.fullscreen-mode iframe {
   width: 100% !important;
   height: 100% !important;
+  max-width: 100% !important;
   border-radius: 0px !important;
   border: none;
 }
@@ -296,10 +365,27 @@ h1 {
 .no-results {
   text-align: center;
   grid-column: 1 / -1;
-  padding: 40px 0;
+  padding: 60px 0;
   color: var(--text-secondary);
-  font-size: 16px;
+  font-size: 1.1rem;
   display: none;
+}
+
+@media (max-width: 600px) {
+  .search-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-input, .filter-btn {
+    width: 100%;
+    max-width: 100%;
+  }
+  .popup iframe {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    border: none;
+  }
 }
 </style>
 </head>
@@ -349,9 +435,9 @@ async function loadTools() {
   } catch (err) {
     console.error("Error loading tools.json:", err);
     document.getElementById('grid').innerHTML = `
-      <p style="color:var(--primary); text-align:center; grid-column: 1/-1; padding: 20px;">
-        Error: Could not load tools.json<br>
-        Please ensure the server file structure matches setup requirements.
+      <p style="color:var(--primary); text-align:center; grid-column: 1/-1; padding: 40px; background: rgba(255,0,127,0.1); border-radius: 12px; border: 1px solid rgba(255,0,127,0.2);">
+        <strong>Error: Could not load tools.json</strong><br><br>
+        Please ensure the server file structure matches setup requirements and you are running a local web server (e.g., Live Server).
       </p>`;
   }
 }
@@ -402,7 +488,7 @@ function renderCards(filteredTools = toolsData) {
       <div class="card-image"></div>
       <div class="card-header">
         <div class="card-title"></div>
-        <button class="fav-btn">★</button>
+        <button class="fav-btn" title="Add to Favorites">★</button>
       </div>
       <div class="card-desc"></div>
     `;
@@ -488,6 +574,9 @@ function openTool(url) {
   spinner.style.visibility = 'visible';
   iframe.style.opacity = '0';
 
+  // Prevent background scrolling on mobile & desktop
+  document.body.classList.add('modal-open');
+
   iframe.src = url;
   popup.style.display = 'flex';
 }
@@ -495,6 +584,7 @@ function openTool(url) {
 function onIframeLoaded() {
   const iframe = document.getElementById('toolFrame');
   const spinner = document.getElementById('popupSpinner');
+  
   if (iframe.src && currentToolUrl !== '') {
     spinner.style.opacity = '0';
     spinner.style.visibility = 'hidden';
@@ -516,8 +606,12 @@ function closeTool() {
   if (document.fullscreenElement) {
     document.exitFullscreen().catch(() => {});
   }
+  
   popup.classList.remove('fullscreen-mode');
   document.getElementById('fullscreenBtn').innerText = '🗖';
+  
+  // Re-enable background scrolling
+  document.body.classList.remove('modal-open');
 
   popup.style.display = 'none';
   iframe.src = '';
@@ -533,6 +627,7 @@ function toggleFullscreen() {
       btn.innerText = '🗗';
       popup.classList.add('fullscreen-mode');
     }).catch(() => {
+      // Fallback for browsers that block requestFullscreen
       popup.classList.toggle('fullscreen-mode');
       btn.innerText = popup.classList.contains('fullscreen-mode') ? '🗗' : '🗖';
     });
@@ -550,8 +645,16 @@ document.getElementById('newTabBtn').addEventListener('click', openInNewTab);
 document.getElementById('fullscreenBtn').addEventListener('click', toggleFullscreen);
 document.getElementById('closeBtn').addEventListener('click', closeTool);
 
+// Close popup on background click
 document.getElementById('popup').addEventListener('click', function(e) {
   if (e.target === this) closeTool();
+});
+
+// Handle Esc key to close popup
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('popup').style.display === 'flex') {
+    closeTool();
+  }
 });
 
 document.addEventListener('fullscreenchange', () => {
