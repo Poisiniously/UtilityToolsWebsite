@@ -15,61 +15,91 @@
             --border: rgba(255, 255, 255, .08);
             --font: 'Outfit', 'Segoe UI', sans-serif;
         }
+
+        /* Dark-Mode für Systemkomponenten erzwingen */
+        html {
+            color-scheme: dark;
+        }
+
         body {
             margin: 0;
             padding: 20px;
             background: var(--background);
             color: var(--text);
             font-family: var(--font);
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            box-sizing: border-box;
         }
+
+        /* Globale Custom Dark Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
         .card {
             width: 100%;
             max-width: 940px;
-            max-height: 90vh;
             background: var(--surface);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             border-radius: 24px;
             display: grid;
             grid-template-columns: 1fr 340px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
             overflow: hidden;
         }
+
         .main {
             padding: 40px;
             display: flex;
             flex-direction: column;
             gap: 24px;
         }
+
         .brand-title {
             font-size: 1.8rem;
             font-weight: 700;
             color: var(--secondary);
             margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
+
         .brand-subtitle {
             color: var(--text-secondary);
             font-size: 0.95rem;
             margin-top: 4px;
         }
+
         label {
             display: block;
             margin-bottom: 8px;
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: bold;
         }
+
         input, select {
             width: 100%;
             padding: 14px 16px;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.4);
             border: 1px solid var(--border);
             border-radius: 12px;
             color: var(--text);
@@ -78,21 +108,31 @@
             box-sizing: border-box;
             transition: all 0.3s ease;
         }
+
+        /* Cyberpunk Dropdown-Styling für Optionen */
+        select option {
+            background: #1a0c26;
+            color: var(--text);
+        }
+
         input:focus, select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
         }
+
         .input-area {
             display: flex;
             align-items: center;
             gap: 16px;
         }
+
         .input-group {
             flex: 1;
             display: flex;
             gap: 12px;
         }
+
         .btn {
             background: var(--primary);
             color: white;
@@ -107,73 +147,80 @@
             align-items: center;
             justify-content: center;
         }
+
         .btn:hover {
             filter: brightness(1.2);
             box-shadow: 0 0 15px var(--primary);
         }
+
         .btn.secondary {
-            background: rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border);
             color: var(--secondary);
             padding: 14px;
         }
+
         .btn.secondary:hover {
             border-color: var(--secondary);
             box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
         }
+
         .result-box {
             margin-top: 10px;
             padding: 24px;
-            background: linear-gradient(90deg, rgba(255,0,127,0.05), transparent);
+            background: linear-gradient(90deg, rgba(255, 0, 127, 0.05), transparent);
             border: 1px solid var(--border);
             border-radius: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .result-value {
             font-size: 2.5rem;
             font-weight: 800;
             color: var(--text);
-            transition: opacity 0.2s ease;
+            transition: opacity 0.15s ease;
+            word-break: break-all;
         }
+
         .result-detail {
             color: var(--text-secondary);
             font-size: 0.95rem;
             margin-top: 6px;
         }
+
         .side {
-            background: rgba(0,0,0,0.2);
+            background: rgba(0, 0, 0, 0.2);
             border-left: 1px solid var(--border);
             padding: 40px 30px;
             display: flex;
             flex-direction: column;
             gap: 24px;
         }
+
         .history-title {
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: bold;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
+
         .history-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            max-height: 380px;
+            gap: 12px;
+            max-height: 400px;
             overflow-y: auto;
             padding-right: 6px;
         }
-        .history-list::-webkit-scrollbar { width: 5px; }
-        .history-list::-webkit-scrollbar-track { background: transparent; }
-        .history-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 5px; }
-        .history-list::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
+
         .hist-item {
             padding: 14px 16px;
             border-radius: 12px;
-            background: rgba(0,0,0,0.25);
+            background: rgba(0, 0, 0, 0.25);
             border: 1px solid var(--border);
             color: var(--text);
             font-size: 0.95rem;
@@ -181,12 +228,15 @@
             transition: all 0.2s ease;
             line-height: 1.4;
         }
+
         .hist-item:hover {
             border-color: var(--secondary);
-            background: rgba(0,240,255,0.08);
+            background: rgba(0, 240, 255, 0.08);
             transform: translateX(4px);
         }
+
         @media (max-width: 880px) {
+            body { padding: 10px; }
             .card { grid-template-columns: 1fr; }
             .side { border-left: none; border-top: 1px solid var(--border); padding: 30px; }
             .input-area { flex-direction: column; align-items: stretch; }
@@ -199,7 +249,7 @@
     <div class="main">
         <div>
             <h1 class="brand-title">Unit Converter</h1>
-            <div class="brand-subtitle">Metrisches System — Utility Hub</div>
+            <div class="brand-subtitle">Metric & Custom Systems — Utility Hub</div>
         </div>
         <div>
             <label for="category">Category</label>
@@ -207,12 +257,12 @@
         </div>
         <div class="input-area">
             <div class="input-group">
-                <input id="value" type="number" step="any" value="" placeholder="Enter value..." />
+                <input id="value" type="number" step="any" placeholder="Enter value..." />
                 <select id="fromUnit"></select>
             </div>
-           
+            
             <button id="swapBtn" class="btn secondary" title="Swap Units">⇄</button>
-           
+            
             <div class="input-group">
                 <select id="toUnit"></select>
             </div>
@@ -222,9 +272,9 @@
                 <div class="result-value" id="resultValue">—</div>
                 <div class="result-detail" id="resultDetail">Ready to convert</div>
             </div>
-            <div style="text-align: right; min-width: 120px;">
+            <div style="text-align: right; min-width: 140px;">
                 <label for="precision">Precision</label>
-                <select id="precision" style="padding: 10px;">
+                <select id="precision" style="padding: 10px; font-size: 0.9rem;">
                     <option value="4" selected>4 Decimals</option>
                     <option value="2">2 Decimals</option>
                     <option value="0">Integer</option>
@@ -249,14 +299,14 @@
             const response = await fetch('units.json');
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             unitsData = await response.json();
-            console.log("✅ units.json erfolgreich geladen");
+            console.log("✅ units.json successfully loaded");
             init();
         } catch (err) {
-            console.error("Fehler beim Laden von units.json:", err);
+            console.error("Error loading units.json:", err);
             document.querySelector('.main').insertAdjacentHTML('beforeend', `
-                <p style="color:#ff5555; text-align:center; margin:20px; padding:15px; background:rgba(255,0,0,0.1); border-radius:12px;">
-                    ❌ Konnte units.json nicht laden.<br>
-                    Die Datei muss im selben Ordner wie diese index.html liegen.
+                <p style="color:#ff007f; text-align:center; margin:20px; padding:15px; background:rgba(255,0,127,0.1); border: 1px solid rgba(255,0,127,0.2); border-radius:12px;">
+                    ❌ Could not load units.json.<br>
+                    Please ensure the file is in the same directory.
                 </p>
             `);
         }
@@ -276,19 +326,21 @@
     let isRestoring = false;
 
     function init() {
-        Object.keys(unitsData).forEach(k => {
+        categoryEl.innerHTML = '';
+        const categories = Object.keys(unitsData);
+        
+        categories.forEach(k => {
             const opt = document.createElement('option');
             opt.value = k;
             opt.textContent = k;
             categoryEl.appendChild(opt);
         });
-       
-        categoryEl.value = "Length";
-        populateUnits("Length");
-       
-        pushHistory({ cat: "Length", from: "ly", to: "pc", input: 1, output: "0,3066" });
-        pushHistory({ cat: "Chemistry", from: "M", to: "mM", input: 1, output: "1.000" });
-       
+        
+        if (categories.length > 0) {
+            categoryEl.value = categories[0];
+            populateUnits(categories[0]);
+        }
+        
         resultValueEl.textContent = '—';
         resultDetailEl.textContent = 'Ready to convert';
     }
@@ -297,18 +349,20 @@
         fromEl.innerHTML = '';
         toEl.innerHTML = '';
         const currentCategory = unitsData[cat];
-       
+        
+        if (!currentCategory) return;
+
         Object.keys(currentCategory).forEach(u => {
             if (u === "special") return;
             const o1 = document.createElement('option');
             o1.value = u;
             o1.textContent = u;
             fromEl.appendChild(o1);
-           
+            
             const o2 = o1.cloneNode(true);
             toEl.appendChild(o2);
         });
-       
+        
         fromEl.value = fromEl.options[0]?.value || '';
         toEl.value = toEl.options[1]?.value || fromEl.value;
     }
@@ -319,7 +373,7 @@
         if (unit === "°F") return (Number(v) - 32) * 5/9 + 273.15;
         return Number(v);
     }
-   
+    
     function kToTemp(k, unit) {
         if (unit === "K") return k;
         if (unit === "°C") return k - 273.15;
@@ -341,14 +395,14 @@
 
     function showResult(rawVal, val, from, to) {
         const prec = Number(precisionEl.value);
-        const formatted = Number(rawVal).toLocaleString('de-DE', { maximumFractionDigits: prec });
-       
-        resultValueEl.style.opacity = 0;
+        const formatted = Number(rawVal).toLocaleString('en-US', { maximumFractionDigits: prec });
+        
+        resultValueEl.style.opacity = '0';
         setTimeout(() => {
             resultValueEl.textContent = formatted;
-            resultValueEl.style.opacity = 1;
-        }, 120);
-       
+            resultValueEl.style.opacity = '1';
+        }, 50);
+        
         resultDetailEl.textContent = `${val} ${from} → ${to}`;
         return formatted;
     }
@@ -359,19 +413,19 @@
         const to = toEl.value;
         
         let val = valueEl.value.trim() === "" ? 1 : Number(valueEl.value);
-       
+        
         if (isNaN(val)) {
             resultValueEl.textContent = '—';
             resultDetailEl.textContent = 'Ready to convert';
             return;
         }
-       
+        
         const rawResult = convert(cat, from, to, val);
-        const displayVal = (val === 1 && valueEl.value.trim() === "") ? "" : val;
+        const displayVal = (val === 1 && valueEl.value.trim() === "") ? "1" : val;
         const formattedStr = showResult(rawResult, displayVal, from, to);
-       
-        if (!skipHistory && !isRestoring) {
-            pushHistory({ cat, from, to, input: val, output: formattedStr });
+        
+        if (!skipHistory && !isRestoring && valueEl.value.trim() !== "") {
+            pushHistory({ cat, from, to, input: displayVal, output: formattedStr });
         }
     }
 
@@ -383,7 +437,7 @@
             historyData[0].input === item.input) return;
 
         historyData.unshift(item);
-        if (historyData.length > 12) historyData.pop();
+        if (historyData.length > 8) historyData.pop();
         renderHistory();
     }
 
@@ -397,7 +451,7 @@
                 <span style="color:var(--secondary)">→ ${h.output} ${h.to}</span>
             `;
             d.title = `${h.cat} • Click to restore`;
-           
+            
             d.addEventListener('click', () => {
                 isRestoring = true;
                 categoryEl.value = h.cat;
@@ -424,10 +478,9 @@
         populateUnits(categoryEl.value);
         doConvert(true);
     });
-   
+    
     precisionEl.addEventListener('change', () => doConvert(true));
     valueEl.addEventListener('input', () => doConvert(true));
-    valueEl.addEventListener('blur', () => doConvert(false));
     fromEl.addEventListener('change', () => doConvert(false));
     toEl.addEventListener('change', () => doConvert(false));
 
