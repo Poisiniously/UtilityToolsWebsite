@@ -4,30 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Converter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-main: #0c0812;
-            --bg-panel: #180e25;
-            --border-color: #26163a;
-            --text-main: #f3effa;
-            --text-muted: #6e568b;
-            --accent-pink: #d61c59;
-            --accent-hover: #fa2a73;
+            --background: #0d0714;
+            --surface: rgba(26, 12, 38, 0.65);
+            --primary: #ff007f;
+            --secondary: #00f0ff;
+            --text: #f4f4ff;
+            --text-secondary: #a0a0c0;
+            --border: rgba(255, 255, 255, 0.08);
             --btn-dark: #1f1230;
             --btn-dark-border: #361f54;
+        }
+
+        /* Dark-Mode für Systemkomponenten erzwingen */
+        html {
+            color-scheme: dark;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Outfit', 'Segoe UI', sans-serif;
         }
 
         body {
-            background: var(--bg-main);
-            color: var(--text-main);
+            background: var(--background);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -38,22 +44,25 @@
         .app {
             width: 100%;
             max-width: 700px;
-            background: var(--bg-panel);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
             padding: 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 0, 127, 0.05);
         }
 
         h2 {
             text-align: center;
             font-size: 1.8rem;
             margin-bottom: 8px;
+            letter-spacing: 0.5px;
         }
 
         .subtitle {
             text-align: center;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             margin-bottom: 25px;
         }
 
@@ -61,87 +70,92 @@
             width: 100%;
             padding: 45px 20px;
             border: 2px dashed var(--btn-dark-border);
-            border-radius: 8px;
+            border-radius: 16px;
             text-align: center;
             cursor: pointer;
-            background: #08050c;
-            transition: .25s;
+            background: rgba(0, 0, 0, 0.2);
+            transition: 0.25s ease;
         }
 
         .drop:hover, .drop.active {
-            border-color: var(--accent-pink);
-            background: #120a1c;
+            border-color: var(--secondary);
+            background: rgba(0, 240, 255, 0.03);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
         }
 
         .file {
             display: none;
             margin-top: 20px;
-            background: #08050c;
-            border: 1px solid var(--btn-dark-border);
-            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
             padding: 15px;
         }
 
         .file-name {
-            font-weight: bold;
+            font-weight: 600;
             margin-bottom: 5px;
             word-break: break-word;
         }
 
         .file-size {
-            color: var(--text-muted);
-            font-size: .85rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
         }
 
+        /* Anpassung des Dropdown-Menüs an das Cyberpunk-Design */
         select {
             width: 100%;
             margin-top: 20px;
             padding: 12px;
-            background: #08050c;
-            color: var(--text-main);
+            background: var(--btn-dark);
+            color: var(--text);
             border: 1px solid var(--btn-dark-border);
-            border-radius: 8px;
-            font-size: .95rem;
-            transition: .25s;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: 0.25s ease;
+            cursor: pointer;
         }
 
         select:focus {
             outline: none;
-            border-color: var(--accent-pink);
+            border-color: var(--secondary);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
         }
 
         button {
             width: 100%;
             margin-top: 15px;
             padding: 12px;
-            border-radius: 6px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: .95rem;
-            transition: .2s;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: 0.25s ease;
         }
 
         #convertBtn {
             background: var(--btn-dark);
-            color: var(--text-main);
+            color: var(--text);
             border: 1px solid var(--btn-dark-border);
         }
 
         #convertBtn:hover {
-            background: var(--border-color);
-            border-color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--text-secondary);
         }
 
         .download {
             display: none;
-            background: var(--accent-pink);
+            background: var(--primary);
             border: none;
             color: white;
-            font-weight: bold;
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
         }
 
         .download:hover {
-            background: var(--accent-hover);
-            box-shadow: 0 0 12px rgba(214,28,89,.4);
+            background: #ff2a93;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
         }
     </style>
 </head>
@@ -149,7 +163,7 @@
 <body>
     <div class="app">
         <h2>File Converter</h2>
-        <p class="subtitle">Convert files directly in your browser.</p>
+        <p class="subtitle">Convert any text, code, or image file formats instantly.</p>
 
         <div class="drop" id="drop">
             <span>Drop file here or click to browse</span>
@@ -180,17 +194,11 @@
         let currentFile = null;
         let currentBlob = null;
 
-        const allowedFormats = {
-            csv: ["json", "txt", "xml"],
-            txt: ["md", "json"],
-            md: ["html", "txt"],
-            json: ["txt"],
-            png: ["jpg", "jpeg"],
-            jpg: ["png"],
-            jpeg: ["png"]
-        };
+        // Vollständige, universelle Formatlisten
+        const textFormats = ["txt", "md", "json", "csv", "html", "xml", "js", "css"];
+        const imageFormats = ["png", "jpg", "jpeg", "webp"];
 
-        // ---------- Drag & Drop ----------
+        // Drag & Drop Event-Listener
         drop.addEventListener("click", () => fileInput.click());
 
         drop.addEventListener("dragover", e => {
@@ -216,17 +224,12 @@
             }
         });
 
-        // ---------- Register File ----------
+        // Datei registrieren und dynamisch passende Ziel-Formate bereitstellen
         function registerFile(file) {
             currentFile = file;
             currentBlob = null;
 
             const extension = file.name.split(".").pop().toLowerCase();
-
-            if (!allowedFormats[extension]) {
-                alert("Unsupported file type.");
-                return;
-            }
 
             fileInfo.style.display = "block";
             downloadBtn.style.display = "none";
@@ -236,7 +239,21 @@
 
             format.innerHTML = "";
 
-            allowedFormats[extension].forEach(type => {
+            let availableTargets = [];
+
+            if (imageFormats.includes(extension)) {
+                // Wenn Bild, erlaube alle anderen Bildformate
+                availableTargets = imageFormats.filter(f => f !== extension);
+            } else {
+                // Wenn Text/Dokument/Code, erlaube alle anderen Textformate universell
+                availableTargets = textFormats.filter(f => f !== extension);
+                // Falls die hochgeladene Datei eine unbekannte Text-Endung hat, füge Text-Ziele hinzu
+                if (availableTargets.length === textFormats.length) {
+                    availableTargets = textFormats;
+                }
+            }
+
+            availableTargets.forEach(type => {
                 const option = document.createElement("option");
                 option.value = type;
                 option.innerText = type.toUpperCase();
@@ -244,7 +261,7 @@
             });
         }
 
-        // ---------- Convert ----------
+        // Konvertierungs-Routing
         convertBtn.addEventListener("click", () => {
             if (!currentFile) {
                 alert("Select a file first.");
@@ -254,14 +271,14 @@
             const extension = currentFile.name.split(".").pop().toLowerCase();
             const target = format.value;
 
-            if (["png", "jpg", "jpeg"].includes(extension)) {
+            if (imageFormats.includes(extension)) {
                 convertImage(target);
             } else {
                 convertText(extension, target);
             }
         });
 
-        // ---------- Text ----------
+        // Universelle Text- und Datenstrukturen-Umwandlung
         function convertText(ext, target) {
             const reader = new FileReader();
 
@@ -270,22 +287,24 @@
                 let output = text;
                 let mime = "text/plain";
 
+                // Spezial-Konverter: CSV zu JSON
                 if (ext === "csv" && target === "json") {
                     const lines = text.trim().split("\n");
-                    const headers = lines.shift().split(",");
-
-                    const data = lines.map(line => {
-                        const values = line.split(",");
-                        let obj = {};
-                        headers.forEach((h, i) => {
-                            obj[h.trim()] = values[i]?.trim() || "";
+                    if (lines.length > 0) {
+                        const headers = lines.shift().split(",");
+                        const data = lines.map(line => {
+                            const values = line.split(",");
+                            let obj = {};
+                            headers.forEach((h, i) => {
+                                obj[h.trim()] = values[i]?.trim() || "";
+                            });
+                            return obj;
                         });
-                        return obj;
-                    });
-
-                    output = JSON.stringify(data, null, 2);
+                        output = JSON.stringify(data, null, 2);
+                    }
                     mime = "application/json";
                 }
+                // Spezial-Konverter: Markdown zu HTML
                 else if (ext === "md" && target === "html") {
                     output = text
                         .replace(/^# (.*)$/gm, "<h1>$1</h1>")
@@ -296,9 +315,34 @@
                         .replace(/\n/g, "<br>");
                     mime = "text/html";
                 }
-                else if (ext === "csv" && target === "txt") {
-                    output = text.replace(/,/g, " ");
+                // Spezial-Konverter: JSON zu CSV
+                else if (ext === "json" && target === "csv") {
+                    try {
+                        const parsed = JSON.parse(text);
+                        const arr = Array.isArray(parsed) ? parsed : [parsed];
+                        if (arr.length > 0) {
+                            const headers = Object.keys(arr[0]);
+                            const csvRows = [headers.join(",")];
+                            for (const row of arr) {
+                                const values = headers.map(header => {
+                                    const val = row[header] ? String(row[header]).replace(/"/g, '""') : '';
+                                    return `"${val}"`;
+                                });
+                                csvRows.push(values.join(","));
+                            }
+                            output = csvRows.join("\n");
+                        }
+                    } catch (err) {
+                        alert("Invalid JSON format for CSV conversion.");
+                        return;
+                    }
                 }
+                // Setzen korrekter MIME-Types für gängige Formate
+                if (target === "json") mime = "application/json";
+                if (target === "html") mime = "text/html";
+                if (target === "xml") mime = "application/xml";
+                if (target === "js") mime = "application/javascript";
+                if (target === "css") mime = "text/css";
 
                 currentBlob = new Blob([output], { type: mime });
                 downloadBtn.style.display = "block";
@@ -307,7 +351,7 @@
             reader.readAsText(currentFile);
         }
 
-        // ---------- Image ----------
+        // Universelle Canvas-basierte Bildkonvertierung (unterstützt nun auch WebP)
         function convertImage(target) {
             const reader = new FileReader();
 
@@ -321,6 +365,7 @@
                     const ctx = canvas.getContext("2d");
                     ctx.drawImage(img, 0, 0);
 
+                    // Dynamischer Export in das gewählte Bildformat
                     canvas.toBlob(blob => {
                         currentBlob = blob;
                         downloadBtn.style.display = "block";
@@ -332,7 +377,7 @@
             reader.readAsDataURL(currentFile);
         }
 
-        // ---------- Download ----------
+        // Download Trigger
         downloadBtn.addEventListener("click", () => {
             if (!currentBlob) return;
 
