@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal File Converter</title>
+    <title>Universal File Converter | Utility Hub</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
         :root {
@@ -44,42 +49,45 @@
             width: 100%;
             max-width: 700px;
             background: var(--surface);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 0, 127, 0.05);
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 240, 255, 0.05);
         }
 
         h2 {
             text-align: center;
-            font-size: 1.8rem;
+            font-size: 2rem;
             margin-bottom: 8px;
-            letter-spacing: 0.5px;
+            color: var(--secondary);
+            letter-spacing: 1px;
         }
 
         .subtitle {
             text-align: center;
             color: var(--text-secondary);
-            margin-bottom: 25px;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
         }
 
         .drop {
             width: 100%;
-            padding: 45px 20px;
+            padding: 50px 20px;
             border: 2px dashed var(--btn-dark-border);
             border-radius: 16px;
             text-align: center;
             cursor: pointer;
             background: rgba(0, 0, 0, 0.2);
-            transition: 0.25s ease;
+            transition: all 0.3s ease;
         }
 
         .drop:hover, .drop.active {
             border-color: var(--secondary);
-            background: rgba(0, 240, 255, 0.03);
+            background: rgba(0, 240, 255, 0.05);
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+            transform: translateY(-2px);
         }
 
         .file {
@@ -88,13 +96,15 @@
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 15px;
+            padding: 18px;
+            text-align: center;
         }
 
         .file-name {
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             word-break: break-word;
+            font-size: 1.05rem;
         }
 
         .file-size {
@@ -104,32 +114,43 @@
 
         select {
             width: 100%;
-            margin-top: 20px;
-            padding: 12px;
-            background: var(--btn-dark);
+            margin-top: 24px;
+            padding: 14px 16px;
+            background: var(--surface);
             color: var(--text);
             border: 1px solid var(--btn-dark-border);
             border-radius: 12px;
-            font-size: 0.95rem;
-            transition: 0.25s ease;
+            font-size: 1rem;
+            transition: 0.3s ease;
             cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300f0ff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px top 50%;
+            background-size: 12px auto;
+        }
+        
+        select option {
+            background: #180e25;
+            color: var(--text);
         }
 
         select:focus {
             outline: none;
             border-color: var(--secondary);
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
         }
 
         button {
             width: 100%;
-            margin-top: 15px;
-            padding: 12px;
+            margin-top: 16px;
+            padding: 14px;
             border-radius: 12px;
             cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: 0.25s ease;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
         }
 
         #convertBtn {
@@ -138,9 +159,15 @@
             border: 1px solid var(--btn-dark-border);
         }
 
-        #convertBtn:hover {
+        #convertBtn:hover:not(:disabled) {
             background: rgba(255, 255, 255, 0.05);
-            border-color: var(--text-secondary);
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+        }
+
+        #convertBtn:disabled {
+            opacity: 0.5;
+            cursor: wait;
         }
 
         .download {
@@ -148,12 +175,14 @@
             background: var(--primary);
             border: none;
             color: white;
-            box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
+            box-shadow: 0 4px 15px rgba(255, 0, 127, 0.3);
+            margin-top: 20px;
         }
 
         .download:hover {
             background: #ff2a93;
-            box-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
+            box-shadow: 0 0 25px rgba(255, 0, 127, 0.5);
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -161,10 +190,11 @@
 <body>
     <div class="app">
         <h2>Universal File Converter</h2>
-        <p class="subtitle">Convert between Code, Vector Graphics, Text and Images.</p>
+        <p class="subtitle">Convert Documents, iOS Photos, Vector Graphics, and more.</p>
 
         <div class="drop" id="drop">
-            <span>Drop file here or click to browse</span>
+            <span style="font-size: 1.1rem; font-weight: 600; color: var(--text)">Drop file here or click to browse</span><br>
+            <span style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 8px; display: inline-block;">Supports: HEIC, DOCX, ODT, SVG, PNG, MD, JSON...</span>
             <input type="file" id="fileInput" accept="*/*" hidden>
         </div>
 
@@ -192,9 +222,9 @@
         let currentFile = null;
         let currentBlob = null;
 
-        // Erweiterte Formatlisten für bekannte Dateiarten
-        const textFormats = ["txt", "md", "json", "csv", "html", "xml", "js", "ts", "css", "yaml", "yml", "svg"];
-        const imageFormats = ["png", "jpg", "jpeg", "webp", "gif", "bmp", "ico", "svg"];
+        // Extended formats including advanced docs and iOS images
+        const textFormats = ["txt", "md", "json", "csv", "html", "xml", "js", "ts", "css", "yaml", "yml", "svg", "docx", "odt"];
+        const imageFormats = ["png", "jpg", "jpeg", "webp", "gif", "bmp", "ico", "svg", "heic", "heif"];
 
         drop.addEventListener("click", () => fileInput.click());
 
@@ -224,32 +254,34 @@
         function registerFile(file) {
             currentFile = file;
             currentBlob = null;
-
             const extension = file.name.split(".").pop().toLowerCase();
 
             fileInfo.style.display = "block";
             downloadBtn.style.display = "none";
-
             fileName.textContent = file.name;
             fileSize.textContent = (file.size / 1024).toFixed(1) + " KB";
-
             format.innerHTML = "";
 
             let availableTargets = [];
 
-            // Spezialfall SVG: Kann in alles (Bilder & Code) konvertiert werden
-            if (extension === "svg") {
-                availableTargets = [...new Set([...imageFormats, ...textFormats])].filter(f => f !== "svg");
-            } 
-            // Normale Bildformate
-            else if (imageFormats.includes(extension)) {
-                availableTargets = imageFormats.filter(f => f !== extension);
-            } 
-            // Text- und Codeformate
-            else {
-                availableTargets = textFormats.filter(f => f !== extension);
-                if (availableTargets.length === textFormats.length) {
-                    availableTargets = textFormats;
+            if (["heic", "heif"].includes(extension)) {
+                // HEIC/HEIF can be converted to standard images
+                availableTargets = ["jpg", "jpeg", "png", "webp", "gif"];
+            } else if (extension === "docx") {
+                // DOCX parsing via Mammoth
+                availableTargets = ["html", "txt"];
+            } else if (extension === "odt") {
+                // ODT parsing via JSZip
+                availableTargets = ["txt"];
+            } else if (extension === "svg") {
+                // SVG crosses over to both lists
+                availableTargets = [...new Set([...imageFormats, ...textFormats])].filter(f => f !== "svg" && !["heic", "heif", "docx", "odt"].includes(f));
+            } else if (imageFormats.includes(extension)) {
+                availableTargets = imageFormats.filter(f => f !== extension && !["heic", "heif"].includes(f));
+            } else {
+                availableTargets = textFormats.filter(f => f !== extension && !["docx", "odt"].includes(f));
+                if (availableTargets.length === textFormats.length - 2) {
+                    availableTargets = textFormats.filter(f => !["docx", "odt"].includes(f));
                 }
             }
 
@@ -261,7 +293,8 @@
             });
         }
 
-        convertBtn.addEventListener("click", () => {
+        // Async Event Listener to handle heavy libraries without freezing
+        convertBtn.addEventListener("click", async () => {
             if (!currentFile) {
                 alert("Select a file first.");
                 return;
@@ -270,183 +303,213 @@
             const extension = currentFile.name.split(".").pop().toLowerCase();
             const target = format.value;
 
-            // Logik-Routing basierend auf Zielformat
-            if (imageFormats.includes(target) && target !== "svg") {
-                convertImage(target);
-            } else {
-                convertText(extension, target);
+            convertBtn.textContent = "Converting... Please wait";
+            convertBtn.disabled = true;
+            downloadBtn.style.display = "none";
+
+            try {
+                if (["heic", "heif"].includes(extension)) {
+                    await convertHeic(target);
+                } else if (["docx", "odt"].includes(extension)) {
+                    await convertAdvancedDocs(extension, target);
+                } else if (imageFormats.includes(target) && target !== "svg") {
+                    await convertImage(extension, target);
+                } else {
+                    await convertText(extension, target);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Conversion failed. Ensure the file is not corrupted.");
+            } finally {
+                convertBtn.textContent = "Convert File";
+                convertBtn.disabled = false;
             }
         });
 
-        // Konvertierung von Text, Code-Strukturen und SVG als Quell-Code
-        function convertText(ext, target) {
-            const reader = new FileReader();
+        // 1. HEIC / HEIF Decoder via heic2any
+        async function convertHeic(target) {
+            if (typeof heic2any === "undefined") throw new Error("HEIC library not loaded");
+            
+            const mimeType = target === "jpg" ? "image/jpeg" : `image/${target}`;
+            const converted = await heic2any({
+                blob: currentFile,
+                toType: mimeType,
+                quality: 0.95
+            });
 
-            reader.onload = e => {
-                let text = e.target.result;
-                let output = text;
-                let mime = "text/plain";
-
-                // CSV zu JSON
-                if (ext === "csv" && target === "json") {
-                    const lines = text.trim().split("\n");
-                    if (lines.length > 0) {
-                        const headers = lines.shift().split(",");
-                        const data = lines.map(line => {
-                            const values = line.split(",");
-                            let obj = {};
-                            headers.forEach((h, i) => {
-                                obj[h.trim()] = values[i]?.trim() || "";
-                            });
-                            return obj;
-                        });
-                        output = JSON.stringify(data, null, 2);
-                    }
-                }
-                // JSON zu CSV
-                else if (ext === "json" && target === "csv") {
-                    try {
-                        const parsed = JSON.parse(text);
-                        const arr = Array.isArray(parsed) ? parsed : [parsed];
-                        if (arr.length > 0) {
-                            const headers = Object.keys(arr[0]);
-                            const csvRows = [headers.join(",")];
-                            for (const row of arr) {
-                                const values = headers.map(header => {
-                                    const val = row[header] ? String(row[header]).replace(/"/g, '""') : '';
-                                    return `"${val}"`;
-                                });
-                                csvRows.push(values.join(","));
-                            }
-                            output = csvRows.join("\n");
-                        }
-                    } catch (err) {
-                        alert("Invalid JSON format for CSV conversion.");
-                        return;
-                    }
-                }
-                // Markdown zu HTML
-                else if (ext === "md" && target === "html") {
-                    output = text
-                        .replace(/^# (.*)$/gm, "<h1>$1</h1>")
-                        .replace(/^## (.*)$/gm, "<h2>$1</h2>")
-                        .replace(/^### (.*)$/gm, "<h3>$1</h3>")
-                        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                        .replace(/\*(.*?)\*/g, "<em>$1</em>")
-                        .replace(/\n/g, "<br>");
-                }
-                // Bild (z.B. PNG) zu SVG Vektor-Container (Einbettung als Base64)
-                else if (imageFormats.includes(ext) && target === "svg") {
-                    // Da wir das Bild bereits als Text lesen wollen, brechen wir hier ab und nutzen readAsDataURL
-                    convertImageToSvg();
-                    return;
-                }
-
-                // Mime-Types zuweisen
-                if (target === "json") mime = "application/json";
-                else if (target === "html") mime = "text/html";
-                else if (target === "xml") mime = "application/xml";
-                else if (target === "svg") mime = "image/svg+xml";
-                else if (target === "js") mime = "application/javascript";
-                else if (target === "ts") mime = "application/x-typescript";
-                else if (target === "css") mime = "text/css";
-                else if (target === "yaml" || target === "yml") mime = "application/x-yaml";
-
-                currentBlob = new Blob([output], { type: mime });
-                downloadBtn.style.display = "block";
-            };
-
-            reader.readAsText(currentFile);
+            currentBlob = Array.isArray(converted) ? converted[0] : converted;
+            downloadBtn.style.display = "block";
         }
 
-        // Konvertierung von Rasterbildern & SVG-Quellen in Rastergrafiken (Canvas-basiert)
-        function convertImage(target) {
-            const reader = new FileReader();
+        // 2. DOCX & ODT Parser via Mammoth & JSZip
+        async function convertAdvancedDocs(ext, target) {
+            let output = "";
+            let mime = "text/plain";
+            
+            if (ext === "docx") {
+                if (typeof mammoth === "undefined") throw new Error("Mammoth library not loaded");
+                const arrayBuffer = await currentFile.arrayBuffer();
+                
+                if (target === "html") {
+                    const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+                    output = result.value;
+                    mime = "text/html";
+                } else if (target === "txt") {
+                    const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+                    output = result.value;
+                }
+            } else if (ext === "odt" && target === "txt") {
+                if (typeof JSZip === "undefined") throw new Error("JSZip library not loaded");
+                const zip = await JSZip.loadAsync(currentFile);
+                const xml = await zip.file("content.xml").async("string");
+                
+                // Strip XML tags to get raw readable text
+                output = xml.replace(/<text:p[^>]*>/g, '\n').replace(/<[^>]+>/g, '');
+            }
 
-            reader.onload = e => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement("canvas");
-                    canvas.width = img.width;
-                    canvas.height = img.height;
+            currentBlob = new Blob([output], { type: mime });
+            downloadBtn.style.display = "block";
+        }
 
-                    const ctx = canvas.getContext("2d");
-                    
-                    // Weißer Hintergrund für JPEG/BMP falls Transparenzen vorhanden sind
-                    if (["jpg", "jpeg", "bmp"].includes(target)) {
-                        ctx.fillStyle = "#ffffff";
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    }
-
-                    ctx.drawImage(img, 0, 0);
-
-                    canvas.toBlob(blob => {
-                        currentBlob = blob;
-                        downloadBtn.style.display = "block";
-                    }, "image/" + (target === "jpg" ? "jpeg" : target), 0.95);
-                };
-                img.src = e.target.result;
-            };
-
-            // Falls es sich um ein SVG handelt, erstellen wir ein Blob-URL-Objekt für das Image
-            if (currentFile.name.split(".").pop().toLowerCase() === "svg") {
-                const textReader = new FileReader();
-                textReader.onload = evt => {
-                    const svgBlob = new Blob([evt.target.result], {type: 'image/svg+xml;charset=utf-8'});
-                    const url = URL.createObjectURL(svgBlob);
+        // 3. Image & SVG-Rasterization
+        function convertImage(ext, target) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => {
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement("canvas");
-                        canvas.width = img.width || 500; // Fallback falls Dimensionen fehlen
-                        canvas.height = img.height || 500;
+                        canvas.width = img.width || 800;
+                        canvas.height = img.height || 800;
                         const ctx = canvas.getContext("2d");
+                        
                         if (["jpg", "jpeg", "bmp"].includes(target)) {
                             ctx.fillStyle = "#ffffff";
                             ctx.fillRect(0, 0, canvas.width, canvas.height);
                         }
                         ctx.drawImage(img, 0, 0);
+
                         canvas.toBlob(blob => {
                             currentBlob = blob;
                             downloadBtn.style.display = "block";
-                            URL.revokeObjectURL(url);
+                            resolve();
                         }, "image/" + (target === "jpg" ? "jpeg" : target), 0.95);
                     };
-                    img.src = url;
+                    img.onerror = reject;
+                    img.src = e.target.result;
                 };
-                textReader.readAsText(currentFile);
-            } else {
-                reader.readAsDataURL(currentFile);
-            }
+                reader.onerror = reject;
+
+                if (ext === "svg") {
+                    const textReader = new FileReader();
+                    textReader.onload = evt => {
+                        const svgBlob = new Blob([evt.target.result], {type: 'image/svg+xml;charset=utf-8'});
+                        reader.readAsDataURL(svgBlob);
+                    };
+                    textReader.readAsText(currentFile);
+                } else {
+                    reader.readAsDataURL(currentFile);
+                }
+            });
         }
 
-        // Hilfsfunktion: Bild-Datei in ein valides Vektor-SVG kapseln
-        function convertImageToSvg() {
-            const imgReader = new FileReader();
-            imgReader.onload = event => {
-                const base64Data = event.target.result;
-                // Dynamisches Auslesen der Dimensionen über temporäres Image-Objekt
-                const tempImg = new Image();
-                tempImg.onload = () => {
-                    const svgOutput = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${tempImg.width} ${tempImg.height}" width="${tempImg.width}" height="${tempImg.height}">\n  <image width="${tempImg.width}" height="${tempImg.height}" href="${base64Data}"/>\n</svg>`;
-                    currentBlob = new Blob([svgOutput], { type: "image/svg+xml" });
+        // 4. Standard Text & Code Conversion
+        function convertText(ext, target) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    let text = e.target.result;
+                    let output = text;
+                    let mime = "text/plain";
+
+                    if (ext === "csv" && target === "json") {
+                        const lines = text.trim().split("\n");
+                        if (lines.length > 0) {
+                            const headers = lines.shift().split(",");
+                            const data = lines.map(line => {
+                                const values = line.split(",");
+                                let obj = {};
+                                headers.forEach((h, i) => { obj[h.trim()] = values[i]?.trim() || ""; });
+                                return obj;
+                            });
+                            output = JSON.stringify(data, null, 2);
+                        }
+                    } else if (ext === "json" && target === "csv") {
+                        try {
+                            const parsed = JSON.parse(text);
+                            const arr = Array.isArray(parsed) ? parsed : [parsed];
+                            if (arr.length > 0) {
+                                const headers = Object.keys(arr[0]);
+                                const csvRows = [headers.join(",")];
+                                for (const row of arr) {
+                                    const values = headers.map(header => `"${row[header] ? String(row[header]).replace(/"/g, '""') : ''}"`);
+                                    csvRows.push(values.join(","));
+                                }
+                                output = csvRows.join("\n");
+                            }
+                        } catch (err) {
+                            reject(new Error("Invalid JSON"));
+                            return;
+                        }
+                    } else if (ext === "md" && target === "html") {
+                        output = text
+                            .replace(/^# (.*)$/gm, "<h1>$1</h1>")
+                            .replace(/^## (.*)$/gm, "<h2>$1</h2>")
+                            .replace(/^### (.*)$/gm, "<h3>$1</h3>")
+                            .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                            .replace(/\*(.*?)\*/g, "<em>$1</em>")
+                            .replace(/\n/g, "<br>");
+                    } else if (imageFormats.includes(ext) && target === "svg") {
+                        convertImageToSvg().then(resolve).catch(reject);
+                        return;
+                    }
+
+                    if (target === "json") mime = "application/json";
+                    else if (target === "html") mime = "text/html";
+                    else if (target === "xml") mime = "application/xml";
+                    else if (target === "svg") mime = "image/svg+xml";
+                    else if (target === "js") mime = "application/javascript";
+                    else if (target === "ts") mime = "application/x-typescript";
+                    else if (target === "css") mime = "text/css";
+                    else if (target === "yaml" || target === "yml") mime = "application/x-yaml";
+
+                    currentBlob = new Blob([output], { type: mime });
                     downloadBtn.style.display = "block";
+                    resolve();
                 };
-                tempImg.src = base64Data;
-            };
-            imgReader.readAsDataURL(currentFile);
+                reader.onerror = reject;
+                reader.readAsText(currentFile);
+            });
         }
 
-        // Download Trigger
+        // Helper: Image to SVG vector wrapper
+        function convertImageToSvg() {
+            return new Promise((resolve, reject) => {
+                const imgReader = new FileReader();
+                imgReader.onload = event => {
+                    const base64Data = event.target.result;
+                    const tempImg = new Image();
+                    tempImg.onload = () => {
+                        const svgOutput = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${tempImg.width} ${tempImg.height}" width="${tempImg.width}" height="${tempImg.height}">\n  <image width="${tempImg.width}" height="${tempImg.height}" href="${base64Data}"/>\n</svg>`;
+                        currentBlob = new Blob([svgOutput], { type: "image/svg+xml" });
+                        downloadBtn.style.display = "block";
+                        resolve();
+                    };
+                    tempImg.onerror = reject;
+                    tempImg.src = base64Data;
+                };
+                imgReader.onerror = reject;
+                imgReader.readAsDataURL(currentFile);
+            });
+        }
+
         downloadBtn.addEventListener("click", () => {
             if (!currentBlob) return;
-
             const a = document.createElement("a");
             const url = URL.createObjectURL(currentBlob);
             a.href = url;
-
             const name = currentFile.name.substring(0, currentFile.name.lastIndexOf("."));
             a.download = name + "." + format.value;
-
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
