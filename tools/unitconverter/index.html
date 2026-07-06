@@ -15,46 +15,29 @@
             --border: rgba(255, 255, 255, .08);
             --font: 'Outfit', 'Segoe UI', sans-serif;
         }
-        
-        /* Lokale Webkit Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--background);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--secondary);
-        }
-
         body {
             margin: 0;
-            padding: 40px 20px;
+            padding: 20px;
             background: var(--background);
             color: var(--text);
             font-family: var(--font);
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-sizing: border-box;
+            overflow: hidden;
         }
         .card {
             width: 100%;
             max-width: 940px;
+            max-height: 90vh;
             background: var(--surface);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             border-radius: 24px;
             display: grid;
             grid-template-columns: 1fr 340px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             overflow: hidden;
         }
         .main {
@@ -147,14 +130,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 20px;
         }
         .result-value {
             font-size: 2.5rem;
             font-weight: 800;
             color: var(--text);
             transition: opacity 0.2s ease;
-            word-break: break-all;
         }
         .result-detail {
             color: var(--text-secondary);
@@ -211,54 +192,6 @@
             .input-area { flex-direction: column; align-items: stretch; }
             .input-group { flex-direction: column; }
         }
-        /* Styling für das sichtbare Auswahlfeld (Select) */
-select {
-    background: var(--surface);
-    color: var(--text);
-    border: 1px solid var(--border);
-    padding: 12px 16px;
-    border-radius: 12px;
-    font-family: 'Outfit', 'Segoe UI', sans-serif;
-    font-size: 0.95rem;
-    cursor: pointer;
-    outline: none;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    transition: all 0.3s ease;
-    
-    /* Entfernt den Standard-Browser-Pfeil, falls du einen eigenen nutzen möchtest */
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    
-    /* Optional: Füge hier ein eigenes Icon als Hintergrundbild für den Pfeil ein */
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2300f0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 16px;
-    padding-right: 40px; /* Platz für den Pfeil */
-}
-
-/* Hover- und Fokus-Effekt mit Neon-Glow */
-select:hover, select:focus {
-    border-color: var(--secondary);
-    box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
-}
-
-/* Styling für die ausgeklappte Liste (Optionen) */
-select option {
-    /* Ein sattes, dunkles Cyberpunk-Violett, passend zu deiner Palette */
-    background: #130a1c; 
-    color: var(--text);
-    padding: 12px;
-    font-family: 'Outfit', sans-serif;
-}
-
-/* Deaktiviert den standardmäßigen blauen Hover-Effekt im Browser (wo unterstützt) */
-select option:hover {
-    background: var(--primary);
-    color: #ffffff;
-}
     </style>
 </head>
 <body>
@@ -277,9 +210,9 @@ select option:hover {
                 <input id="value" type="number" step="any" value="" placeholder="Enter value..." />
                 <select id="fromUnit"></select>
             </div>
-            
+           
             <button id="swapBtn" class="btn secondary" title="Swap Units">⇄</button>
-            
+           
             <div class="input-group">
                 <select id="toUnit"></select>
             </div>
@@ -323,7 +256,7 @@ select option:hover {
             document.querySelector('.main').insertAdjacentHTML('beforeend', `
                 <p style="color:#ff5555; text-align:center; margin:20px; padding:15px; background:rgba(255,0,0,0.1); border-radius:12px;">
                     ❌ Konnte units.json nicht laden.<br>
-                    Stelle sicher, dass die Datei im selben Ordner wie diese index.html liegt.
+                    Die Datei muss im selben Ordner wie diese index.html liegen.
                 </p>
             `);
         }
@@ -343,20 +276,19 @@ select option:hover {
     let isRestoring = false;
 
     function init() {
-        categoryEl.innerHTML = '';
         Object.keys(unitsData).forEach(k => {
             const opt = document.createElement('option');
             opt.value = k;
             opt.textContent = k;
             categoryEl.appendChild(opt);
         });
-        
-        if(Object.keys(unitsData).length > 0) {
-            const firstCat = Object.keys(unitsData)[0];
-            categoryEl.value = firstCat;
-            populateUnits(firstCat);
-        }
-        
+       
+        categoryEl.value = "Length";
+        populateUnits("Length");
+       
+        pushHistory({ cat: "Length", from: "ly", to: "pc", input: 1, output: "0,3066" });
+        pushHistory({ cat: "Chemistry", from: "M", to: "mM", input: 1, output: "1.000" });
+       
         resultValueEl.textContent = '—';
         resultDetailEl.textContent = 'Ready to convert';
     }
@@ -365,19 +297,18 @@ select option:hover {
         fromEl.innerHTML = '';
         toEl.innerHTML = '';
         const currentCategory = unitsData[cat];
-        if(!currentCategory) return;
-        
+       
         Object.keys(currentCategory).forEach(u => {
             if (u === "special") return;
             const o1 = document.createElement('option');
             o1.value = u;
             o1.textContent = u;
             fromEl.appendChild(o1);
-            
+           
             const o2 = o1.cloneNode(true);
             toEl.appendChild(o2);
         });
-        
+       
         fromEl.value = fromEl.options[0]?.value || '';
         toEl.value = toEl.options[1]?.value || fromEl.value;
     }
@@ -388,7 +319,7 @@ select option:hover {
         if (unit === "°F") return (Number(v) - 32) * 5/9 + 273.15;
         return Number(v);
     }
-    
+   
     function kToTemp(k, unit) {
         if (unit === "K") return k;
         if (unit === "°C") return k - 273.15;
@@ -398,8 +329,6 @@ select option:hover {
 
     function convert(cat, from, to, val) {
         const currentCategory = unitsData[cat];
-        if(!currentCategory) return 0;
-        
         if (currentCategory.special) {
             const kelvin = tempToK(val, from);
             return kToTemp(kelvin, to);
@@ -413,13 +342,13 @@ select option:hover {
     function showResult(rawVal, val, from, to) {
         const prec = Number(precisionEl.value);
         const formatted = Number(rawVal).toLocaleString('de-DE', { maximumFractionDigits: prec });
-        
+       
         resultValueEl.style.opacity = 0;
         setTimeout(() => {
             resultValueEl.textContent = formatted;
             resultValueEl.style.opacity = 1;
         }, 120);
-        
+       
         resultDetailEl.textContent = `${val} ${from} → ${to}`;
         return formatted;
     }
@@ -429,22 +358,20 @@ select option:hover {
         const from = fromEl.value;
         const to = toEl.value;
         
-        if(!cat || !from || !to) return;
-        
         let val = valueEl.value.trim() === "" ? 1 : Number(valueEl.value);
-        
+       
         if (isNaN(val)) {
             resultValueEl.textContent = '—';
             resultDetailEl.textContent = 'Ready to convert';
             return;
         }
-        
+       
         const rawResult = convert(cat, from, to, val);
-        const displayVal = (val === 1 && valueEl.value.trim() === "") ? 1 : val;
+        const displayVal = (val === 1 && valueEl.value.trim() === "") ? "" : val;
         const formattedStr = showResult(rawResult, displayVal, from, to);
-        
-        if (!skipHistory && !isRestoring && valueEl.value.trim() !== "") {
-            pushHistory({ cat, from, to, input: displayVal, output: formattedStr });
+       
+        if (!skipHistory && !isRestoring) {
+            pushHistory({ cat, from, to, input: val, output: formattedStr });
         }
     }
 
@@ -470,7 +397,7 @@ select option:hover {
                 <span style="color:var(--secondary)">→ ${h.output} ${h.to}</span>
             `;
             d.title = `${h.cat} • Click to restore`;
-            
+           
             d.addEventListener('click', () => {
                 isRestoring = true;
                 categoryEl.value = h.cat;
@@ -497,7 +424,7 @@ select option:hover {
         populateUnits(categoryEl.value);
         doConvert(true);
     });
-    
+   
     precisionEl.addEventListener('change', () => doConvert(true));
     valueEl.addEventListener('input', () => doConvert(true));
     valueEl.addEventListener('blur', () => doConvert(false));
