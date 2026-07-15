@@ -40,12 +40,7 @@
             text-align: center;
             position: relative;
         }
-        h1 {
-            color: var(--primary);
-            margin-bottom: 5px;
-            font-size: 1.8rem;
-            text-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
-        }
+        h1 { color: var(--primary); margin-bottom: 5px; font-size: 1.8rem; text-shadow: 0 0 10px rgba(255, 0, 127, 0.4); }
         .score-board {
             display: flex;
             justify-content: space-between;
@@ -54,10 +49,7 @@
             font-size: 1.1rem;
             color: var(--text-secondary);
         }
-        .score-board span {
-            color: var(--secondary);
-            font-weight: bold;
-        }
+        .score-board span { color: var(--secondary); font-weight: bold; }
         #gameCanvas {
             background: rgba(0, 0, 0, 0.4);
             border: 2px solid var(--border);
@@ -68,82 +60,33 @@
             box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.1);
             cursor: pointer;
         }
-        .instructions {
-            margin-top: 15px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
+        .instructions { margin-top: 15px; color: var(--text-secondary); font-size: 0.9rem; }
         .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(13, 7, 20, 0.85);
-            border-radius: 24px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 7, 20, 0.85); border-radius: 24px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 10;
-            transition: opacity 0.3s ease;
         }
-        .overlay.hidden {
-            display: none;
-        }
+        .overlay.hidden { display: none; }
         .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            margin-top: 15px;
+            background: var(--primary); color: white; border: none;
+            padding: 14px 28px; border-radius: 12px; cursor: pointer;
+            font-weight: bold; font-size: 1.1rem; margin-top: 15px;
             box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
         }
-        .btn:hover {
-            filter: brightness(1.2);
-            box-shadow: 0 0 25px var(--primary);
-            transform: scale(1.05);
-        }
+        .btn:hover { filter: brightness(1.2); box-shadow: 0 0 25px var(--primary); transform: scale(1.05); }
         .hidden-ai-trigger {
-            position: absolute;
-            bottom: 12px;
-            right: 20px;
-            width: 20px;
-            height: 20px;
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.03);
-            font-size: 14px;
-            cursor: pointer;
-            z-index: 100;
-            outline: none;
-            transition: color 0.3s;
+            position: absolute; bottom: 12px; right: 20px;
+            width: 20px; height: 20px; background: transparent; border: none;
+            color: rgba(255, 255, 255, 0.03); cursor: pointer; z-index: 100;
         }
-        .hidden-ai-trigger:hover {
-            color: var(--secondary);
-        }
+        .hidden-ai-trigger:hover { color: var(--secondary); }
         #aiStatus {
-            position: absolute;
-            top: 40px;
-            right: 45px;
-            font-size: 0.8rem;
-            color: #39ff14;
-            font-weight: bold;
-            text-shadow: 0 0 8px #39ff14;
-            letter-spacing: 1px;
-            display: none;
-            animation: pulse 1.5s infinite;
+            position: absolute; top: 40px; right: 45px;
+            font-size: 0.8rem; color: #39ff14; font-weight: bold;
+            text-shadow: 0 0 8px #39ff14; display: none; animation: pulse 1.5s infinite;
         }
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
     </style>
 </head>
 <body>
@@ -173,8 +116,6 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const overlay = document.getElementById('overlay');
-    const overlayTitle = document.getElementById('overlayTitle');
-    const overlayDesc = document.getElementById('overlayDesc');
     const startBtn = document.getElementById('startBtn');
     const aiBtn = document.getElementById('aiBtn');
     const aiStatus = document.getElementById('aiStatus');
@@ -197,8 +138,8 @@
         width: 24,
         height: 34,
         velocityY: 0,
-        gravity: 0.7,
-        jumpStrength: -14,
+        gravity: 0.9,          // erhöht → schnelleres Absinken
+        jumpStrength: -11.5,   // reduziert → niedrigerer Sprung
         isJumping: false,
        
         draw() {
@@ -309,7 +250,6 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         frameCount++;
 
-        // Bodenlinie
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -317,18 +257,16 @@
         ctx.lineTo(canvas.width, 184);
         ctx.stroke();
 
-        // Dino
         dino.update();
         dino.draw();
 
-        // Hindernisse spawnen
         let spawnInterval = Math.max(50, 85 - Math.floor(gameSpeed * 2));
         if (frameCount % spawnInterval === 0) {
             obstacles.push(new Obstacle());
             if (gameSpeed < 14) gameSpeed += 0.15;
         }
 
-        // === AUTOPILOT - Frühzeitiges Springen ===
+        // Autopilot – früh springen, aber mit niedrigem Sprung
         if (autopilot) {
             let nextObstacle = null;
             for (let obs of obstacles) {
@@ -342,24 +280,19 @@
                 let distance = nextObstacle.x - dino.x;
 
                 if (nextObstacle.type === 'ground') {
-                    // Sehr frühes Springen
-                    let optimalJumpDistance = gameSpeed * 16;
+                    let optimalJumpDistance = gameSpeed * 15.5;
                     if (distance > 0 && distance < optimalJumpDistance) {
                         dino.jump();
                     }
-                } else {
-                    // Drohnen
-                    if (nextObstacle.y > 130) { // tiefe Drohne → muss drüber springen
-                        let optimalJumpDistance = gameSpeed * 17;
-                        if (distance > 0 && distance < optimalJumpDistance) {
-                            dino.jump();
-                        }
+                } else if (nextObstacle.y > 130) {
+                    let optimalJumpDistance = gameSpeed * 16.5;
+                    if (distance > 0 && distance < optimalJumpDistance) {
+                        dino.jump();
                     }
                 }
             }
         }
 
-        // Hindernisse updaten & Kollision
         for (let i = obstacles.length - 1; i >= 0; i--) {
             obstacles[i].update();
             obstacles[i].draw();
@@ -385,11 +318,8 @@
     }
 
     function triggerJump() {
-        if (isPlaying) {
-            if (!autopilot) dino.jump();
-        } else {
-            startGame();
-        }
+        if (isPlaying && !autopilot) dino.jump();
+        else if (!isPlaying) startGame();
     }
 
     window.addEventListener('keydown', (e) => {
@@ -400,15 +330,11 @@
     });
 
     canvas.addEventListener('click', triggerJump);
-    startBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        startGame();
-    });
+    startBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
 
     aiBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         autopilot = !autopilot;
-       
         if (autopilot) {
             aiStatus.style.display = 'block';
             aiBtn.style.color = '#39ff14';
@@ -419,7 +345,6 @@
         }
     });
 
-    // Initiales Zeichnen
     dino.draw();
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
     ctx.lineWidth = 2;
