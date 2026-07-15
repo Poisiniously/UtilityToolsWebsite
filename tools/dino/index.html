@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber-Dino Run | Utility Hub</title>
+    <style>
+        :root {
+            --background: #0d0714;
+            --surface: rgba(26, 12, 38, .65);
+            --primary: #ff007f;
+            --secondary: #00f0ff;
+            --text: #f4f4ff;
+            --text-secondary: #a0a0c0;
+            --border: rgba(255, 255, 255, .08);
+            --font: 'Outfit', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: var(--background);
+            color: var(--text);
+            font-family: var(--font);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 5px;
+            font-size: 1.8rem;
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            max-width: 600px;
+            margin: 0 auto 15px auto;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .score-board span {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        /* Das Spielfeld */
+        #gameCanvas {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .instructions {
+            margin-top: 15px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Overlay für Game Over / Start */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 7, 20, 0.85);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.hidden {
+            display: none;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+        }
+
+        .btn:hover {
+            filter: brightness(1.2);
+            box-shadow: 0 0 25px var(--primary);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>Cyber-Dino Run</h1>
+    
+    <div class="score-board">
+        <div>Score: <span id="score">0</span></div>
+        <div>Highscore: <span id="highscore">0</span></div>
+    </div>
+
+    <div style="position: relative;">
+        <canvas id="gameCanvas" width="600" height="200"></canvas>
+
+        <div id="overlay" class="overlay">
+            <h2 id="overlayTitle" style="color: var(--secondary); font-size: 2rem; margin: 0;">Bereit?</h2>
+            <p id="overlayDesc" style="color: var(--text-secondary); margin: 8px 0 0 0;">Drücke die Taste zum Starten</p>
+            <button id="startBtn" class="btn">SPIELEN</button>
+        </div>
+    </div>
+
+    <div class="instructions">
+        Tippe auf das Spielfeld oder drücke <strong>LEERTASTE / PFEILTASTE HOCH</strong> zum Springen.
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const overlay = document.getElementById('overlay');
+    const overlayTitle = document.getElementById('overlayTitle');
+    const overlayDesc = document.getElementById('overlayDesc');
+    const startBtn = document.getElementById('startBtn');
+    
+    const scoreEl = document.getElementById('score');
+    const highscoreEl = document.getElementById('highscore');
+
+    // Spiel-Variablen
+    let isPlaying = false;
+    let score = 0;
+    let highscore = localStorage.getItem('dinoHighscore') || 0;
+    highscoreEl.textContent = highscore;
+
+    let animationId;
+    let gameSpeed = 5;
+    let frameCount = 0;
+
+    // Dino Objekt
+    const dino = {
+        x: 50,
+        y: 150,
+        width: 24,
+        height: 34,
+        velocityY: 0,
+        gravity: 0.6,
+        jumpStrength: -10,
+        isJumping: false,
+        
+        draw() {
+            // Neon Cyberpunk Dino zeichnen
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = '#ff007f';
+            ctx.fillStyle = '#ff007f';
+            
+            // Körper
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            
+            // Kleines Auge
+            ctx.fillStyle = '#0d0714';
+            ctx.fillRect(this.x + 16, this.y + 6, 4, 4);
+            
+            // Schatten-Reset, damit nicht alles leuchtet
+            ctx.shadowBlur = 0;
+        },
+        
+        jump() {
+            if (!this.isJumping) {
+                this.velocityY = this.jumpStrength;
+                this.isJumping = true;
+            }
+        },
+        
+        update() {
+            this.y += this.velocityY;
+            this.velocityY += this.gravity;
+
+            // Bodenkollision
+            if (this.y >= 150) {
+                this.y = 150;
+                this.velocityY = 0;
+                this.isJumping = false;
+            }
+        }
+    };
+
+    // Hindernis-Klasse (Kakteen)
+    class Obstacle {
+        constructor() {
+            this.x = canvas.width;
+            this.y = 150;
+            this.width = 15 + Math.random() * 15; // Zufällige Breiten
+            this.height = 20 + Math.random() * 25; // Zufällige Höhen
+            this.y = 184 - this.height; // Perfekt auf dem Boden positionieren
+        }
+
+        draw() {
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#00f0ff';
+            ctx.fillStyle = '#00f0ff';
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.shadowBlur = 0;
+        }
+
+        update() {
+            this.x -= gameSpeed;
+        }
+    }
+
+    let obstacles = [];
+
+    // Spiel starten / zurücksetzen
+    function startGame() {
+        isPlaying = true;
+        score = 0;
+        gameSpeed = 5;
+        obstacles = [];
+        dino.y = 150;
+        dino.velocityY = 0;
+        dino.isJumping = false;
+        overlay.classList.add('hidden');
+        scoreEl.textContent = score;
+        
+        cancelAnimationFrame(animationId);
+        gameLoop();
+    }
+
+    // Game Over
+    function gameOver() {
+        isPlaying = false;
+        cancelAnimationFrame(animationId);
+        
+        // Highscore speichern
+        if (score > highscore) {
+            highscore = score;
+            localStorage.setItem('dinoHighscore', highscore);
+            highscoreEl.textContent = highscore;
+        }
+
+        overlayTitle.textContent = "GAME OVER";
+        overlayDesc.textContent = `Erreichte Punktzahl: ${score}`;
+        startBtn.textContent = "ERNEUT STARTEN";
+        overlay.classList.remove('hidden');
+    }
+
+    // Spiel-Schleife (Game Loop)
+    function gameLoop() {
+        if (!isPlaying) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        frameCount++;
+
+        // 1. Hintergrund-Bodenlinie zeichnen
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, 184);
+        ctx.lineTo(canvas.width, 184);
+        ctx.stroke();
+
+        // 2. Dino aktualisieren und zeichnen
+        dino.update();
+        dino.draw();
+
+        // 3. Hindernisse generieren (Zufällige Abstände)
+        if (frameCount % 90 === 0) {
+            obstacles.push(new Obstacle());
+            // Geschwindigkeit ganz leicht anheben mit der Zeit
+            if (gameSpeed < 12) gameSpeed += 0.25; 
+        }
+
+        // 4. Hindernisse updaten und kollidieren
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+            obstacles[i].update();
+            obstacles[i].draw();
+
+            // Kollisionsprüfung (AABB)
+            if (
+                dino.x < obstacles[i].x + obstacles[i].width &&
+                dino.x + dino.width > obstacles[i].x &&
+                dino.y < obstacles[i].y + obstacles[i].height &&
+                dino.y + dino.height > obstacles[i].y
+            ) {
+                gameOver();
+                return;
+            }
+
+            // Aus dem Bildschirm gelaufene Objekte löschen & Score erhöhen
+            if (obstacles[i].x + obstacles[i].width < 0) {
+                obstacles.splice(i, 1);
+                score++;
+                scoreEl.textContent = score;
+            }
+        }
+
+        animationId = requestAnimationFrame(gameLoop);
+    }
+
+    // Steuerung Events
+    function triggerJump() {
+        if (isPlaying) {
+            dino.jump();
+        } else {
+            startGame();
+        }
+    }
+
+    // Tastatur Steuerung
+    window.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'ArrowUp') {
+            e.preventDefault(); // Verhindert das Scrollen der Seite bei Leertaste
+            triggerJump();
+        }
+    });
+
+    // Touch & Klick-Steuerung fürs Canvas und den Startknopf
+    canvas.addEventListener('click', triggerJump);
+    startBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Verhindert doppelten Trigger durch das Canvas
+        startGame();
+    });
+
+    // Erstes Zeichnen des Dinos auf dem Canvas
+    dino.draw();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, 184);
+    ctx.lineTo(canvas.width, 184);
+    ctx.stroke();
+</script>
+</body>
+</html>
