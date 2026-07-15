@@ -15,7 +15,6 @@
             --border: rgba(255, 255, 255, .08);
             --font: 'Outfit', 'Segoe UI', sans-serif;
         }
-
         body {
             margin: 0;
             padding: 20px;
@@ -29,7 +28,6 @@
             overflow: hidden;
             user-select: none;
         }
-
         .game-container {
             width: 100%;
             max-width: 800px;
@@ -42,14 +40,12 @@
             text-align: center;
             position: relative;
         }
-
         h1 {
             color: var(--primary);
             margin-bottom: 5px;
             font-size: 1.8rem;
             text-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
         }
-
         .score-board {
             display: flex;
             justify-content: space-between;
@@ -58,13 +54,10 @@
             font-size: 1.1rem;
             color: var(--text-secondary);
         }
-
         .score-board span {
             color: var(--secondary);
             font-weight: bold;
         }
-
-        /* Das Spielfeld */
         #gameCanvas {
             background: rgba(0, 0, 0, 0.4);
             border: 2px solid var(--border);
@@ -75,14 +68,11 @@
             box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.1);
             cursor: pointer;
         }
-
         .instructions {
             margin-top: 15px;
             color: var(--text-secondary);
             font-size: 0.9rem;
         }
-
-        /* Overlay für Game Over / Start */
         .overlay {
             position: absolute;
             top: 0;
@@ -98,11 +88,9 @@
             z-index: 10;
             transition: opacity 0.3s ease;
         }
-
         .overlay.hidden {
             display: none;
         }
-
         .btn {
             background: var(--primary);
             color: white;
@@ -116,14 +104,11 @@
             margin-top: 15px;
             box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
         }
-
         .btn:hover {
             filter: brightness(1.2);
             box-shadow: 0 0 25px var(--primary);
             transform: scale(1.05);
         }
-
-        /* Versteckter Autopilot-Knopf unten rechts */
         .hidden-ai-trigger {
             position: absolute;
             bottom: 12px;
@@ -132,19 +117,16 @@
             height: 20px;
             background: transparent;
             border: none;
-            color: rgba(255, 255, 255, 0.03); /* Extrem schwach sichtbar */
+            color: rgba(255, 255, 255, 0.03);
             font-size: 14px;
             cursor: pointer;
             z-index: 100;
             outline: none;
             transition: color 0.3s;
         }
-
         .hidden-ai-trigger:hover {
-            color: var(--secondary); /* Leuchtet leicht auf, wenn man drüberhovert */
+            color: var(--secondary);
         }
-
-        /* Status-Anzeige für den Autopiloten */
         #aiStatus {
             position: absolute;
             top: 40px;
@@ -157,7 +139,6 @@
             display: none;
             animation: pulse 1.5s infinite;
         }
-
         @keyframes pulse {
             0% { opacity: 0.6; }
             50% { opacity: 1; }
@@ -166,31 +147,25 @@
     </style>
 </head>
 <body>
-
 <div class="game-container">
     <h1>Cyber-Dino Run</h1>
-    
+   
     <div id="aiStatus">A.I. AUTOPILOT ACTIVE</div>
-
     <div class="score-board">
         <div>Score: <span id="score">0</span></div>
         <div>Highscore: <span id="highscore">0</span></div>
     </div>
-
     <div style="position: relative;">
         <canvas id="gameCanvas" width="600" height="200"></canvas>
-
         <div id="overlay" class="overlay">
             <h2 id="overlayTitle" style="color: var(--secondary); font-size: 2rem; margin: 0;">Bereit?</h2>
             <p id="overlayDesc" style="color: var(--text-secondary); margin: 8px 0 0 0;">Drücke die Taste zum Starten</p>
             <button id="startBtn" class="btn">SPIELEN</button>
         </div>
     </div>
-
     <div class="instructions">
         Tippe auf das Spielfeld oder drücke <strong>LEERTASTE / PFEILTASTE HOCH</strong> zum Springen.
     </div>
-
     <button class="hidden-ai-trigger" id="aiBtn" title="Toggle Neural Net Autopilot">.</button>
 </div>
 
@@ -203,59 +178,50 @@
     const startBtn = document.getElementById('startBtn');
     const aiBtn = document.getElementById('aiBtn');
     const aiStatus = document.getElementById('aiStatus');
-    
+   
     const scoreEl = document.getElementById('score');
     const highscoreEl = document.getElementById('highscore');
 
-    // Spiel-Variablen
     let isPlaying = false;
     let autopilot = false;
     let score = 0;
     let highscore = localStorage.getItem('dinoHighscore') || 0;
     highscoreEl.textContent = highscore;
-
     let animationId;
     let gameSpeed = 5;
     let frameCount = 0;
 
-    // Dino Objekt (Physik für schnelleren Jump optimiert)
     const dino = {
         x: 50,
         y: 150,
         width: 24,
         height: 34,
         velocityY: 0,
-        gravity: 0.95,       // Erhöht für schnelleres Absinken (vorher 0.6)
-        jumpStrength: -14,   // Erhöht für kraftvolleren Absprung (vorher -10)
+        gravity: 0.7,
+        jumpStrength: -14,
         isJumping: false,
-        
+       
         draw() {
             ctx.shadowBlur = 12;
             ctx.shadowColor = '#ff007f';
             ctx.fillStyle = '#ff007f';
-            
-            // Körper
             ctx.fillRect(this.x, this.y, this.width, this.height);
-            
-            // Kleines Auge
+           
             ctx.fillStyle = '#0d0714';
             ctx.fillRect(this.x + 16, this.y + 6, 4, 4);
-            
             ctx.shadowBlur = 0;
         },
-        
+       
         jump() {
             if (!this.isJumping) {
                 this.velocityY = this.jumpStrength;
                 this.isJumping = true;
             }
         },
-        
+       
         update() {
             this.y += this.velocityY;
             this.velocityY += this.gravity;
-
-            // Bodenkollision
             if (this.y >= 150) {
                 this.y = 150;
                 this.velocityY = 0;
@@ -264,35 +230,31 @@
         }
     };
 
-    // Hindernis-Klasse (Boden-Kakteen und schwebende Drohnen)
     class Obstacle {
         constructor() {
-            this.type = Math.random() > 0.35 ? 'ground' : 'air'; // 35% Chance auf Flugdrohne
+            this.type = Math.random() > 0.35 ? 'ground' : 'air';
             this.x = canvas.width;
-            
+           
             if (this.type === 'ground') {
-                this.width = 16 + Math.random() * 16;   // Zufällige Breite
-                this.height = 24 + Math.random() * 20;  // Zufällige Höhe
-                this.y = 184 - this.height;             // Auf dem Boden
-                this.color = '#00f0ff';                 // Cyan für Boden
+                this.width = 16 + Math.random() * 16;
+                this.height = 24 + Math.random() * 20;
+                this.y = 184 - this.height;
+                this.color = '#00f0ff';
             } else {
                 this.width = 20;
                 this.height = 14;
-                // Schwebt auf einer Höhe, bei der man drunter herlaufen ODER drüberspringen muss
-                this.y = Math.random() > 0.5 ? 115 : 145; 
-                this.color = '#ffff00';                 // Gelb für Drohnen
+                this.y = Math.random() > 0.5 ? 115 : 145;
+                this.color = '#ffff00';
             }
         }
-
         draw() {
             ctx.shadowBlur = 10;
             ctx.shadowColor = this.color;
             ctx.fillStyle = this.color;
-            
+           
             if (this.type === 'ground') {
                 ctx.fillRect(this.x, this.y, this.width, this.height);
             } else {
-                // Drohnen-Form (Hexagon-artig)
                 ctx.beginPath();
                 ctx.moveTo(this.x, this.y + this.height/2);
                 ctx.lineTo(this.x + 5, this.y);
@@ -305,7 +267,6 @@
             }
             ctx.shadowBlur = 0;
         }
-
         update() {
             this.x -= gameSpeed;
         }
@@ -313,7 +274,6 @@
 
     let obstacles = [];
 
-    // Spiel starten
     function startGame() {
         isPlaying = true;
         score = 0;
@@ -324,36 +284,32 @@
         dino.isJumping = false;
         overlay.classList.add('hidden');
         scoreEl.textContent = score;
-        
+       
         cancelAnimationFrame(animationId);
         gameLoop();
     }
 
-    // Game Over
     function gameOver() {
         isPlaying = false;
         cancelAnimationFrame(animationId);
-        
+       
         if (score > highscore) {
             highscore = score;
             localStorage.setItem('dinoHighscore', highscore);
             highscoreEl.textContent = highscore;
         }
-
         overlayTitle.textContent = "GAME OVER";
         overlayDesc.textContent = `Score: ${score}`;
         startBtn.textContent = "RESTART";
         overlay.classList.remove('hidden');
     }
 
-    // Spiel-Schleife (Game Loop)
     function gameLoop() {
         if (!isPlaying) return;
-
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         frameCount++;
 
-        // 1. Cyber-Bodenlinie zeichnen
+        // Bodenlinie
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -361,20 +317,19 @@
         ctx.lineTo(canvas.width, 184);
         ctx.stroke();
 
-        // 2. Dino updaten
+        // Dino
         dino.update();
         dino.draw();
 
-        // 3. Hindernisse spawnen (Abstand verringert sich leicht bei höherer Geschwindigkeit)
+        // Hindernisse spawnen
         let spawnInterval = Math.max(50, 85 - Math.floor(gameSpeed * 2));
         if (frameCount % spawnInterval === 0) {
             obstacles.push(new Obstacle());
-            if (gameSpeed < 14) gameSpeed += 0.15; // Sanfte Beschleunigung
+            if (gameSpeed < 14) gameSpeed += 0.15;
         }
 
-        // 4. Autopilot-K.I. Logik
+        // === AUTOPILOT - Frühzeitiges Springen ===
         if (autopilot) {
-            // Finde das nächste kommende Hindernis vor dem Dino
             let nextObstacle = null;
             for (let obs of obstacles) {
                 if (obs.x + obs.width > dino.x) {
@@ -385,33 +340,30 @@
 
             if (nextObstacle) {
                 let distance = nextObstacle.x - dino.x;
-                
+
                 if (nextObstacle.type === 'ground') {
-                    // Perfekten Absprung berechnen basierend auf der aktuellen Geschwindigkeit
-                    let optimalJumpDistance = gameSpeed * 10.5; 
+                    // Sehr frühes Springen
+                    let optimalJumpDistance = gameSpeed * 16;
                     if (distance > 0 && distance < optimalJumpDistance) {
                         dino.jump();
                     }
                 } else {
-                    // K.I.-Verhalten für Drohnen:
-                    // Wenn die Drohne zu tief fliegt (y = 145), MUSS der Dino drüberspringen.
-                    if (nextObstacle.y > 130) {
-                        let optimalJumpDistance = gameSpeed * 11.5;
+                    // Drohnen
+                    if (nextObstacle.y > 130) { // tiefe Drohne → muss drüber springen
+                        let optimalJumpDistance = gameSpeed * 17;
                         if (distance > 0 && distance < optimalJumpDistance) {
                             dino.jump();
                         }
                     }
-                    // Wenn sie hoch genug fliegt (y = 115), läuft der Dino einfach darunter durch (kein Sprung).
                 }
             }
         }
 
-        // 5. Hindernisse zeichnen und auf Kollision prüfen
+        // Hindernisse updaten & Kollision
         for (let i = obstacles.length - 1; i >= 0; i--) {
             obstacles[i].update();
             obstacles[i].draw();
 
-            // Kollisionsprüfung (AABB)
             if (
                 dino.x < obstacles[i].x + obstacles[i].width &&
                 dino.x + dino.width > obstacles[i].x &&
@@ -422,7 +374,6 @@
                 return;
             }
 
-            // Entfernen & Score erhöhen
             if (obstacles[i].x + obstacles[i].width < 0) {
                 obstacles.splice(i, 1);
                 score++;
@@ -433,16 +384,14 @@
         animationId = requestAnimationFrame(gameLoop);
     }
 
-    // Steuerung triggern
     function triggerJump() {
         if (isPlaying) {
-            if (!autopilot) dino.jump(); // Verhindert manuelle Sprünge im Autopilot-Modus
+            if (!autopilot) dino.jump();
         } else {
             startGame();
         }
     }
 
-    // Event Listener für Tastatur
     window.addEventListener('keydown', (e) => {
         if (e.key === ' ' || e.key === 'ArrowUp') {
             e.preventDefault();
@@ -450,21 +399,19 @@
         }
     });
 
-    // Klick auf Spielfeld
     canvas.addEventListener('click', triggerJump);
     startBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         startGame();
     });
 
-    // Versteckten Autopilot-Knopf umschalten
     aiBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         autopilot = !autopilot;
-        
+       
         if (autopilot) {
             aiStatus.style.display = 'block';
-            aiBtn.style.color = '#39ff14'; // Zeigt beim Hovern jetzt grün
+            aiBtn.style.color = '#39ff14';
             if (!isPlaying) startGame();
         } else {
             aiStatus.style.display = 'none';
