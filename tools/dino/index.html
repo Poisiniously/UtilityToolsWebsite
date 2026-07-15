@@ -1,23 +1,22 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber-Dino Run | Utility Hub</title>
+    <title>Cyber-Dino Run</title>
     <style>
         :root {
             --background: #0d0714;
-            --surface: rgba(26, 12, 38, .65);
+            --surface: rgba(26, 12, 38, .75);
             --primary: #ff007f;
             --secondary: #00f0ff;
             --text: #f4f4ff;
             --text-secondary: #a0a0c0;
-            --border: rgba(255, 255, 255, .08);
-            --font: 'Outfit', 'Segoe UI', sans-serif;
+            --border: rgba(255, 255, 255, .1);
+            --font: 'Outfit', system-ui, sans-serif;
         }
         body {
-            margin: 0;
-            padding: 20px;
+            margin: 0; padding: 20px;
             background: var(--background);
             color: var(--text);
             font-family: var(--font);
@@ -29,44 +28,51 @@
             user-select: none;
         }
         .game-container {
-            width: 100%;
-            max-width: 800px;
+            width: 100%; max-width: 800px;
             background: var(--surface);
             backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             border-radius: 24px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
             text-align: center;
             position: relative;
         }
-        h1 { color: var(--primary); margin-bottom: 5px; font-size: 1.8rem; text-shadow: 0 0 10px rgba(255, 0, 127, 0.4); }
+        h1 {
+            color: var(--primary);
+            margin: 0 0 10px 0;
+            font-size: 2.2rem;
+            text-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
+        }
         .score-board {
             display: flex;
             justify-content: space-between;
             max-width: 600px;
-            margin: 0 auto 15px auto;
-            font-size: 1.1rem;
+            margin: 0 auto 15px;
+            font-size: 1.15rem;
             color: var(--text-secondary);
         }
         .score-board span { color: var(--secondary); font-weight: bold; }
 
         #gameCanvas {
-            background: rgba(0, 0, 0, 0.4);
+            background: #0a050f;
             border: 2px solid var(--border);
             border-radius: 16px;
             display: block;
             margin: 0 auto;
-            max-width: 100%;
-            box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.1);
-            cursor: pointer;
+            box-shadow: inset 0 0 30px rgba(0, 240, 255, 0.15);
         }
 
-        .instructions { margin-top: 15px; color: var(--text-secondary); font-size: 0.9rem; }
+        .instructions {
+            margin-top: 15px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
 
         .overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(13, 7, 20, 0.85); border-radius: 24px;
+            background: rgba(13, 7, 20, 0.9);
+            border-radius: 24px;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 10;
         }
@@ -74,25 +80,22 @@
 
         .btn {
             background: var(--primary); color: white; border: none;
-            padding: 14px 28px; border-radius: 12px; cursor: pointer;
-            font-weight: bold; font-size: 1.1rem; margin-top: 15px;
-            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+            padding: 14px 32px; border-radius: 12px; cursor: pointer;
+            font-weight: bold; font-size: 1.15rem; margin-top: 15px;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
+            transition: all 0.3s;
         }
-        .btn:hover { filter: brightness(1.2); box-shadow: 0 0 25px var(--primary); transform: scale(1.05); }
+        .btn:hover {
+            filter: brightness(1.15);
+            transform: scale(1.05);
+        }
 
-        /* Versteckte Buttons */
         .hidden-trigger {
-            position: absolute;
-            bottom: 12px;
-            width: 20px;
-            height: 20px;
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.03);
-            font-size: 14px;
-            cursor: pointer;
-            z-index: 100;
-            outline: none;
+            position: absolute; bottom: 12px;
+            width: 22px; height: 22px;
+            background: transparent; border: none;
+            color: rgba(255,255,255,0.04);
+            font-size: 15px; cursor: pointer; z-index: 100;
             transition: color 0.3s;
         }
         .hidden-trigger:hover { color: var(--secondary); }
@@ -100,51 +103,43 @@
         #aiBtn { right: 20px; }
         #godBtn { left: 20px; }
 
-        /* Status Anzeigen */
         #aiStatus, #godStatus {
-            position: absolute;
-            top: 40px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            text-shadow: 0 0 8px;
-            letter-spacing: 1px;
-            display: none;
-            animation: pulse 1.5s infinite;
+            position: absolute; top: 45px; font-size: 0.82rem;
+            font-weight: bold; letter-spacing: 1px;
+            display: none; animation: pulse 1.8s infinite;
         }
-        #aiStatus  { right: 45px; color: #39ff14; text-shadow: 0 0 8px #39ff14; }
-        #godStatus { left: 45px;  color: #ff00ff; text-shadow: 0 0 8px #ff00ff; }
-
-        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+        #aiStatus  { right: 48px; color: #39ff14; }
+        #godStatus { left:  48px; color: #ff00ff; }
+        @keyframes pulse { 0%,100% { opacity: 0.65; } 50% { opacity: 1; } }
     </style>
 </head>
 <body>
 <div class="game-container">
-    <h1>Cyber-Dino Run</h1>
+    <h1>CYBER-DINO RUN</h1>
    
-    <div id="aiStatus">A.I. AUTOPILOT ACTIVE</div>
-    <div id="godStatus">GOD MODE ACTIVE</div>
+    <div id="aiStatus">🤖 AUTOPILOT ACTIVE</div>
+    <div id="godStatus">⚡ GOD MODE ACTIVE</div>
 
     <div class="score-board">
-        <div>Score: <span id="score">0</span></div>
-        <div>Highscore: <span id="highscore">0</span></div>
+        <div>SCORE: <span id="score">0</span></div>
+        <div>HIGHSCORE: <span id="highscore">0</span></div>
     </div>
 
     <div style="position: relative;">
         <canvas id="gameCanvas" width="600" height="200"></canvas>
         <div id="overlay" class="overlay">
-            <h2 id="overlayTitle" style="color: var(--secondary); font-size: 2rem; margin: 0;">Bereit?</h2>
-            <p id="overlayDesc" style="color: var(--text-secondary); margin: 8px 0 0 0;">Drücke die Taste zum Starten</p>
-            <button id="startBtn" class="btn">SPIELEN</button>
+            <h2 id="overlayTitle" style="color: var(--secondary); font-size: 2.4rem; margin: 0;">READY?</h2>
+            <p id="overlayDesc" style="color: var(--text-secondary); margin: 10px 0 20px;">Press SPACE or click to start</p>
+            <button id="startBtn" class="btn">PLAY</button>
         </div>
     </div>
 
     <div class="instructions">
-        Tippe auf das Spielfeld oder drücke <strong>LEERTASTE / PFEILTASTE HOCH</strong> zum Springen.
+        Click on the field or press <strong>SPACE / UP ARROW</strong> to jump
     </div>
 
-    <!-- Versteckte Buttons -->
-    <button class="hidden-trigger" id="godBtn" title="Toggle God Mode (Unsterblich)">.</button>
-    <button class="hidden-trigger" id="aiBtn" title="Toggle Neural Net Autopilot">.</button>
+    <button class="hidden-trigger" id="godBtn" title="Toggle God Mode">★</button>
+    <button class="hidden-trigger" id="aiBtn" title="Toggle Autopilot">⚡</button>
 </div>
 
 <script>
@@ -162,84 +157,121 @@
 
     let isPlaying = false;
     let autopilot = false;
-    let immortal = false;        // ← Neuer God Mode
+    let immortal = false;
     let score = 0;
-    let highscore = localStorage.getItem('dinoHighscore') || 0;
+    let highscore = localStorage.getItem('cyberDinoHighscore') || 0;
     highscoreEl.textContent = highscore;
-    let animationId;
-    let gameSpeed = 5;
-    let frameCount = 0;
+
+    let animationId, gameSpeed = 5.5, frameCount = 0;
 
     const dino = {
-        x: 50, y: 150, width: 24, height: 34,
+        x: 50, y: 150, width: 28, height: 38,
         velocityY: 0,
-        gravity: 0.9,
-        jumpStrength: -11.5,
+        gravity: 0.92,
+        jumpStrength: -12.5,
         isJumping: false,
-       
+
         draw() {
-            ctx.shadowBlur = 12;
+            ctx.shadowBlur = 18;
             ctx.shadowColor = '#ff007f';
             ctx.fillStyle = '#ff007f';
-            ctx.fillRect(this.x, this.y, this.width, this.height);
+
+            // Body
+            ctx.fillRect(this.x + 4, this.y + 6, 20, 22);
+            // Head
+            ctx.fillRect(this.x + 18, this.y + 4, 12, 14);
+            // Leg
+            ctx.fillRect(this.x + 8, this.y + 26, 6, 10);
+            ctx.fillRect(this.x + 16, this.y + 26, 6, 10);
+
+            // Spikes
+            ctx.fillStyle = '#00f0ff';
+            ctx.fillRect(this.x + 6, this.y + 8, 4, 6);
+            ctx.fillRect(this.x + 12, this.y + 6, 4, 6);
+
+            // Eye
             ctx.fillStyle = '#0d0714';
-            ctx.fillRect(this.x + 16, this.y + 6, 4, 4);
+            ctx.fillRect(this.x + 24, this.y + 9, 5, 5);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(this.x + 25, this.y + 10, 2, 2);
+
             ctx.shadowBlur = 0;
         },
-       
+
         jump() {
             if (!this.isJumping) {
                 this.velocityY = this.jumpStrength;
                 this.isJumping = true;
             }
         },
-       
+
         update() {
             this.y += this.velocityY;
             this.velocityY += this.gravity;
-            if (this.y >= 150) {
-                this.y = 150;
+            if (this.y >= 148) {
+                this.y = 148;
                 this.velocityY = 0;
                 this.isJumping = false;
             }
         }
     };
 
-    class Obstacle { /* ... unverändert ... */
+    class Obstacle {
         constructor() {
-            this.type = Math.random() > 0.35 ? 'ground' : 'air';
-            this.x = canvas.width;
-            if (this.type === 'ground') {
-                this.width = 16 + Math.random() * 16;
-                this.height = 24 + Math.random() * 20;
-                this.y = 184 - this.height;
-                this.color = '#00f0ff';
-            } else {
-                this.width = 20; this.height = 14;
-                this.y = Math.random() > 0.5 ? 115 : 145;
+            this.type = Math.random();
+            this.x = canvas.width + 20;
+            this.color = '#00f0ff';
+
+            if (this.type < 0.4) { // Single cactus
+                this.width = 18; this.height = 32;
+                this.y = 168 - this.height;
+                this.isDouble = false;
+            } else if (this.type < 0.65) { // Double cactus
+                this.width = 42; this.height = 32;
+                this.y = 168 - this.height;
+                this.isDouble = true;
+            } else { // Flying enemy
+                this.width = 28; this.height = 16;
+                this.y = Math.random() > 0.5 ? 95 : 125;
                 this.color = '#ffff00';
+                this.wave = 0;
+                this.isFlying = true;
             }
         }
+
+        update() {
+            this.x -= gameSpeed;
+            if (this.isFlying) this.wave += 0.12;
+        }
+
         draw() {
-            ctx.shadowBlur = 10;
+            ctx.shadowBlur = 12;
             ctx.shadowColor = this.color;
             ctx.fillStyle = this.color;
-            if (this.type === 'ground') {
-                ctx.fillRect(this.x, this.y, this.width, this.height);
-            } else {
+
+            if (this.isFlying) {
+                // Pterodactyl style
+                const flyY = this.y + Math.sin(this.wave) * 4;
                 ctx.beginPath();
-                ctx.moveTo(this.x, this.y + this.height/2);
-                ctx.lineTo(this.x + 5, this.y);
-                ctx.lineTo(this.x + this.width - 5, this.y);
-                ctx.lineTo(this.x + this.width, this.y + this.height/2);
-                ctx.lineTo(this.x + this.width - 5, this.y + this.height);
-                ctx.lineTo(this.x + 5, this.y + this.height);
+                ctx.moveTo(this.x, flyY + 8);
+                ctx.lineTo(this.x + 8, flyY);
+                ctx.lineTo(this.x + 20, flyY + 4);
+                ctx.lineTo(this.x + this.width, flyY + 10);
+                ctx.lineTo(this.x + 18, flyY + 16);
+                ctx.lineTo(this.x + 6, flyY + 13);
                 ctx.closePath();
                 ctx.fill();
+            } else {
+                // Cactus style
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+                ctx.fillRect(this.x + 5, this.y - 8, 8, 12); // arm
+                if (this.isDouble) {
+                    ctx.fillRect(this.x + 22, this.y, 16, this.height);
+                    ctx.fillRect(this.x + 26, this.y - 8, 8, 12);
+                }
             }
             ctx.shadowBlur = 0;
         }
-        update() { this.x -= gameSpeed; }
     }
 
     let obstacles = [];
@@ -247,9 +279,9 @@
     function startGame() {
         isPlaying = true;
         score = 0;
-        gameSpeed = 5.5;
+        gameSpeed = 5.8;
         obstacles = [];
-        dino.y = 150; dino.velocityY = 0; dino.isJumping = false;
+        dino.y = 148; dino.velocityY = 0; dino.isJumping = false;
         overlay.classList.add('hidden');
         scoreEl.textContent = score;
         cancelAnimationFrame(animationId);
@@ -257,17 +289,17 @@
     }
 
     function gameOver() {
-        if (immortal) return; // ← Unsterblichkeit
+        if (immortal) return;
         isPlaying = false;
         cancelAnimationFrame(animationId);
-       
+
         if (score > highscore) {
             highscore = score;
-            localStorage.setItem('dinoHighscore', highscore);
+            localStorage.setItem('cyberDinoHighscore', highscore);
             highscoreEl.textContent = highscore;
         }
         overlayTitle.textContent = "GAME OVER";
-        overlayDesc.textContent = `Score: ${score}`;
+        overlayDesc.textContent = `Final Score: ${score}`;
         startBtn.textContent = "RESTART";
         overlay.classList.remove('hidden');
     }
@@ -277,54 +309,59 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         frameCount++;
 
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-        ctx.lineWidth = 2;
+        // Background grid
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.08)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < canvas.width; x += 40) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+
+        // Ground
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.moveTo(0, 184);
-        ctx.lineTo(canvas.width, 184);
+        ctx.moveTo(0, 170);
+        ctx.lineTo(canvas.width, 170);
         ctx.stroke();
 
         dino.update();
         dino.draw();
 
-        let spawnInterval = Math.max(50, 85 - Math.floor(gameSpeed * 2));
-        if (frameCount % spawnInterval === 0) {
+        // Spawn obstacles
+        if (frameCount % Math.max(45, 78 - Math.floor(gameSpeed * 2.2)) === 0) {
             obstacles.push(new Obstacle());
-            if (gameSpeed < 14) gameSpeed += 0.15;
+            if (gameSpeed < 15) gameSpeed += 0.13;
         }
 
         // Autopilot
         if (autopilot) {
-            let nextObstacle = null;
-            for (let obs of obstacles) {
-                if (obs.x + obs.width > dino.x) { nextObstacle = obs; break; }
-            }
-            if (nextObstacle) {
-                let distance = nextObstacle.x - dino.x;
-                if (nextObstacle.type === 'ground') {
-                    if (distance > 0 && distance < gameSpeed * 15.5) dino.jump();
-                } else if (nextObstacle.y > 130) {
-                    if (distance > 0 && distance < gameSpeed * 16.5) dino.jump();
+            let next = obstacles.find(o => o.x + o.width > dino.x);
+            if (next) {
+                let dist = next.x - dino.x;
+                if (next.isFlying && next.y > 110) {
+                    if (dist > 0 && dist < gameSpeed * 15) dino.jump();
+                } else if (!next.isFlying) {
+                    if (dist > 0 && dist < gameSpeed * 14.5) dino.jump();
                 }
             }
         }
 
-        // Hindernisse
+        // Update & draw obstacles
         for (let i = obstacles.length - 1; i >= 0; i--) {
-            obstacles[i].update();
-            obstacles[i].draw();
+            const obs = obstacles[i];
+            obs.update();
+            obs.draw();
 
-            // Kollision nur prüfen, wenn NICHT unsterblich
-            if (!immortal && 
-                dino.x < obstacles[i].x + obstacles[i].width &&
-                dino.x + dino.width > obstacles[i].x &&
-                dino.y < obstacles[i].y + obstacles[i].height &&
-                dino.y + dino.height > obstacles[i].y) {
+            if (!immortal &&
+                dino.x < obs.x + obs.width &&
+                dino.x + dino.width > obs.x &&
+                dino.y < obs.y + obs.height &&
+                dino.y + dino.height > obs.y) {
                 gameOver();
                 return;
             }
 
-            if (obstacles[i].x + obstacles[i].width < 0) {
+            if (obs.x + obs.width < 0) {
                 obstacles.splice(i, 1);
                 score++;
                 scoreEl.textContent = score;
@@ -339,42 +376,34 @@
         else if (!isPlaying) startGame();
     }
 
-    // Events
-    window.addEventListener('keydown', (e) => {
+    // Controls
+    window.addEventListener('keydown', e => {
         if (e.key === ' ' || e.key === 'ArrowUp') {
             e.preventDefault();
             triggerJump();
         }
     });
-
     canvas.addEventListener('click', triggerJump);
-    startBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
+    startBtn.addEventListener('click', e => { e.stopPropagation(); startGame(); });
 
-    // Autopilot Button
-    aiBtn.addEventListener('click', (e) => {
+    // Hidden buttons
+    aiBtn.addEventListener('click', e => {
         e.stopPropagation();
         autopilot = !autopilot;
         aiStatus.style.display = autopilot ? 'block' : 'none';
-        aiBtn.style.color = autopilot ? '#39ff14' : 'rgba(255,255,255,0.03)';
+        aiBtn.style.color = autopilot ? '#39ff14' : 'rgba(255,255,255,0.04)';
         if (autopilot && !isPlaying) startGame();
     });
 
-    // God Mode Button (neu)
-    godBtn.addEventListener('click', (e) => {
+    godBtn.addEventListener('click', e => {
         e.stopPropagation();
         immortal = !immortal;
         godStatus.style.display = immortal ? 'block' : 'none';
-        godBtn.style.color = immortal ? '#ff00ff' : 'rgba(255,255,255,0.03)';
+        godBtn.style.color = immortal ? '#ff00ff' : 'rgba(255,255,255,0.04)';
     });
 
-    // Initiales Zeichnen
+    // Initial draw
     dino.draw();
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, 184);
-    ctx.lineTo(canvas.width, 184);
-    ctx.stroke();
 </script>
 </body>
 </html>
