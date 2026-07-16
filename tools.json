@@ -45,6 +45,15 @@
     "url": "tools/barcode-generator/index.html"
   },
   {
+    "id": "fc",
+    "name": "font converter",
+    "category": "text",
+    "title": "Font Converter",
+    "desc": "Advanced text formatting",
+    "imageText": "FONT",
+    "url": "tools/font-converter/index.html"
+  },
+  {
     "id": "timer",
     "name": "timer",
     "category": "utility",
