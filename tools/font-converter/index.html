@@ -321,7 +321,7 @@
         // --- Retro & Monospace ---
         "monospace": {
             name: "Monospace", category: "retro",
-            map: "𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕ｍ𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝚉𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿"
+            map: "𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕ｍ𝚗𝚘𝚙𝚚𝚛𝚜𝚝uu𝚟𝚠𝚡𝚢𝚣𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝚉𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿"
         },
         "double-struck": {
             name: "Double Struck", category: "retro",
@@ -513,6 +513,30 @@
         });
     }
 
+    // Fallback-Methode für alte Browser oder lokale Datei-Aufrufe (file:///)
+    function fallbackCopy(text, callback) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        
+        // Aus dem sichtbaren Bereich schieben
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            callback();
+        } catch (err) {
+            console.error('Fallback-Kopieren ist fehlgeschlagen: ', err);
+        }
+        
+        document.body.removeChild(textArea);
+    }
+
     // Create single rows inside the scrolling view
     function createRow(name, content) {
         const row = document.createElement('div');
@@ -534,7 +558,8 @@
         btn.textContent = 'Copy';
 
         btn.addEventListener('click', () => {
-            navigator.clipboard.writeText(content).then(() => {
+            // Hilfsfunktion zum visuellen Feedback
+            const triggerSuccess = () => {
                 btn.textContent = 'Copied!';
                 btn.classList.add('copied');
                 
@@ -542,7 +567,17 @@
                     btn.textContent = 'Copy';
                     btn.classList.remove('copied');
                 }, 1200);
-            });
+            };
+
+            // 1. Moderner Weg (über HTTPS oder Localhost)
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(content).then(triggerSuccess).catch(err => {
+                    fallbackCopy(content, triggerSuccess);
+                });
+            } else {
+                // 2. Fallback-Weg (für lokale file:/// Dateien)
+                fallbackCopy(content, triggerSuccess);
+            }
         });
 
         info.appendChild(nameEl);
