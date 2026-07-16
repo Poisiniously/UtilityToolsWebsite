@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unicode Font Converter | Utility Hub</title>
+    <style>
+        :root {
+            --background: #0d0714;
+            --surface: rgba(26, 12, 38, .65);
+            --primary: #ff007f;
+            --secondary: #00f0ff;
+            --success: #39ff14;
+            --text: #f4f4ff;
+            --text-secondary: #a0a0c0;
+            --border: rgba(255, 255, 255, .08);
+            --font: 'Outfit', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: var(--background);
+            color: var(--text);
+            font-family: var(--font);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Custom Dark Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--background); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        .card {
+            width: 100%;
+            max-width: 940px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .main {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .brand-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin: 0;
+        }
+
+        .brand-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 16px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 1.1rem;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            resize: none;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
+        }
+
+        /* Font Output List */
+        .output-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-height: 420px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .font-row {
+            padding: 18px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .font-row:hover {
+            border-color: rgba(255, 0, 127, 0.25);
+            background: rgba(255, 0, 127, 0.02);
+        }
+
+        .font-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .font-name {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .font-preview {
+            font-size: 1.25rem;
+            color: var(--text);
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        .btn-copy {
+            background: rgba(255, 0, 127, 0.1);
+            border: 1px solid rgba(255, 0, 127, 0.3);
+            color: var(--primary);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-copy:hover {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .btn-copy.copied {
+            background: rgba(57, 255, 20, 0.15) !important;
+            border-color: var(--success) !important;
+            color: var(--success) !important;
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.3) !important;
+        }
+
+        /* Sidebar */
+        .side {
+            background: rgba(0,0,0,0.2);
+            border-left: 1px solid var(--border);
+            padding: 40px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .filter-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 12px 16px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-align: left;
+            transition: all 0.2s ease;
+            font-family: var(--font);
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            border-color: var(--secondary);
+            color: var(--text);
+            background: rgba(0, 240, 255, 0.05);
+        }
+
+        .filter-btn.active {
+            box-shadow: inset 0 0 8px rgba(0, 240, 255, 0.15);
+        }
+
+        /* Responsive */
+        @media (max-width: 880px) {
+            .card { grid-template-columns: 1fr; }
+            .side { border-left: none; border-top: 1px solid var(--border); padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="main">
+        <div>
+            <h1 class="brand-title">Unicode Font Converter</h1>
+            <div class="brand-subtitle">Stylize your text with rich Unicode characters — Utility Hub</div>
+        </div>
+
+        <div>
+            <label for="textInput">Input Text</label>
+            <textarea id="textInput" placeholder="Tippe etwas ein, um Schriften zu generieren...">Hello Cyberpunk</textarea>
+        </div>
+
+        <div>
+            <label>Styles & Output</label>
+            <div class="output-container" id="outputList"></div>
+        </div>
+    </div>
+
+    <div class="side">
+        <div>
+            <label>Filter Styles</label>
+            <div class="filter-list">
+                <button class="filter-btn active" data-filter="all">All Styles</button>
+                <button class="filter-btn" data-filter="bold">Bold & Italic</button>
+                <button class="filter-btn" data-filter="script">Script & Gothic</button>
+                <button class="filter-btn" data-filter="retro">Retro & Monospace</button>
+                <button class="filter-btn" data-filter="dec">Decorated & Fun</button>
+            </div>
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">
+            <strong>Hinweis:</strong> Unicode-Schriften bestehen aus mathematischen Symbolen. Manche Plattformen/Browser unterstützen eventuell nicht jedes dieser Sonderzeichen.
+        </div>
+    </div>
+</div>
+
+<script>
+    /* High-Performance Unicode Map Library 
+       Maps standard A-Z, a-z, and 0-9 to stylized ranges.
+    */
+    const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    const fontMap = {
+        // --- Bold & Italic ---
+        "sans-bold": {
+            name: "Sans Bold", category: "bold",
+            map: "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵"
+        },
+        "serif-bold-italic": {
+            name: "Serif Bold Italic", category: "bold",
+            map: "𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁0123456789"
+        },
+        "sans-italic": {
+            name: "Sans Italic", category: "bold",
+            map: "𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘲𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡0123456789"
+        },
+
+        // --- Script & Gothic ---
+        "script": {
+            name: "Cursive / Script", category: "script",
+            map: "𝒶𝒷𝒸𝒹 get𝒽𝒾𝒿𝓀𝓁𝓂𝓃ℴ𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏𝒜ℬ𝒞𝒟ℰℱ𝒢ℋℐ𝒥𝒦ℒℳ𝒩𝒪𝒫𝒬ℛ𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵0123456789"
+        },
+        "bold-script": {
+            name: "Bold Cursive", category: "script",
+            map: "𝓪𝒷𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩0123456789"
+        },
+        "gothic": {
+            name: "Gothic / Fraktur", category: "script",
+            map: "𝔞𝔟𝔠𝔡𝔢𝔣𝔤𝔥𝔦𝔨𝔩𝔪𝔫𝔬𝔭𝔮𝔯𝔰𝔱𝔲𝔳𝔴𝔵𝔶𝔷𝔄𝔅ℭ𝔇𝔈𝔉𝔊𝔋ℑ𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔ℜ𝔖𝔗𝔘𝔙𝔚𝔛𝔜battery0123456789"
+        },
+        "bold-gothic": {
+            name: "Bold Gothic", category: "script",
+            map: "𝖇𝖈𝖉𝖖𝖋𝖌𝖍𝖎𝖏𝖐𝖑𝖒𝖓𝖔𝖕𝖖𝖗𝖘𝖙𝖚𝖛𝖜𝖝𝖞𝖟𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅0123456789"
+        },
+
+        // --- Retro & Monospace ---
+        "monospace": {
+            name: "Monospace", category: "retro",
+            map: "𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝚉𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿"
+        },
+        "double-struck": {
+            name: "Double Struck / Outline", category: "retro",
+            map: "𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫𝔸𝔹ℂ𝔻𝔼𝔽𝔾ℍ𝕀𝕁𝕂𝕃𝕄ℕ𝕆ℙℚℝ𝕊𝕋𝕌𝕍𝕎𝕏𝕐ℤ𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡"
+        },
+        "fullwidth": {
+            name: "Vaporwave / Fullwidth", category: "retro",
+            map: "ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ０１２３４５６７８９"
+        },
+
+        // --- Decorated & Fun ---
+        "bubble": {
+            name: "Eingekreist / Bubble", category: "dec",
+            map: "ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩⒶⒷⒸⒹⒺⒻ MustⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ⓪①②③④⑤⑥⑦⑧⑨"
+        },
+        "squared": {
+            name: "Eingerahmt / Squared", category: "dec",
+            map: "🄲🄾🄳🄸🄽🄶🄷🅄🄱🄰🄲🄳🄴🄵🄶🄷🄸🄹🄺🄻🄼🄽🄾🄿🅀🅁🅂🅃🅄🅅🅆🅇🅈🅉🄰🄱🄲🄳🄴🄵🄶🄷🄸🄹🄺🄻🄼🄽🄾🄿🅀🅁🅂🅃🅄🅅🅆🅇🅈🅉0123456789"
+        }
+    };
+
+    /* Special Combiners & Modifiers functions */
+    const specialTransforms = {
+        "strike": {
+            name: "Durchgestrichen / Strike", category: "dec",
+            fn: (str) => str.split("").map(char => char + "\u0336").join("")
+        },
+        "underline": {
+            name: "Unterstrichen / Underline", category: "dec",
+            fn: (str) => str.split("").map(char => char + "\u0332").join("")
+        },
+        "upsidedown": {
+            name: "Flipped / Umgedreht", category: "dec",
+            fn: (str) => {
+                const normal = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.?!',";
+                const flipped = "ɐqɔpǝɟƃɥıɾʞlɯuodbɹsʇnʌʍxʎzⱯᗺƆᗡƎℲ⅁HIſʞ˥WNOԀΌᴚS┴∩ΛMẌ⅄Z0ƖᄅƐㄣϛ9ㄥ86˙¿¡,Ɀ";
+                return str.split("").reverse().map(c => {
+                    const idx = normal.indexOf(c);
+                    return idx !== -1 ? flipped[idx] : c;
+                }).join("");
+            }
+        }
+    };
+
+    /* DOM Elements */
+    const textInput = document.getElementById('textInput');
+    const outputList = document.getElementById('outputList');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+
+    let activeFilter = 'all';
+
+    function init() {
+        renderSchriften();
+        
+        // Event Listeners
+        textInput.addEventListener('input', renderSchriften);
+        
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeFilter = btn.dataset.filter;
+                renderSchriften();
+            });
+        });
+    }
+
+    // Main Conversion Function
+    function convertText(input, mapString) {
+        let result = "";
+        
+        // Array matching for complex unicode mappings
+        const mapArray = Array.from(mapString);
+        
+        for (let i = 0; i < input.length; i++) {
+            const char = input[i];
+            const idx = alphabet.indexOf(char);
+            
+            if (idx !== -1 && mapArray[idx]) {
+                result += mapArray[idx];
+            } else {
+                result += char; // Fallback to normal char
+            }
+        }
+        return result;
+    }
+
+    // Render Outputs dynamically
+    function renderSchriften() {
+        outputList.innerHTML = '';
+        const rawText = textInput.value || "Tippe etwas ein...";
+
+        // Process Standard Font Maps
+        Object.keys(fontMap).forEach(key => {
+            const style = fontMap[key];
+            
+            if (activeFilter !== 'all' && style.category !== activeFilter) return;
+
+            const converted = convertText(rawText, style.map);
+            createRow(style.name, converted);
+        });
+
+        // Process Special Modifier Functions
+        Object.keys(specialTransforms).forEach(key => {
+            const style = specialTransforms[key];
+
+            if (activeFilter !== 'all' && style.category !== activeFilter) return;
+
+            const converted = style.fn(rawText);
+            createRow(style.name, converted);
+        });
+    }
+
+    // Helper to create UI row elements
+    function createRow(name, content) {
+        const row = document.createElement('div');
+        row.className = 'font-row';
+
+        const info = document.createElement('div');
+        info.className = 'font-info';
+
+        const nameEl = document.createElement('div');
+        nameEl.className = 'font-name';
+        nameEl.textContent = name;
+
+        const previewEl = document.createElement('div');
+        previewEl.className = 'font-preview';
+        previewEl.textContent = content;
+
+        const btn = document.createElement('button');
+        btn.className = 'btn-copy';
+        btn.textContent = 'Copy';
+
+        btn.addEventListener('click', () => {
+            navigator.clipboard.writeText(content).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 1200);
+            });
+        });
+
+        info.appendChild(nameEl);
+        info.appendChild(previewEl);
+        row.appendChild(info);
+        row.appendChild(btn);
+        
+        outputList.appendChild(row);
+    }
+
+    // Run on startup
+    init();
+</script>
+</body>
+</html>
