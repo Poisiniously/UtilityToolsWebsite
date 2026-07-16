@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unicode Font Converter | Utility Hub</title>
+    <title>Unicode Font Converter | Utility Tools</title>
     <style>
         :root {
             --background: #0d0714;
@@ -23,10 +23,12 @@
             background: var(--background);
             color: var(--text);
             font-family: var(--font);
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden; /* Prevents body from scrolling */
+            box-sizing: border-box;
         }
 
         /* Custom Dark Scrollbar */
@@ -38,6 +40,8 @@
         .card {
             width: 100%;
             max-width: 940px;
+            height: 85vh;
+            max-height: 700px;
             background: var(--surface);
             backdrop-filter: blur(20px);
             border: 1px solid var(--border);
@@ -45,14 +49,15 @@
             display: grid;
             grid-template-columns: 1fr 280px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            overflow: hidden;
+            overflow: hidden; /* Card structure stays fully static */
         }
 
         .main {
             padding: 40px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
+            min-height: 0; /* Vital for nested flex scrolling in Chrome */
         }
 
         .brand-title {
@@ -72,7 +77,7 @@
             display: block;
             margin-bottom: 8px;
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: bold;
@@ -80,8 +85,8 @@
 
         textarea {
             width: 100%;
-            height: 100px;
-            padding: 16px;
+            height: 80px;
+            padding: 14px;
             background: rgba(0,0,0,0.4);
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -99,18 +104,25 @@
             box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
         }
 
-        /* Font Output List */
+        .output-section {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            flex: 1;
+        }
+
+        /* Font Output List - The ONLY scrollable element */
         .output-container {
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            max-height: 420px;
+            gap: 12px;
             overflow-y: auto;
+            flex: 1;
             padding-right: 8px;
         }
 
         .font-row {
-            padding: 18px;
+            padding: 16px;
             background: rgba(0,0,0,0.2);
             border: 1px solid var(--border);
             border-radius: 14px;
@@ -132,7 +144,7 @@
         }
 
         .font-name {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--text-secondary);
@@ -140,7 +152,7 @@
         }
 
         .font-preview {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             color: var(--text);
             word-break: break-all;
             white-space: pre-wrap;
@@ -150,11 +162,11 @@
             background: rgba(255, 0, 127, 0.1);
             border: 1px solid rgba(255, 0, 127, 0.3);
             color: var(--primary);
-            padding: 10px 16px;
+            padding: 8px 14px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             transition: all 0.2s ease;
             white-space: nowrap;
         }
@@ -179,7 +191,8 @@
             padding: 40px 24px;
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            justify-content: space-between;
+            gap: 20px;
         }
 
         .filter-list {
@@ -213,8 +226,10 @@
 
         /* Responsive */
         @media (max-width: 880px) {
-            .card { grid-template-columns: 1fr; }
+            body { height: auto; overflow: auto; }
+            .card { grid-template-columns: 1fr; height: auto; max-height: none; }
             .side { border-left: none; border-top: 1px solid var(--border); padding: 30px; }
+            .output-container { max-height: 400px; }
         }
     </style>
 </head>
@@ -229,10 +244,10 @@
 
         <div>
             <label for="textInput">Input Text</label>
-            <textarea id="textInput" placeholder="Tippe etwas ein, um Schriften zu generieren...">Hello Cyberpunk</textarea>
+            <textarea id="textInput" placeholder="Type something to stylize..."></textarea>
         </div>
 
-        <div>
+        <div class="output-section">
             <label>Styles & Output</label>
             <div class="output-container" id="outputList"></div>
         </div>
@@ -249,23 +264,21 @@
                 <button class="filter-btn" data-filter="dec">Decorated & Fun</button>
             </div>
         </div>
-        <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">
-            <strong>Hinweis:</strong> Unicode-Schriften bestehen aus mathematischen Symbolen. Manche Plattformen/Browser unterstützen eventuell nicht jedes dieser Sonderzeichen.
+        <div style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+            <strong>Notice:</strong> Unicode fonts utilize unique mathematical symbols. Some external social networks or messaging apps might not render every styling variant.
         </div>
     </div>
 </div>
 
 <script>
-    /* High-Performance Unicode Map Library 
-       Maps standard A-Z, a-z, and 0-9 to stylized ranges.
-    */
+    /* High-Performance Unicode Mapping Library */
     const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     const fontMap = {
         // --- Bold & Italic ---
         "sans-bold": {
             name: "Sans Bold", category: "bold",
-            map: "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵"
+            map: "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝑽𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵"
         },
         "serif-bold-italic": {
             name: "Serif Bold Italic", category: "bold",
@@ -273,20 +286,27 @@
         },
         "sans-italic": {
             name: "Sans Italic", category: "bold",
-            map: "𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘲𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡0123456789"
+            map: "𝘢𝘣𝘤𝘥e𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹yj𝘻𝘈𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘲𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡0123456789"
+        },
+
+        // --- Custom Added Fonts & Aesthetics ---
+        "neotokyo": {
+            name: "Neo Tokyo", category: "retro",
+            // Faux-kanji / Faux-kana layout mapping that mirrors latin letters
+            map: "ﾑ乃匚刀乇下gんﾉﾌ KelMn oｱq尺丂ｲu√wﾒﾘ乙ﾑ乃匚刀乇下gんﾉﾌ KelMn oｱq尺丂ｲu√wﾒﾘ乙0123456789"
         },
 
         // --- Script & Gothic ---
         "script": {
-            name: "Cursive / Script", category: "script",
-            map: "𝒶𝒷𝒸𝒹 get𝒽𝒾𝒿𝓀𝓁𝓂𝓃ℴ𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏𝒜ℬ𝒞𝒟ℰℱ𝒢ℋℐ𝒥𝒦ℒℳ𝒩𝒪𝒫𝒬ℛ𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵0123456789"
+            name: "Cursive Script", category: "script",
+            map: "𝒶𝒷𝒸𝒹get𝒽𝒾𝒿𝓀𝓁𝓂𝓃ℴ𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏𝒜ℬ𝒞𝒟ℰℱ𝒢ℋℐ𝒥𝒦ℒℳ𝒩𝒪𝒫𝒬ℛ𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵0123456789"
         },
         "bold-script": {
             name: "Bold Cursive", category: "script",
             map: "𝓪𝒷𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩0123456789"
         },
         "gothic": {
-            name: "Gothic / Fraktur", category: "script",
+            name: "Gothic Fraktur", category: "script",
             map: "𝔞𝔟𝔠𝔡𝔢𝔣𝔤𝔥𝔦𝔨𝔩𝔪𝔫𝔬𝔭𝔮𝔯𝔰𝔱𝔲𝔳𝔴𝔵𝔶𝔷𝔄𝔅ℭ𝔇𝔈𝔉𝔊𝔋ℑ𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔ℜ𝔖𝔗𝔘𝔙𝔚𝔛𝔜battery0123456789"
         },
         "bold-gothic": {
@@ -297,40 +317,55 @@
         // --- Retro & Monospace ---
         "monospace": {
             name: "Monospace", category: "retro",
-            map: "𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝚉𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿"
+            map: "𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕ｍ𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝚉𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿"
         },
         "double-struck": {
-            name: "Double Struck / Outline", category: "retro",
+            name: "Double Struck", category: "retro",
             map: "𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫𝔸𝔹ℂ𝔻𝔼𝔽𝔾ℍ𝕀𝕁𝕂𝕃𝕄ℕ𝕆ℙℚℝ𝕊𝕋𝕌𝕍𝕎𝕏𝕐ℤ𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡"
         },
         "fullwidth": {
-            name: "Vaporwave / Fullwidth", category: "retro",
+            name: "Vaporwave", category: "retro",
             map: "ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ０１２３４５６７８９"
         },
 
         // --- Decorated & Fun ---
         "bubble": {
-            name: "Eingekreist / Bubble", category: "dec",
+            name: "Circle Bubbles", category: "dec",
             map: "ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩⒶⒷⒸⒹⒺⒻ MustⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ⓪①②③④⑤⑥⑦⑧⑨"
         },
         "squared": {
-            name: "Eingerahmt / Squared", category: "dec",
+            name: "Square Blocks", category: "dec",
             map: "🄲🄾🄳🄸🄽🄶🄷🅄🄱🄰🄲🄳🄴🄵🄶🄷🄸🄹🄺🄻🄼🄽🄾🄿🅀🅁🅂🅃🅄🅅🅆🅇🅈🅉🄰🄱🄲🄳🄴🄵🄶🄷🄸🄹🄺🄻🄼🄽🄾🄿🅀🅁🅂🅃🅄🅅🅆🅇🅈🅉0123456789"
         }
     };
 
-    /* Special Combiners & Modifiers functions */
+    /* Special Modifiers, Decorators */
     const specialTransforms = {
+        "smallcaps": {
+            name: "Small Caps", category: "retro",
+            fn: (str) => {
+                const normal = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                const caps = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢ";
+                return str.split("").map(c => {
+                    const idx = normal.indexOf(c);
+                    return idx !== -1 ? caps[idx] : c;
+                }).join("");
+            }
+        },
+        "glitch": {
+            name: "Cyber Glitch", category: "dec",
+            fn: (str) => str.split("").map(char => char + (Math.random() > 0.5 ? "\u0336" : "\u033F")).join("")
+        },
         "strike": {
-            name: "Durchgestrichen / Strike", category: "dec",
+            name: "Strikethrough", category: "dec",
             fn: (str) => str.split("").map(char => char + "\u0336").join("")
         },
         "underline": {
-            name: "Unterstrichen / Underline", category: "dec",
+            name: "Underline", category: "dec",
             fn: (str) => str.split("").map(char => char + "\u0332").join("")
         },
         "upsidedown": {
-            name: "Flipped / Umgedreht", category: "dec",
+            name: "Upside Down", category: "dec",
             fn: (str) => {
                 const normal = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.?!',";
                 const flipped = "ɐqɔpǝɟƃɥıɾʞlɯuodbɹsʇnʌʍxʎzⱯᗺƆᗡƎℲ⅁HIſʞ˥WNOԀΌᴚS┴∩ΛMẌ⅄Z0ƖᄅƐㄣϛ9ㄥ86˙¿¡,Ɀ";
@@ -350,26 +385,24 @@
     let activeFilter = 'all';
 
     function init() {
-        renderSchriften();
+        renderFonts();
         
         // Event Listeners
-        textInput.addEventListener('input', renderSchriften);
+        textInput.addEventListener('input', renderFonts);
         
         filterBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 filterBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 activeFilter = btn.dataset.filter;
-                renderSchriften();
+                renderFonts();
             });
         });
     }
 
-    // Main Conversion Function
+    // Convert standard text with standard Unicode ranges
     function convertText(input, mapString) {
         let result = "";
-        
-        // Array matching for complex unicode mappings
         const mapArray = Array.from(mapString);
         
         for (let i = 0; i < input.length; i++) {
@@ -379,39 +412,41 @@
             if (idx !== -1 && mapArray[idx]) {
                 result += mapArray[idx];
             } else {
-                result += char; // Fallback to normal char
+                result += char;
             }
         }
         return result;
     }
 
-    // Render Outputs dynamically
-    function renderSchriften() {
+    // Render lists on the screen
+    function renderFonts() {
         outputList.innerHTML = '';
-        const rawText = textInput.value || "Tippe etwas ein...";
+        const rawText = textInput.value; // Starts as empty
 
-        // Process Standard Font Maps
+        // 1. Process Standard Maps
         Object.keys(fontMap).forEach(key => {
             const style = fontMap[key];
-            
             if (activeFilter !== 'all' && style.category !== activeFilter) return;
 
-            const converted = convertText(rawText, style.map);
+            // If text input is empty, convert the Font's Name itself as a preview
+            const textToConvert = rawText !== "" ? rawText : style.name;
+            const converted = convertText(textToConvert, style.map);
             createRow(style.name, converted);
         });
 
-        // Process Special Modifier Functions
+        // 2. Process Special Modifiers
         Object.keys(specialTransforms).forEach(key => {
             const style = specialTransforms[key];
-
             if (activeFilter !== 'all' && style.category !== activeFilter) return;
 
-            const converted = style.fn(rawText);
+            // If text input is empty, pass the Font's Name itself as a preview
+            const textToConvert = rawText !== "" ? rawText : style.name;
+            const converted = style.fn(textToConvert);
             createRow(style.name, converted);
         });
     }
 
-    // Helper to create UI row elements
+    // Create single rows inside the scrolling view
     function createRow(name, content) {
         const row = document.createElement('div');
         row.className = 'font-row';
@@ -451,7 +486,7 @@
         outputList.appendChild(row);
     }
 
-    // Run on startup
+    // Initialize application
     init();
 </script>
 </body>
