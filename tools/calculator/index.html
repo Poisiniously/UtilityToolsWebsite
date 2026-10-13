@@ -33,7 +33,7 @@
             padding: 40px;
         }
 
-        /* Das Dashboard füllt den Bildschirm elegant aus (max 1400px für perfekte Ergonomie) */
+        /* The dashboard fills the screen while maintaining comfortable proportions (max. 1400px) */
         .workspace {
             display: grid;
             grid-template-columns: 350px 1fr;
@@ -48,7 +48,7 @@
             backdrop-filter: blur(20px);
         }
 
-        /* LINKE SEITE: Die Historie vergangener Rechnungen */
+        /* LEFT SIDE: Calculation history */
         .history-panel {
             border-right: 1px solid var(--border-color);
             padding: 2.5rem;
@@ -130,7 +130,7 @@
         }
         .main-display::-webkit-scrollbar { display: none; }
 
-        /* Großzügiges Desktop-Tasten-Grid */
+        /* Spacious desktop button grid */
         .buttons-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -210,7 +210,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Schöne Scrollbar für die Historie */
+        /* Custom scrollbar for the history panel */
         .history-log::-webkit-scrollbar { width: 4px; }
         .history-log::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
     </style>
@@ -219,7 +219,7 @@
 
     <div class="workspace">
         <div class="history-panel">
-            <div class="history-title">Verlauf</div>
+            <div class="history-title">History</div>
             <div class="history-log" id="historyLog">
                 </div>
         </div>
