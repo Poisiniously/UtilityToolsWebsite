@@ -176,25 +176,25 @@
 <body>
     <div class="app">
         <h2>QR Code Generator</h2>
-        <p class="subtitle">Der QR-Code wird live beim Tippen generiert.</p>
+        <p class="subtitle">The QR code is generated as you type.</p>
 
         <div class="preview">
             <div id="qrcode-container">
                 <div id="qrcode"></div>
             </div>
             <div id="empty" class="empty-state">
-                Der QR-Code erscheint hier
+                Your QR code will appear here
             </div>
         </div>
 
         <div class="input-group">
-            <label for="text">Text oder URL</label>
-            <textarea id="text" placeholder="Gib hier den Text oder die URL ein, die in den QR-Code soll..."></textarea>
+            <label for="text">Text or URL</label>
+            <textarea id="text" placeholder="Enter the text or URL to encode as a QR code..."></textarea>
         </div>
 
         <div class="controls">
-            <button onclick="clearInput()" class="btn-clear">Löschen</button>
-            <button onclick="downloadQR()" class="btn-download" id="downloadBtn" disabled>Als PNG herunterladen</button>
+            <button onclick="clearInput()" class="btn-clear">Clear</button>
+            <button onclick="downloadQR()" class="btn-download" id="downloadBtn" disabled>Download as PNG</button>
         </div>
     </div>
 

@@ -5,7 +5,7 @@
     const iframe = document.getElementById('toolFrame');
     const spinner = document.getElementById('popupSpinner');
     
-    // NEU: Scrollen der Hauptseite verhindern
+    // NEW: Prevent scrolling on the main page
     document.body.style.overflow = 'hidden';
     
     spinner.style.opacity = '1';
@@ -20,7 +20,7 @@
     const popup = document.getElementById('popup');
     const iframe = document.getElementById('toolFrame');
     
-    // NEU: Scrollen der Hauptseite wieder erlauben
+    // NEW: Re-enable scrolling on the main page
     document.body.style.overflow = 'auto';
     
     if (document.fullscreenElement) {
