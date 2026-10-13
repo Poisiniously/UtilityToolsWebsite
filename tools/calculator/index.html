@@ -293,16 +293,59 @@
             updateDisplay();
         }
 
+        // Evaluate arithmetic without executing dynamically generated JavaScript.
+        function evaluateExpression(expression) {
+            const tokens = expression.match(/\d+(?:\.\d*)?|\.\d+|[()+\-*/]/g) || [];
+            if (tokens.join('') !== expression.replace(/\s+/g, '') || tokens.length === 0) {
+                throw new Error('Invalid expression');
+            }
+
+            let index = 0;
+            function parsePrimary() {
+                const token = tokens[index++];
+                if (token === '+') return parsePrimary();
+                if (token === '-') return -parsePrimary();
+                if (token === '(') {
+                    const value = parseExpression();
+                    if (tokens[index++] !== ')') throw new Error('Missing closing parenthesis');
+                    return value;
+                }
+                if (token === undefined || !/^\d+(?:\.\d*)?$|^\.\d+$/.test(token)) {
+                    throw new Error('Expected a number');
+                }
+                return Number(token);
+            }
+            function parseTerm() {
+                let value = parsePrimary();
+                while (tokens[index] === '*' || tokens[index] === '/') {
+                    const operator = tokens[index++];
+                    const right = parsePrimary();
+                    if (operator === '/' && right === 0) throw new Error('Division by zero');
+                    value = operator === '*' ? value * right : value / right;
+                }
+                return value;
+            }
+            function parseExpression() {
+                let value = parseTerm();
+                while (tokens[index] === '+' || tokens[index] === '-') {
+                    const operator = tokens[index++];
+                    const right = parseTerm();
+                    value = operator === '+' ? value + right : value - right;
+                }
+                return value;
+            }
+
+            const result = parseExpression();
+            if (index !== tokens.length || !Number.isFinite(result)) throw new Error('Invalid result');
+            return result;
+        }
+
         function calculate() {
             try {
                 const rawExpression = currentInput;
-                let result = Function('"use strict";return (' + rawExpression + ')')();
-                
-                if (result % 1 !== 0) {
-                    result = parseFloat(result.toFixed(8));
-                }
+                let result = evaluateExpression(rawExpression);
+                if (!Number.isInteger(result)) result = Number(result.toFixed(8));
 
-                // Schön formatierte mathematische Zeichen für die Historie
                 const formattedExpr = rawExpression
                     .replace(/\*/g, ' × ')
                     .replace(/\//g, ' ÷ ')
@@ -310,7 +353,6 @@
                     .replace(/\-/g, ' − ');
 
                 addHistoryItem(formattedExpr, result);
-
                 preview.textContent = formattedExpr + ' =';
                 currentInput = result.toString();
                 isResultDisplayed = true;
@@ -332,10 +374,13 @@
         function addHistoryItem(expr, res) {
             const item = document.createElement('div');
             item.className = 'history-item';
-            item.innerHTML = `
-                <div class="history-expr">${expr}</div>
-                <div class="history-res">${res}</div>
-            `;
+            const expression = document.createElement('div');
+            expression.className = 'history-expr';
+            expression.textContent = expr;
+            const result = document.createElement('div');
+            result.className = 'history-res';
+            result.textContent = String(res);
+            item.append(expression, result);
             historyLog.insertBefore(item, historyLog.firstChild);
         }
     </script>
