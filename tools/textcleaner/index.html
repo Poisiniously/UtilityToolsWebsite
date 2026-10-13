@@ -129,22 +129,22 @@
 
 <div class="container">
     <h1>Textcleaner</h1>
-    <p class="subtitle">Füge deinen Text ein und bereinige ihn mit nur einem Klick.</p>
+    <p class="subtitle">Paste your text and clean it up with a single click.</p>
 
-    <textarea id="textInput" placeholder="Füge deinen Text hier ein..."></textarea>
+    <textarea id="textInput" placeholder="Paste your text here..."></textarea>
 
     <div class="button-grid">
-        <button onclick="removeLineBreaks()">Zeilenumbrüche entfernen</button>
-        <button onclick="removeDoubleSpaces()">Doppelte Leerzeichen</button>
-        <button onclick="toUpperCase()">ALLES GROSS</button>
-        <button onclick="toLowerCase()">alles klein</button>
-        <button onclick="stripHTML()">HTML-Tags entfernen</button>
-        <button onclick="clearText()">Text löschen</button>
+        <button onclick="removeLineBreaks()">Remove line breaks</button>
+        <button onclick="removeDoubleSpaces()">Remove extra spaces</button>
+        <button onclick="toUpperCase()">UPPERCASE</button>
+        <button onclick="toLowerCase()">lowercase</button>
+        <button onclick="stripHTML()">Remove HTML tags</button>
+        <button onclick="clearText()">Clear text</button>
         
-        <button class="action-copy" onclick="copyToClipboard()">Text kopieren</button>
+        <button class="action-copy" onclick="copyToClipboard()">Copy text</button>
     </div>
 
-    <div id="status" class="status-msg">Erfolgreich kopiert!</div>
+    <div id="status" class="status-msg">Copied successfully!</div>
 </div>
 
 <script>
