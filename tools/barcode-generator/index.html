@@ -76,14 +76,14 @@
 
 <div class="card">
     <div class="title">Barcode Generator</div>
-    <input type="text" id="barcodeInput" placeholder="Text oder Nummer eingeben..." value="">
+    <input type="text" id="barcodeInput" placeholder="Enter text or a number..." value="">
     <div id="barcodeContainer">
         <svg id="barcode"></svg>
     </div>
-    <div class="hint">Unterstützt Code128 Format</div>
+    <div class="hint">Supports Code 128 format</div>
 </div>
 
-<!-- Einbindung der JS-Bibliothek für Barcodes -->
+<!-- Include the barcode JavaScript library -->
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 <script>
     const input = document.getElementById('barcodeInput');
