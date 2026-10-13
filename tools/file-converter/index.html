@@ -371,7 +371,7 @@
                 throw new Error("The selected SVG is invalid.");
             }
 
-            parsed.querySelectorAll("script, foreignObject, iframe, object, embed, audio, video").forEach(node => node.remove());
+            parsed.querySelectorAll("script, style, foreignObject, iframe, object, embed, audio, video").forEach(node => node.remove());
             parsed.querySelectorAll("*").forEach(node => {
                 Array.from(node.attributes).forEach(attribute => {
                     const name = attribute.name.toLowerCase();
@@ -382,8 +382,7 @@
                         value !== "" &&
                         !/^data:image\/(png|jpeg|jpg|gif|webp);base64,/i.test(value)) {
                         node.removeAttribute(attribute.name);
-                    } else if ((name === "style" || name === "fill" || name === "filter") &&
-                        /url\s*\(|expression\s*\(|@import/i.test(value)) {
+                    } else if (/url\s*\(|expression\s*\(|@import/i.test(value)) {
                         node.removeAttribute(attribute.name);
                     }
                 });
