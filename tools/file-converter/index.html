@@ -240,6 +240,12 @@
         });
 
         function registerFile(file) {
+            if (!file) return;
+            if (file.size > 50 * 1024 * 1024) {
+                alert("Please choose a file smaller than 50 MB.");
+                fileInput.value = "";
+                return;
+            }
             currentFile = file;
             currentBlob = null;
             const extension = file.name.split(".").pop().toLowerCase();
@@ -269,6 +275,15 @@
                 }
             }
 
+            if (availableTargets.length === 0) {
+                const option = document.createElement("option");
+                option.value = "";
+                option.textContent = "No supported target format";
+                format.appendChild(option);
+                convertBtn.disabled = true;
+                return;
+            }
+            convertBtn.disabled = false;
             availableTargets.forEach(type => {
                 const option = document.createElement("option");
                 option.value = type;
@@ -279,6 +294,7 @@
 
         convertBtn.addEventListener("click", async () => {
             if (!currentFile) { alert("Select a file first."); return; }
+            if (!format.value) { alert("No supported target format is available for this file."); return; }
 
             const extension = currentFile.name.split(".").pop().toLowerCase();
             const target = format.value;
@@ -298,8 +314,8 @@
                     await convertText(extension, target);
                 }
             } catch (err) {
-                console.error(err);
-                alert("Conversion failed. Ensure the file is not corrupted.");
+                console.error("File conversion failed:", err);
+                alert("Conversion failed: " + (err && err.message ? err.message : "The file may be unsupported or corrupted."));
             } finally {
                 convertBtn.textContent = "Convert File";
                 convertBtn.disabled = false;
@@ -331,13 +347,47 @@
                     output = result.value;
                 }
             } else if (ext === "odt" && target === "txt") {
+                if (typeof JSZip === "undefined") throw new Error("ODT support library is unavailable.");
                 const zip = await JSZip.loadAsync(currentFile);
-                const xml = await zip.file("content.xml").async("string");
-                output = xml.replace(/<text:p[^>]*>/g, '\n').replace(/<[^>]+>/g, '');
+                const contentFile = zip.file("content.xml");
+                if (!contentFile) throw new Error("This ODT file has no content.xml document.");
+                const xml = await contentFile.async("string");
+                const documentXml = new DOMParser().parseFromString(xml, "application/xml");
+                if (documentXml.querySelector("parsererror")) throw new Error("The ODT document contains invalid XML.");
+                output = Array.from(documentXml.getElementsByTagName("*"))
+                    .filter(node => node.localName === "p" || node.localName === "h")
+                    .map(node => node.textContent || "")
+                    .join("\n");
             }
 
             currentBlob = new Blob([output], { type: mime });
             downloadBtn.style.display = "block";
+        }
+
+        // Remove active content and external references before rendering user-supplied SVG files.
+        function sanitizeSvg(svgText) {
+            const parsed = new DOMParser().parseFromString(svgText, "image/svg+xml");
+            if (parsed.querySelector("parsererror") || !parsed.documentElement || parsed.documentElement.localName !== "svg") {
+                throw new Error("The selected SVG is invalid.");
+            }
+
+            parsed.querySelectorAll("script, style, foreignObject, iframe, object, embed, audio, video").forEach(node => node.remove());
+            parsed.querySelectorAll("*").forEach(node => {
+                Array.from(node.attributes).forEach(attribute => {
+                    const name = attribute.name.toLowerCase();
+                    const value = attribute.value.trim();
+                    if (name.startsWith("on")) {
+                        node.removeAttribute(attribute.name);
+                    } else if ((name === "href" || name === "xlink:href") &&
+                        value !== "" &&
+                        !/^data:image\/(png|jpeg|jpg|gif|webp);base64,/i.test(value)) {
+                        node.removeAttribute(attribute.name);
+                    } else if (/url\s*\(|expression\s*\(|@import/i.test(value)) {
+                        node.removeAttribute(attribute.name);
+                    }
+                });
+            });
+            return new XMLSerializer().serializeToString(parsed.documentElement);
         }
 
         // 3. Image Rasterization
@@ -358,11 +408,16 @@
                         }
                         ctx.drawImage(img, 0, 0);
 
+                        const mimeType = target === "jpg" ? "image/jpeg" : "image/" + target;
                         canvas.toBlob(blob => {
+                            if (!blob) {
+                                reject(new Error("This image format is not supported by the browser."));
+                                return;
+                            }
                             currentBlob = blob;
                             downloadBtn.style.display = "block";
                             resolve();
-                        }, "image/" + (target === "jpg" ? "jpeg" : target), 0.95);
+                        }, mimeType, 0.95);
                     };
                     img.onerror = reject;
                     img.src = e.target.result;
@@ -372,9 +427,15 @@
                 if (ext === "svg") {
                     const textReader = new FileReader();
                     textReader.onload = evt => {
-                        const svgBlob = new Blob([evt.target.result], {type: 'image/svg+xml;charset=utf-8'});
-                        reader.readAsDataURL(svgBlob);
+                        try {
+                            const safeSvg = sanitizeSvg(evt.target.result);
+                            const svgBlob = new Blob([safeSvg], {type: 'image/svg+xml;charset=utf-8'});
+                            reader.readAsDataURL(svgBlob);
+                        } catch (error) {
+                            reject(error);
+                        }
                     };
+                    textReader.onerror = reject;
                     textReader.readAsText(currentFile);
                 } else {
                     reader.readAsDataURL(currentFile);
@@ -427,6 +488,44 @@
         }
 
         // 4. Standard Text & Code Conversion
+        function parseCsv(text) {
+            const rows = [];
+            let row = [];
+            let cell = "";
+            let quoted = false;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (char === '"') {
+                    if (quoted && text[i + 1] === '"') {
+                        cell += '"';
+                        i++;
+                    } else {
+                        quoted = !quoted;
+                    }
+                } else if (char === "," && !quoted) {
+                    row.push(cell);
+                    cell = "";
+                } else if ((char === "\n" || char === "\r") && !quoted) {
+                    if (char === "\r" && text[i + 1] === "\n") i++;
+                    row.push(cell);
+                    if (row.some(value => value !== "")) rows.push(row);
+                    row = [];
+                    cell = "";
+                } else {
+                    cell += char;
+                }
+            }
+            if (quoted) throw new Error("CSV contains an unclosed quoted field.");
+            row.push(cell);
+            if (row.some(value => value !== "")) rows.push(row);
+            return rows;
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+        }
+
         function convertText(ext, target) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -437,16 +536,16 @@
 
                     // Handle specific data conversions
                     if (ext === "csv" && target === "json") {
-                        const lines = text.trim().split("\n");
-                        if (lines.length > 0) {
-                            const headers = lines.shift().split(",");
-                            const data = lines.map(line => {
-                                const values = line.split(",");
-                                let obj = {};
-                                headers.forEach((h, i) => { obj[h.trim()] = values[i]?.trim() || ""; });
+                        const rows = parseCsv(text);
+                        if (rows.length > 0) {
+                            const headers = rows.shift().map((header, index) => (index === 0 ? header.replace(/^\uFEFF/, "") : header).trim());
+                            const data = rows.map(values => {
+                                const obj = {};
+                                headers.forEach((header, i) => { obj[header] = values[i] ?? ""; });
                                 return obj;
                             });
                             output = JSON.stringify(data, null, 2);
+                            mime = "application/json";
                         }
                     } else if (ext === "json" && target === "csv") {
                         try {
@@ -456,7 +555,10 @@
                                 const headers = Object.keys(arr[0]);
                                 const csvRows = [headers.join(",")];
                                 for (const row of arr) {
-                                    const values = headers.map(header => `"${row[header] ? String(row[header]).replace(/"/g, '""') : ''}"`);
+                                    const values = headers.map(header => {
+                                        const value = row[header] == null ? "" : String(row[header]);
+                                        return '"' + value.replace(/"/g, '""') + '"';
+                                    });
                                     csvRows.push(values.join(","));
                                 }
                                 output = csvRows.join("\n");
@@ -466,13 +568,16 @@
                             return;
                         }
                     } else if (ext === "md" && target === "html") {
-                        output = text
-                            .replace(/^# (.*)$/gm, "<h1>$1</h1>")
-                            .replace(/^## (.*)$/gm, "<h2>$1</h2>")
+                        // This lightweight Markdown conversion intentionally does not allow raw HTML.
+                        output = escapeHtml(text)
                             .replace(/^### (.*)$/gm, "<h3>$1</h3>")
+                            .replace(/^## (.*)$/gm, "<h2>$1</h2>")
+                            .replace(/^# (.*)$/gm, "<h1>$1</h1>")
                             .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
                             .replace(/\*(.*?)\*/g, "<em>$1</em>")
                             .replace(/\n/g, "<br>");
+                    } else if (target === "html") {
+                        output = "<!doctype html><html><head><meta charset=\"utf-8\"><title>Converted document</title></head><body><pre>" + escapeHtml(text) + "</pre></body></html>";
                     } 
                     // SVG Routing for Images vs. Text
                     else if (target === "svg") {
@@ -510,12 +615,13 @@
             const a = document.createElement("a");
             const url = URL.createObjectURL(currentBlob);
             a.href = url;
-            const name = currentFile.name.substring(0, currentFile.name.lastIndexOf("."));
+            const dotIndex = currentFile.name.lastIndexOf(".");
+            const name = dotIndex > 0 ? currentFile.name.substring(0, dotIndex) : currentFile.name;
             a.download = name + "." + format.value;
             document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            a.remove();
+            window.setTimeout(() => URL.revokeObjectURL(url), 1000);
         });
     </script>
 </body>
